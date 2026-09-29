@@ -1,0 +1,796 @@
+{
+  "version": "2026-09-28",
+  "vigencia": "79 modelos",
+  "productos": [
+    {
+      "modelo": "NTW4519JW",
+      "marca": "AMANA",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "3.5 CF TOP LOAD",
+      "nota": "",
+      "precio": 370,
+      "precio_volumen": 365,
+      "regla": "mismo_modelo"
+    },
+    {
+      "modelo": "NED4655EW",
+      "marca": "AMANA",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "6.5 CF ELECTRIC DRYER",
+      "nota": "",
+      "precio": 370,
+      "precio_volumen": 365,
+      "regla": "mismo_modelo"
+    },
+    {
+      "modelo": "NGD4655EW",
+      "marca": "AMANA",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "6.5 CF GAS DRYER",
+      "nota": "",
+      "precio": 375,
+      "precio_volumen": 365,
+      "regla": "mismo_modelo"
+    },
+    {
+      "modelo": "WTW4955HW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "3.8 CF TOP LOAD",
+      "nota": "",
+      "precio": 389,
+      "precio_volumen": 379,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WGD4815EW",
+      "marca": "WHIRLPOOL",
+      "categoria": "DRYERS",
+      "descripcion": "DRYERS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 385,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WTW4105SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "4.0 CF TOP LOAD",
+      "nota": "",
+      "precio": 399,
+      "precio_volumen": 389,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WTW4107SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "4.2 - 4.3 CF TOP LOAD",
+      "nota": "",
+      "precio": 445,
+      "precio_volumen": 435,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WED4105SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.0 CF ELECTRIC / ADAPTIVE DRY",
+      "nota": "",
+      "precio": 429,
+      "precio_volumen": 419,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WGD4105SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.0 CF GAS / ADAPTIVE DRY",
+      "nota": "",
+      "precio": 429,
+      "precio_volumen": 419,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MVW4005SW",
+      "marca": "MAYTAG",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "3.8 CF TOP LOAD",
+      "nota": "",
+      "precio": 445,
+      "precio_volumen": 435,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MED4005SW",
+      "marca": "MAYTAG",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.0 CF ELEC. WRINKLE PREVENT",
+      "nota": "",
+      "precio": 420,
+      "precio_volumen": 410,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MGD4005SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.0 CF GAS WRINKLE PREVENT",
+      "nota": "",
+      "precio": 420,
+      "precio_volumen": 410,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WED5010LW",
+      "marca": "WHIRLPOOL",
+      "categoria": "DRYERS",
+      "descripcion": "7.0 CF ELECT. MOISTURE SENSING DRY",
+      "nota": "Liquidación",
+      "precio": 499,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WGD5010LW",
+      "marca": "WHIRLPOOL",
+      "categoria": "DRYERS",
+      "descripcion": "7.0 CF GAS MOISTURE SENSING DRY",
+      "nota": "Liquidación",
+      "precio": 499,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MVWP586GW",
+      "marca": "MAYTAG",
+      "categoria": "T-01 WASHERS",
+      "descripcion": "3.5 CF TOP L. 5 YEAR WA.",
+      "nota": "",
+      "precio": 699,
+      "precio_volumen": 689,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MEDP586KW",
+      "marca": "MAYTAG",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.4 CF ELEC. COMMERCIAL GRADE RESIDENCIAL",
+      "nota": "",
+      "precio": 645,
+      "precio_volumen": 635,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MGDP586KW",
+      "marca": "MAYTAG",
+      "categoria": "T-07 DRYERS",
+      "descripcion": "7.4 CF GAS COMMERCIAL GRADE RESIDENCIAL",
+      "nota": "",
+      "precio": 645,
+      "precio_volumen": 635,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWW1002B",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "20\" 4 BURNERS",
+      "nota": "",
+      "precio": 188,
+      "precio_volumen": 182,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWW1002Q",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "20\" 4 BURNERS",
+      "nota": "",
+      "precio": 188,
+      "precio_volumen": 182,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LAGR2110B",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 6 BURNERS PORCELAIN COOKTOP",
+      "nota": "",
+      "precio": 290,
+      "precio_volumen": 280,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LAGR4130G",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 6 BURNERS 5.1 CF OVEN",
+      "nota": "",
+      "precio": 320,
+      "precio_volumen": 315,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWFR3100Q",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 6 BURNERS 5.1 CF OVEN",
+      "nota": "Exceso",
+      "precio": 365,
+      "precio_volumen": 360,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWFR3100B",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 6 BURNERS 5.1 CF OVEN",
+      "nota": "",
+      "precio": 385,
+      "precio_volumen": 375,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWFR7000S",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 6 BURNERS 5.1 CF OVEN WITH CAPELO GLASS TOP",
+      "nota": "Liquidación",
+      "precio": null,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "AGR6303MMS",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "",
+      "precio": 535,
+      "precio_volumen": 525,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "AEP222VAW",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "20\" 2.6 CF ELECTRIC 4 BURNER",
+      "nota": "",
+      "precio": 437,
+      "precio_volumen": 427,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "AER6303MMS",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 4.8 CF ELECT. Temp Assure™ Cooking System",
+      "nota": "",
+      "precio": 580,
+      "precio_volumen": 570,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFES3030RW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
+      "nota": "",
+      "precio": 565,
+      "precio_volumen": 555,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFES3030RB",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
+      "nota": "",
+      "precio": 565,
+      "precio_volumen": 555,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFES3030RS",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
+      "nota": "",
+      "precio": 595,
+      "precio_volumen": 585,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWFRE1330D",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" SLIDE-IN Tecnologia Ever Clean",
+      "nota": "",
+      "precio": 580,
+      "precio_volumen": 570,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWFRE2450D",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30\" SLIDE-IN Tecnologia Ever Clean",
+      "nota": "",
+      "precio": 615,
+      "precio_volumen": 599,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WT02409D",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "9 CF XPERT INVERTER",
+      "nota": "",
+      "precio": 320,
+      "precio_volumen": 310,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WT1130M",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "11.3 CF XPERT ENERGY",
+      "nota": "",
+      "precio": 470,
+      "precio_volumen": 460,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WT1133M",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "11.3 CF XPERT ENERGY DISP.",
+      "nota": "",
+      "precio": 475,
+      "precio_volumen": 465,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRT112CZJW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "24\" 11.6 CF COUNTER DEPTH",
+      "nota": "",
+      "precio": 485,
+      "precio_volumen": 475,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRT112CZJZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "24\" 11.6 CF COUNTER DEPTH",
+      "nota": "",
+      "precio": 505,
+      "precio_volumen": 495,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "ARTX2419SW",
+      "marca": "AMANA",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "19 CF ENERGY STAR",
+      "nota": "",
+      "precio": 548,
+      "precio_volumen": 535,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "ARTX2419SZ",
+      "marca": "AMANA",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "19 CF ENERGY STAR",
+      "nota": "",
+      "precio": 571,
+      "precio_volumen": 557,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRT108FFDM",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "T-03 REFRIGERATION",
+      "nota": "Liquidación",
+      "precio": 579,
+      "precio_volumen": 555,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRT518SZFM",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "28\" 18 CF Adjustable Door Bins",
+      "nota": "Liquidación",
+      "precio": 635,
+      "precio_volumen": 625,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRTX3019SW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "30\" 19 CF Total Coverage Cooling",
+      "nota": "",
+      "precio": 605,
+      "precio_volumen": 590,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRTX5419SZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "19 CF ENERGY STAR",
+      "nota": "Liquidación",
+      "precio": 638,
+      "precio_volumen": 620,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRS312SNHM",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "SXS 33\" 22 CF",
+      "nota": "",
+      "precio": 785,
+      "precio_volumen": 775,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "ASI2575GRS",
+      "marca": "AMANA",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "SXS 36\" 25 CF",
+      "nota": "Exceso",
+      "precio": 1013,
+      "precio_volumen": 978,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRF560SEHZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "FRENCH DOOR 30\" 20 CF",
+      "nota": "",
+      "precio": 1063,
+      "precio_volumen": 1038,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRS325SDHZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "SXS 36\" 25 CF",
+      "nota": "",
+      "precio": 1125,
+      "precio_volumen": 1110,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRQA59CNKZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "36\" 19.4 CF COUNTER DEPTH 4 DOOR",
+      "nota": "",
+      "precio": 1160,
+      "precio_volumen": 1145,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRFF3436RZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "25 cf Max. Ice Capacity 3.7lb",
+      "nota": "",
+      "precio": 1599,
+      "precio_volumen": 1579,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRFF3536SZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "30 cf Indoor Ice",
+      "nota": "",
+      "precio": 1340,
+      "precio_volumen": 1320,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WM1807B",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": ".7 CF BLACK",
+      "nota": "",
+      "precio": 56,
+      "precio_volumen": 54,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WM1811D",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "1.1 CF SILVER",
+      "nota": "",
+      "precio": 83,
+      "precio_volumen": 80,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WM1811B",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "1.1 CF BLACK",
+      "nota": "",
+      "precio": 83,
+      "precio_volumen": 80,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WMMS3130RS",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "30-inch Microhood - 1.7 cu. ft.",
+      "nota": "",
+      "precio": 243,
+      "precio_volumen": 237,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WMMS3130RW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "30-inch Microhood - 1.7 cu. ft.",
+      "nota": "",
+      "precio": 235,
+      "precio_volumen": 230,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WMMS3130RZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "30-inch Microhood - 1.7 cu. ft.",
+      "nota": "",
+      "precio": 251,
+      "precio_volumen": 245,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WCE55US0HB",
+      "marca": "WHIRLPOOL",
+      "categoria": "COOKTOPS",
+      "descripcion": "30-inch Electric Ceramic",
+      "nota": "",
+      "precio": 400,
+      "precio_volumen": 390,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WCE55US0HS",
+      "marca": "WHIRLPOOL",
+      "categoria": "COOKTOPS",
+      "descripcion": "30-inch Electric Ceramic",
+      "nota": "",
+      "precio": 417,
+      "precio_volumen": 407,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WCGK5030PS",
+      "marca": "WHIRLPOOL",
+      "categoria": "COOKTOPS",
+      "descripcion": "30-inch Electric Ceramic",
+      "nota": "",
+      "precio": 388,
+      "precio_volumen": 379,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WCGK5030PB",
+      "marca": "WHIRLPOOL",
+      "categoria": "COOKTOPS",
+      "descripcion": "30-inch Electric Ceramic",
+      "nota": "",
+      "precio": 356,
+      "precio_volumen": 348,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WH7610D",
+      "marca": "WHIRLPOOL",
+      "categoria": "HOODS",
+      "descripcion": "30-inch wall hood",
+      "nota": "",
+      "precio": 117,
+      "precio_volumen": 114,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KCED600GBL",
+      "marca": "KITCHENAID",
+      "categoria": "COOKTOPS",
+      "descripcion": "COOKTOPS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1073,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KCED606GBL",
+      "marca": "KITCHENAID",
+      "categoria": "COOKTOPS",
+      "descripcion": "COOKTOPS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1312,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KCES556HBL",
+      "marca": "KITCHENAID",
+      "categoria": "COOKTOPS",
+      "descripcion": "COOKTOPS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 637,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KCGS550ESS",
+      "marca": "KITCHENAID",
+      "categoria": "COOKTOPS",
+      "descripcion": "COOKTOPS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 599,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KRFC704FPS",
+      "marca": "KITCHENAID",
+      "categoria": "REFRIGERATORS",
+      "descripcion": "REFRIGERATORS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 4381,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KSEB900ESS",
+      "marca": "KITCHENAID",
+      "categoria": "RANGES",
+      "descripcion": "RANGES",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1897,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KSGB900ESS",
+      "marca": "KITCHENAID",
+      "categoria": "RANGES",
+      "descripcion": "RANGES",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1935,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KUWR214KSB",
+      "marca": "KITCHENAID",
+      "categoria": "REFRIGERATORS",
+      "descripcion": "WINE CELLAR",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1622,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "KXD4630YSS",
+      "marca": "KITCHENAID",
+      "categoria": "HOODS",
+      "descripcion": "HOOD 30\" Retractable Downdraft",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 842,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LKUIX535PPS",
+      "marca": "KITCHENAID",
+      "categoria": "ICE MAKER",
+      "descripcion": "ICE MAKER",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1533,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MED6500MW",
+      "marca": "MAYTAG",
+      "categoria": "DRYERS",
+      "descripcion": "DRYERS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 743,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MER4600LS",
+      "marca": "MAYTAG",
+      "categoria": "RANGES",
+      "descripcion": "RANGES",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 645,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MGD6500MBK",
+      "marca": "MAYTAG",
+      "categoria": "DRYERS",
+      "descripcion": "DRYERS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 615,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "MTK2230PZ",
+      "marca": "MAYTAG",
+      "categoria": "ACCESORIES",
+      "descripcion": "ACCESORIES",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 83,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "UVL5430JSS",
+      "marca": "WHIRLPOOL",
+      "categoria": "HOODS",
+      "descripcion": "HOODS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 553,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WCI55US0JB",
+      "marca": "WHIRLPOOL",
+      "categoria": "COOKTOPS INDUCTION",
+      "descripcion": "COOKTOPS INDUCTION",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 764,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WEG745H0LZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "RANGES",
+      "descripcion": "RANGES",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1119,
+      "precio_volumen": null,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WOS72EC7HS",
+      "marca": "WHIRLPOOL",
+      "categoria": "OVENS",
+      "descripcion": "OVENS",
+      "nota": "Solo inv disp en Lewar",
+      "precio": 1213,
+      "precio_volumen": null,
+      "regla": "combinable"
+    }
+  ]
+}
