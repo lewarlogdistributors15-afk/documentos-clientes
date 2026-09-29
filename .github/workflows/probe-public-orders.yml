@@ -1,0 +1,14 @@
+name: Probe public order registry
+on:
+  push:
+    paths:
+      - ".github/workflows/probe-public-orders.yml"
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public read
+        shell: bash
+        run: |
+          curl -sS -i 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro?offset=0' \
+            -H 'Origin: https://lewarlogdistributors15-afk.github.io'
