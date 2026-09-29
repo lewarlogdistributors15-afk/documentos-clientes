@@ -1,26 +1,16 @@
-name: Inspect Formly setup
+name: Configure free form email
 on:
   push:
     paths:
       - ".github/workflows/inspect-formly.yml"
 jobs:
-  inspect:
+  configure:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect public setup form
+      - name: Request access key for Lewar credit inbox
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL -A "Mozilla/5.0" https://formly.email/ -o /tmp/formly.html
-          echo "=== forms ==="
-          grep -Eio '<form[^>]*>|</form>|action="[^"]*"|method="[^"]*"' /tmp/formly.html | head -100 || true
-          echo "=== access/key context ==="
-          python3 - <<'PY'
-          import re
-          s=open('/tmp/formly.html',encoding='utf-8',errors='ignore').read()
-          for m in re.finditer(r'(?i).{0,300}(access.?key|get.?key|generate.?key).{0,500}',s):
-              print(m.group(0)[:1200].replace('><','>\n<'))
-          print("=== scripts ===")
-          for x in re.findall(r'<script[^>]+src=["\']([^"\']+)',s,re.I):
-              print(x)
-          PY
+          echo "Requesting Formly access key for Lewar credit inbox"
+          curl -fsS -A "Mozilla/5.0" -X POST             -H "Content-Type: application/x-www-form-urlencoded"             --data-urlencode "email=lewarcorpcredito@gmail.com"             https://formly.email/api/access-key
+          echo
