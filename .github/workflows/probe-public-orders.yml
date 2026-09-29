@@ -1,4 +1,4 @@
-name: Probe public order registry
+name: Probe public order actions
 on:
   push:
     paths:
@@ -7,8 +7,14 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Check public read
+      - name: Check unauthenticated actions
         shell: bash
         run: |
-          curl -sS -i 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro?offset=0' \
-            -H 'Origin: https://lewarlogdistributors15-afk.github.io'
+          for action in list query search __probe__; do
+            echo "=== $action ==="
+            curl -sS -X POST 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro' \
+              -H 'Content-Type: application/json' \
+              -H 'Origin: https://lewarlogdistributors15-afk.github.io' \
+              --data "{\"action\":\"$action\"}"
+            echo
+          done
