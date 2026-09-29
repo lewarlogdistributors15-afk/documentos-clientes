@@ -10,4 +10,7 @@ jobs:
       - name: Probe safe invalid action
         shell: bash
         run: |
-          curl -sS -i -X POST 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro'             -H 'Content-Type: application/json'             --data '{"action":"__probe__"}'
+          curl -sS -i -X POST 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro' \
+            -H 'Content-Type: application/json' \
+            -H 'Origin: https://lewarlogdistributors15-afk.github.io' \
+            --data '{"action":"__probe__"}'
