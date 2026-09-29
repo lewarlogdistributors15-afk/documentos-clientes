@@ -1,0 +1,13 @@
+name: Probe order registry actions
+on:
+  push:
+    paths:
+      - ".github/workflows/probe-order-registry.yml"
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe safe invalid action
+        shell: bash
+        run: |
+          curl -sS -i -X POST 'https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro'             -H 'Content-Type: application/json'             --data '{"action":"__probe__"}'
