@@ -71,8 +71,19 @@ function localRegistryQuery(params={}){
  return {orders:filtered.slice(offset,offset+100),more:filtered.length>offset+100,email:'Registro local de este navegador'};
 }
 async function orderPdf(data){const res=await fetch('./lewar-logo.png');if(!res.ok)throw Error('No se pudo cargar el logo');return createOrderPdf(data,await res.arrayBuffer())}
-async function submitOrderEmail(data,bytes,receipt){
- const pdf=new Blob([bytes],{type:'application/pdf'}),money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const PENDING_EMAIL_KEY='lewar-pending-order-emails-v1';
+function pendingEmails(){try{return JSON.parse(localStorage.getItem(PENDING_EMAIL_KEY)||'[]')}catch{return []}}
+function savePendingEmails(items){localStorage.setItem(PENDING_EMAIL_KEY,JSON.stringify(items))}
+function pendingEmailFor(id){return pendingEmails().some(x=>x.data?.id===id)}
+function queuePendingEmail(data,receipt){
+ const items=pendingEmails();
+ if(!items.some(x=>x.data?.id===data.id&&x.data?.version===data.version)){
+  items.push({data:jsonClone(data),receipt,queuedAt:new Date().toISOString(),attempts:0});
+  savePendingEmails(items);
+ }
+}
+function buildEmailPayload(data){
+ const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
  const kind=data.status==='cancelada'?'CANCELACIÓN':data.version>1?'MODIFICACIÓN':'PEDIDO';
  const subject=kind+' '+data.id+' | Versión '+data.version+' | '+data.cliente;
  const fields={
@@ -84,39 +95,51 @@ async function submitOrderEmail(data,bytes,receipt){
   'Subtotal':money(data.total/100),'Motivo del cambio':data.changeReason||'No aplica','Notas':data.nota||'Ninguna',
   'Condiciones':data.status==='cancelada'?'ORDEN CANCELADA. No procesar.':'Sujeto a disponibilidad y confirmación. Impuestos, entrega y términos por confirmar.'
  };
+ return {subject,fields,money};
+}
+async function sendOrderEmailNow(data,bytes){
+ const {fields}=buildEmailPayload(data);
+ const formData=new FormData();
+ for(const [name,value] of Object.entries(fields))formData.append(name,String(value??''));
+ formData.append('attachment',new Blob([bytes],{type:'application/pdf'}),data.id+'-v'+data.version+'.pdf');
+ const res=await fetch('https://formsubmit.co/ajax/invoice@lewardistributors.com',{method:'POST',headers:{Accept:'application/json'},body:formData,signal:AbortSignal.timeout(12000)});
+ let payload=null;try{payload=await res.json()}catch{}
+ if(!res.ok||payload?.success===false)throw Error(payload?.message||('FormSubmit '+res.status));
+ return true;
+}
+async function submitOrderEmail(data,bytes,receipt){
+ const {money}=buildEmailPayload(data);
  sessionStorage.setItem('ultimo-pedido',JSON.stringify({id:data.id,total:money(data.total/100)}));
  sessionStorage.setItem('order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
  try{let binary='';for(const b of bytes)binary+=String.fromCharCode(b);sessionStorage.setItem('ultimo-pedido-pdf',btoa(binary))}catch{sessionStorage.removeItem('ultimo-pedido-pdf')}
- const formData=new FormData();
- for(const [name,value] of Object.entries(fields))formData.append(name,String(value??''));
- formData.append('attachment',pdf,data.id+'-v'+data.version+'.pdf');
  try{
-  const res=await fetch('https://formsubmit.co/ajax/invoice@lewardistributors.com',{method:'POST',headers:{Accept:'application/json'},body:formData,signal:AbortSignal.timeout(12000)});
-  let payload=null;try{payload=await res.json()}catch{}
-  if(!res.ok||payload?.success===false)throw Error(payload?.message||('FormSubmit '+res.status));
+  await sendOrderEmailNow(data,bytes);
+  const remaining=pendingEmails().filter(x=>!(x.data?.id===data.id&&x.data?.version===data.version));
+  savePendingEmails(remaining);
   return {sent:true};
  }catch(error){
-  console.warn('FormSubmit no disponible; activando respaldo de correo.',error);
-  const url=URL.createObjectURL(pdf),a=document.createElement('a');a.href=url;a.download=data.id+'-v'+data.version+'.pdf';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
-  const lines=data.lines.map(l=>`${l.quantity} x ${l.product.modelo} — ${money(l.unit)} c/u — ${money(l.total/100)}`).join('\n');
-  const body=[
-   kind+' '+data.id,
-   'Versión: '+data.version,
-   'Cliente: '+data.cliente,
-   'Contacto: '+data.contacto,
-   'Teléfono: '+data.telefono,
-   'Correo: '+data.correo,
-   'Vendedor: '+data.vendedor,
-   '',
-   'ARTÍCULOS',
-   lines,
-   '',
-   'Subtotal: '+money(data.total/100),
-   'Notas: '+(data.nota||'Ninguna'),
-   '',
-   'El PDF '+data.id+'-v'+data.version+'.pdf se descargó automáticamente para adjuntarlo a este correo.'
-  ].join('\n');
-  location.href='mailto:invoice@lewardistributors.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-  return {sent:false,fallback:true,error:String(error?.message||error)};
+  console.warn('Correo automático pendiente; se reintentará.',error);
+  queuePendingEmail(data,receipt);
+  return {sent:false,queued:true,error:String(error?.message||error)};
  }
 }
+let retryingPendingEmails=false;
+async function retryPendingEmails(){
+ if(retryingPendingEmails||!navigator.onLine)return;
+ const items=pendingEmails();if(!items.length)return;
+ retryingPendingEmails=true;
+ const keep=[];
+ for(const item of items){
+  try{
+   const bytes=await orderPdf(item.data);
+   await sendOrderEmailNow(item.data,bytes);
+  }catch(error){
+   keep.push({...item,attempts:(item.attempts||0)+1,lastAttempt:new Date().toISOString(),lastError:String(error?.message||error)});
+  }
+ }
+ savePendingEmails(keep);
+ retryingPendingEmails=false;
+}
+window.addEventListener('online',retryPendingEmails);
+setTimeout(retryPendingEmails,1500);
+setInterval(retryPendingEmails,60000);
