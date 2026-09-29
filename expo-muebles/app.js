@@ -2,15 +2,70 @@ const EMAIL_SERVICE_ENABLED=true;
 const $=id=>document.getElementById(id),usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 let products=[],order,invalid=false,sending=false,submitted=false,pendingOrder=null,editOrder=null;try{editOrder=JSON.parse(sessionStorage.getItem('lewar-edit-order'))}catch{}
 function calculate(){const quantities={},overrides={};invalid=false;for(const p of products){const el=$('qty-'+p.modelo),manual=$('manual-'+p.modelo);if(manual.value!==''||manual.validity.badInput){if(!manual.checkValidity())invalid=true;else overrides[p.modelo]=Number(manual.value)}el.disabled=!Number.isFinite(p.precio)&&!Number.isFinite(overrides[p.modelo]);if(!el.disabled&&!el.checkValidity())invalid=true;quantities[p.modelo]=Number(el.value)}order=priceOrder(products,quantities,overrides);$('detalle').replaceChildren();for(const line of order.lines){const {product:p,quantity:q,unit,volume,manual,total}=line;$('price-'+p.modelo).textContent=unit===null?'Precio pendiente':usd(unit)+' c/u'+(manual?' · Manual':volume?' · Volumen':'')+(q?'\n'+usd(total/100):'');if(q){const row=document.createElement('p');row.textContent=`${q} × ${p.modelo} · ${usd(total/100)}`;$('detalle').append(row)}}$('modelos').textContent=order.lines.filter(l=>l.quantity).length;$('unidades').textContent=order.units;$('subtotal').textContent=usd(order.total/100);$('enviar').disabled=sending||submitted||invalid||!order.units;if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (máximo 2 decimales, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'}
-async function load(){try{const response=await fetch('./catalogo.json',{cache:'no-store'});if(!response.ok)throw Error();const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();for(const p of products){const row=document.createElement('div');row.className='item';row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria].join(' ').toLowerCase();const info=document.createElement('div'),strong=document.createElement('strong'),desc=document.createElement('small'),rule=document.createElement('p'),priceList=document.createElement('div');strong.textContent=p.modelo;desc.textContent=p.marca+' · '+p.descripcion;priceList.className='catalog-prices';const regular=document.createElement('span');regular.className='price-chip';regular.textContent=Number.isFinite(p.precio)?'Regular '+usd(p.precio):'Precio por confirmar';priceList.append(regular);if(Number.isFinite(p.precio_volumen)){const special=document.createElement('span');special.className='price-chip special';special.textContent='Convención '+usd(p.precio_volumen);priceList.append(special)}rule.className='hint';rule.textContent=(Number.isFinite(p.precio_volumen)?`Precio de volumen desde 3 ${p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas'}`:'Sin precio especial por volumen')+(p.nota?' · '+p.nota:'');info.className='product-info';info.append(strong,desc,priceList,rule);const photo=document.createElement('div');photo.className='product-photo';const img=document.createElement('img');img.src=typeof productPhotos!=='undefined'?productPhotos[p.modelo]:'';img.alt=p.marca+' '+p.modelo;img.loading='lazy';img.decoding='async';img.width=120;img.height=140;photo.append(img);const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value='0';input.id='qty-'+p.modelo;input.disabled=!Number.isFinite(p.precio);input.setAttribute('aria-label','Cantidad de '+p.modelo);input.addEventListener('input',calculate);const price=document.createElement('div');price.className='money';price.style.whiteSpace='pre-line';price.id='price-'+p.modelo;const manualBox=document.createElement('div');manualBox.className='manual-price';const label=document.createElement('label');label.htmlFor='manual-'+p.modelo;label.textContent='Precio unitario manual ($)';label.style.fontSize='14px';const manualInput=document.createElement('input');manualInput.type='number';manualInput.min='0';manualInput.max='999999.99';manualInput.step='0.01';manualInput.placeholder='Vacío = automático';manualInput.id='manual-'+p.modelo;manualInput.setAttribute('aria-label','Precio unitario manual de '+p.modelo);manualInput.addEventListener('input',calculate);manualBox.append(label,manualInput);const quantityBox=document.createElement('div');quantityBox.className='quantity-box';const quantityLabel=document.createElement('label');quantityLabel.htmlFor=input.id;quantityLabel.textContent='Cantidad';quantityBox.append(quantityLabel,input);row.append(photo,info,quantityBox,price,manualBox);$('catalogo').append(row)}$('vigencia').textContent=data.vigencia+' · catálogo con fotos';if(editOrder){document.querySelector('h1').textContent='Modificar '+editOrder.id;for(const id of ['cliente','tipo','contacto','telefono','correo','vendedor','nota'])$(id).value=editOrder[id]||'';for(const line of editOrder.lines){$('qty-'+line.product.modelo).value=line.quantity;if(line.manual)$('manual-'+line.product.modelo).value=line.unit}$('edit-reason-box').hidden=false;}calculate()}catch(e){$('catalogo').textContent='No se pudo cargar el catálogo. Recarga la página.';$('enviar').disabled=true}}
-$('buscar').addEventListener('input',()=>{const query=$('buscar').value.toLowerCase().trim();for(const row of $('catalogo').children)row.style.display=row.dataset.search.includes(query)?'':'none'});
+async function load(){try{
+ const response=await fetch('./catalogo.json',{cache:'no-store'});if(!response.ok)throw Error();
+ const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();
+ const groups=new Map();
+ for(const p of products){
+  const [sort,label]=categoryInfo(p.categoria),key=sort+'|'+label;
+  if(!groups.has(key))groups.set(key,{sort,label,products:[]});
+  groups.get(key).products.push(p);
+ }
+ for(const group of [...groups.values()].sort((a,b)=>a.sort.localeCompare(b.sort)||a.label.localeCompare(b.label))){
+  const section=document.createElement('section');section.className='catalog-category';section.dataset.category=group.label.toLowerCase();
+  const heading=document.createElement('div');heading.className='category-heading';
+  const title=document.createElement('h3');title.textContent=group.label;
+  const count=document.createElement('span');count.textContent=group.products.length+' modelos';
+  heading.append(title,count);section.append(heading);
+  const body=document.createElement('div');body.className='category-items';
+  for(const p of group.products){
+   const row=document.createElement('div');row.className='item';row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria,group.label].join(' ').toLowerCase();
+   const info=document.createElement('div'),strong=document.createElement('strong'),desc=document.createElement('small'),rule=document.createElement('p'),priceList=document.createElement('div');
+   strong.textContent=p.modelo;desc.textContent=p.marca+' · '+p.descripcion;priceList.className='catalog-prices';
+   const regular=document.createElement('span');regular.className='price-chip';regular.textContent=Number.isFinite(p.precio)?'Regular '+usd(p.precio):'Precio por confirmar';priceList.append(regular);
+   if(Number.isFinite(p.precio_volumen)){const special=document.createElement('span');special.className='price-chip special';special.textContent='Convención '+usd(p.precio_volumen);priceList.append(special)}
+   rule.className='hint';rule.textContent=(Number.isFinite(p.precio_volumen)?`Precio de volumen desde 3 ${p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas'}`:'Sin precio especial por volumen')+(p.nota?' · '+p.nota:'');
+   info.className='product-info';info.append(strong,desc,priceList,rule);
+   const photo=document.createElement('div');photo.className='product-photo';const img=document.createElement('img');img.src=typeof productPhotos!=='undefined'?productPhotos[p.modelo]:'';img.alt=p.marca+' '+p.modelo;img.loading='lazy';img.decoding='async';img.width=120;img.height=140;photo.append(img);
+   const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value='0';input.id='qty-'+p.modelo;input.disabled=!Number.isFinite(p.precio);input.setAttribute('aria-label','Cantidad de '+p.modelo);input.addEventListener('input',calculate);
+   const price=document.createElement('div');price.className='money';price.style.whiteSpace='pre-line';price.id='price-'+p.modelo;
+   const manualBox=document.createElement('div');manualBox.className='manual-price';const label=document.createElement('label');label.htmlFor='manual-'+p.modelo;label.textContent='Precio unitario manual ($)';label.style.fontSize='14px';
+   const manualInput=document.createElement('input');manualInput.type='number';manualInput.min='0';manualInput.max='999999.99';manualInput.step='0.01';manualInput.placeholder='Vacío = automático';manualInput.id='manual-'+p.modelo;manualInput.setAttribute('aria-label','Precio unitario manual de '+p.modelo);manualInput.addEventListener('input',calculate);manualBox.append(label,manualInput);
+   const quantityBox=document.createElement('div');quantityBox.className='quantity-box';const quantityLabel=document.createElement('label');quantityLabel.htmlFor=input.id;quantityLabel.textContent='Cantidad';quantityBox.append(quantityLabel,input);
+   row.append(photo,info,quantityBox,price,manualBox);body.append(row);
+  }
+  section.append(body);$('catalogo').append(section);
+ }
+ $('vigencia').textContent=data.vigencia+' · catálogo por categorías';
+ if(editOrder){document.querySelector('h1').textContent='Modificar '+editOrder.id;for(const id of ['cliente','tipo','contacto','telefono','correo','vendedor','nota'])$(id).value=editOrder[id]||'';for(const line of editOrder.lines){$('qty-'+line.product.modelo).value=line.quantity;if(line.manual)$('manual-'+line.product.modelo).value=line.unit}$('edit-reason-box').hidden=false}
+ calculate()
+}catch(e){$('catalogo').textContent='No se pudo cargar el catálogo. Recarga la página.';$('enviar').disabled=true}}
+$('buscar').addEventListener('input',()=>{const query=$('buscar').value.toLowerCase().trim();for(const section of $('catalogo').querySelectorAll('.catalog-category')){let visible=0;for(const row of section.querySelectorAll('.item')){const show=row.dataset.search.includes(query);row.style.display=show?'':'none';if(show)visible++}section.style.display=visible?'':'none'}});
 function field(id){return $(id).value.trim()}
+function companyRef(name){return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28)||'CLIENTE'}
+const categoryMeta={
+ 'T-01 WASHERS':['01','Lavadoras'],
+ 'T-07 DRYERS':['02','Secadoras'],
+ 'DRYERS':['02','Secadoras'],
+ 'T-02 RANGES':['03','Estufas'],
+ 'RANGES':['03','Estufas'],
+ 'T-03 REFRIGERATION':['04','Neveras y refrigeración'],
+ 'REFRIGERATORS':['04','Neveras y refrigeración'],
+ 'T-04 MWO':['05','Microondas'],
+ 'COOKTOPS':['06','Cooktops'],
+ 'COOKTOPS INDUCTION':['07','Cooktops de inducción'],
+ 'HOODS':['08','Campanas'],
+ 'OVENS':['09','Hornos'],
+ 'ICE MAKER':['10','Máquinas de hielo'],
+ 'ACCESORIES':['11','Accesorios']
+};
+function categoryInfo(raw){return categoryMeta[raw]||['99',raw||'Otros']}
 $('enviar').addEventListener('click',async()=>{
  if(sending||submitted)return;calculate();if(invalid||!order.units)return;
  for(const id of ['cliente','contacto','telefono','correo','vendedor']){if(!field(id)||!$(id).reportValidity()){$(id).focus();return}}
  const data={cliente:field('cliente'),tipo:field('tipo'),contacto:field('contacto'),telefono:field('telefono'),correo:field('correo'),vendedor:field('vendedor'),nota:field('nota'),lines:order.lines.filter(l=>l.quantity),total:order.total};
  const fingerprint=JSON.stringify(data);
- if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:'EXPO26-'+crypto.randomUUID().replaceAll('-','').slice(0,16).toUpperCase(),date:now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
+ if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:'EXPO26-'+companyRef(field('cliente'))+'-'+crypto.randomUUID().replaceAll('-','').slice(0,6).toUpperCase(),date:now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
  if(editOrder&&!field('edit-reason')){$('edit-reason').focus();$('estado').textContent='Indica el motivo de la modificación.';return}
  Object.assign(data,{id:pendingOrder.id,date:pendingOrder.date});sending=true;$('enviar').disabled=true;$('estado').textContent='Guardando pedido '+data.id+'…';
  const controls=[...document.querySelectorAll('input,select,textarea')].filter(el=>!el.disabled);controls.forEach(el=>el.disabled=true);
