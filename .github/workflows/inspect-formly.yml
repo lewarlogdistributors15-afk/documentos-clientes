@@ -1,26 +1,15 @@
-name: Inspect Formly request
+name: Configure free form email
 on:
   push:
     paths:
       - ".github/workflows/inspect-formly.yml"
 jobs:
-  inspect:
+  configure:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect access-key JavaScript
+      - name: Request Formly access key
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL -A "Mozilla/5.0" https://formly.email/ -o /tmp/formly.html
-          python3 - <<'PY'
-          s=open('/tmp/formly.html',encoding='utf-8',errors='ignore').read()
-          needles=["accessKeyForm","/api/access-key","buttonText"]
-          for n in needles:
-              print("\n===",n,"===")
-              start=0
-              while True:
-                  i=s.find(n,start)
-                  if i<0: break
-                  print(s[max(0,i-1200):i+3000])
-                  start=i+len(n)
-          PY
+          curl -fsS -A "Mozilla/5.0" -X POST             -H "Content-Type: application/json"             --data '{"email":"lewarcorpcredito@gmail.com"}'             https://formly.email/get-started
+          echo
