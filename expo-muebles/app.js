@@ -11,7 +11,11 @@ async function load(){try{
   if(!groups.has(key))groups.set(key,{sort,label,products:[]});
   groups.get(key).products.push(p);
  }
- for(const group of [...groups.values()].sort((a,b)=>a.sort.localeCompare(b.sort)||a.label.localeCompare(b.label))){
+ const groupList=[...groups.values()].sort((a,b)=>a.sort.localeCompare(b.sort)||a.label.localeCompare(b.label));
+ const categorySelect=$('categoria');categorySelect.replaceChildren();
+ const allOption=document.createElement('option');allOption.value='';allOption.textContent='Todas las categorías';categorySelect.append(allOption);
+ for(const group of groupList){const option=document.createElement('option');option.value=group.label.toLowerCase();option.textContent=group.label;categorySelect.append(option)}
+ for(const group of groupList){
   const section=document.createElement('section');section.className='catalog-category';section.dataset.category=group.label.toLowerCase();
   const heading=document.createElement('div');heading.className='category-heading';
   const title=document.createElement('h3');title.textContent=group.label;
@@ -40,7 +44,16 @@ async function load(){try{
  if(editOrder){document.querySelector('h1').textContent='Modificar '+editOrder.id;for(const id of ['cliente','tipo','contacto','telefono','correo','vendedor','nota'])$(id).value=editOrder[id]||'';for(const line of editOrder.lines){$('qty-'+line.product.modelo).value=line.quantity;if(line.manual)$('manual-'+line.product.modelo).value=line.unit}$('edit-reason-box').hidden=false}
  calculate()
 }catch(e){$('catalogo').textContent='No se pudo cargar el catálogo. Recarga la página.';$('enviar').disabled=true}}
-$('buscar').addEventListener('input',()=>{const query=$('buscar').value.toLowerCase().trim();for(const section of $('catalogo').querySelectorAll('.catalog-category')){let visible=0;for(const row of section.querySelectorAll('.item')){const show=row.dataset.search.includes(query);row.style.display=show?'':'none';if(show)visible++}section.style.display=visible?'':'none'}});
+function filterCatalog(){
+ const query=$('buscar').value.toLowerCase().trim(),category=$('categoria').value;
+ for(const section of $('catalogo').querySelectorAll('.catalog-category')){
+  const categoryMatch=!category||section.dataset.category===category;let visible=0;
+  for(const row of section.querySelectorAll('.item')){const show=categoryMatch&&row.dataset.search.includes(query);row.style.display=show?'':'none';if(show)visible++}
+  section.style.display=visible?'':'none';
+ }
+}
+$('buscar').addEventListener('input',filterCatalog);
+$('categoria').addEventListener('change',filterCatalog);
 function field(id){return $(id).value.trim()}
 function companyRef(name){return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28)||'CLIENTE'}
 const categoryMeta={
