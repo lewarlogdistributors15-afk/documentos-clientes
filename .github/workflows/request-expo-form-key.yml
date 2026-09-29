@@ -1,0 +1,15 @@
+name: Request Expo Muebles form key
+on:
+  push:
+    paths:
+      - ".github/workflows/request-expo-form-key.yml"
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request key for etorres inbox
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -A "Mozilla/5.0" -X POST             -H "Content-Type: application/json"             --data '{"email":"etorres@lewardistributors.com"}'             https://formly.email/get-started
+          echo
