@@ -1,5 +1,5 @@
-const RECORD_API='https://lewar-convencion-whirlpool.emmatowwerz15.chatgpt.site/api/registro';
-async function recordRequest(action,body){const token=sessionStorage.getItem('lewar-session');const res=await fetch(RECORD_API,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({action,...body}),signal:AbortSignal.timeout(25000)});const result=await res.json();if(!res.ok)throw Error(result.error||'No se pudo guardar la orden');return result;}
+const RECORD_API='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/registro';
+async function recordRequest(action,body){const pin=sessionStorage.getItem('lewar-pin');const res=await fetch(RECORD_API,{method:'POST',headers:{'Content-Type':'application/json',...(pin?{'x-lewar-pin':pin}:{})},body:JSON.stringify({action,...body}),signal:AbortSignal.timeout(25000)});const result=await res.json();if(!res.ok)throw Error(result.error||'No se pudo guardar la orden');return result;}
 async function orderPdf(data){const res=await fetch('./lewar-logo.png');if(!res.ok)throw Error('No se pudo cargar el logo');return createOrderPdf(data,await res.arrayBuffer())}
 const orderMoney=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 function bytesToBase64(bytes){let binary='';const step=0x8000;for(let i=0;i<bytes.length;i+=step)binary+=String.fromCharCode(...bytes.subarray(i,i+step));return btoa(binary)}
