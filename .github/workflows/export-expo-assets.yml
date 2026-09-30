@@ -1,0 +1,16 @@
+name: Export Expo assets
+on:
+  push:
+    paths:
+      - ".github/workflows/export-expo-assets.yml"
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: expo-assets
+          path: |
+            expo-muebles/lewar-logo.png
+            expo-muebles/invitacion-expo-muebles.jpeg
