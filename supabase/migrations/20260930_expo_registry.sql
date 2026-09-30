@@ -3,7 +3,7 @@ create table if not exists public.expo_orders (
   request_key uuid unique,
   version integer not null default 1,
   status text not null default 'activa',
-  receipt uuid,
+  receipt text,
   email_state text not null default 'pending',
   data jsonb not null,
   created_at timestamptz not null default now(),
