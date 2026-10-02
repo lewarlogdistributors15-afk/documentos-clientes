@@ -31,7 +31,7 @@ async function submitOrderEmail(data,bytes,receipt){
   'Teléfono':data.telefono,
   'Correo del cliente':data.correo,
   'Vendedor':data.vendedor,
-  'Artículos':data.lines.map(l=>`${l.quantity} x ${l.product.modelo} | ${orderMoney(l.unit)} c/u | ${orderMoney(l.total/100)}${l.manual?' | PRECIO MANUAL':''}`).join('\n'),
+  'Artículos':data.lines.map(l=>`${l.quantity} x ${l.product.modelo} | ${orderMoney(l.unit)} c/u | ${orderMoney(l.total/100)}${l.manual?' | PRECIO MANUAL':''}${l.manualEntry?' | ENTRADA MANUAL'+(l.product.descripcion?' | '+l.product.descripcion:''):''}`).join('\n'),
   'Subtotal':orderMoney(data.total/100),
   'Motivo del cambio':data.changeReason||'No aplica',
   'Notas':data.nota||'Ninguna',
