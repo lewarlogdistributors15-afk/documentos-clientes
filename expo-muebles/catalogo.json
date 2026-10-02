@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-28",
-  "vigencia": "79 modelos",
+  "version": "2026-10-02",
+  "vigencia": "92 modelos · precios de convención actualizados",
   "productos": [
     {
       "modelo": "NTW4519JW",
@@ -47,7 +47,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "DRYERS",
       "descripcion": "DRYERS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación",
       "precio": 385,
       "precio_volumen": null,
       "regla": "combinable"
@@ -68,8 +68,8 @@
       "categoria": "T-01 WASHERS",
       "descripcion": "4.2 - 4.3 CF TOP LOAD",
       "nota": "",
-      "precio": 445,
-      "precio_volumen": 435,
+      "precio": 450,
+      "precio_volumen": 440,
       "regla": "combinable"
     },
     {
@@ -78,8 +78,8 @@
       "categoria": "T-07 DRYERS",
       "descripcion": "7.0 CF ELECTRIC / ADAPTIVE DRY",
       "nota": "",
-      "precio": 429,
-      "precio_volumen": 419,
+      "precio": 440,
+      "precio_volumen": 425,
       "regla": "combinable"
     },
     {
@@ -88,8 +88,8 @@
       "categoria": "T-07 DRYERS",
       "descripcion": "7.0 CF GAS / ADAPTIVE DRY",
       "nota": "",
-      "precio": 429,
-      "precio_volumen": 419,
+      "precio": 440,
+      "precio_volumen": 425,
       "regla": "combinable"
     },
     {
@@ -98,8 +98,8 @@
       "categoria": "T-01 WASHERS",
       "descripcion": "3.8 CF TOP LOAD",
       "nota": "",
-      "precio": 445,
-      "precio_volumen": 435,
+      "precio": 450,
+      "precio_volumen": 440,
       "regla": "combinable"
     },
     {
@@ -127,7 +127,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "DRYERS",
       "descripcion": "7.0 CF ELECT. MOISTURE SENSING DRY",
-      "nota": "Liquidación",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 499,
       "precio_volumen": null,
       "regla": "combinable"
@@ -137,7 +137,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "DRYERS",
       "descripcion": "7.0 CF GAS MOISTURE SENSING DRY",
-      "nota": "Liquidación",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 499,
       "precio_volumen": null,
       "regla": "combinable"
@@ -198,7 +198,7 @@
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 6 BURNERS PORCELAIN COOKTOP",
       "nota": "",
-      "precio": 290,
+      "precio": 290.24,
       "precio_volumen": 280,
       "regla": "combinable"
     },
@@ -237,19 +237,79 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 6 BURNERS 5.1 CF OVEN WITH CAPELO GLASS TOP",
-      "nota": "Liquidación",
-      "precio": null,
-      "precio_volumen": null,
+      "nota": "Liquidación, Solo inv disp en Lewar",
+      "precio": 399,
+      "precio_volumen": 389,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "AGR6303MMW",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "30-inch Gas Range with Bake Assist Temps",
+      "nota": "Pedido especial no hay en PR",
+      "precio": 485,
+      "precio_volumen": 475,
       "regla": "combinable"
     },
     {
       "modelo": "AGR6303MMS",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
-      "descripcion": "T-02 RANGES",
+      "descripcion": "30-inch Gas Range with Bake Assist Temps",
       "nota": "",
       "precio": 535,
       "precio_volumen": 525,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFG320M0MW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "Liquidación",
+      "precio": 515,
+      "precio_volumen": 505,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFG505M0MW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "Liquidación",
+      "precio": 535,
+      "precio_volumen": 525,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFG505M0MS",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "Liquidación",
+      "precio": 545,
+      "precio_volumen": 535,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFGS3030RS",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "",
+      "precio": 560,
+      "precio_volumen": 545,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WFGS3330RS",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "",
+      "precio": 609,
+      "precio_volumen": 590,
       "regla": "combinable"
     },
     {
@@ -260,6 +320,16 @@
       "nota": "",
       "precio": 437,
       "precio_volumen": 427,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "AER6303MFW",
+      "marca": "AMANA",
+      "categoria": "T-02 RANGES",
+      "descripcion": "T-02 RANGES",
+      "nota": "",
+      "precio": 550,
+      "precio_volumen": 540,
       "regla": "combinable"
     },
     {
@@ -368,8 +438,8 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "24\" 11.6 CF COUNTER DEPTH",
       "nota": "",
-      "precio": 505,
-      "precio_volumen": 495,
+      "precio": 515,
+      "precio_volumen": 499,
       "regla": "combinable"
     },
     {
@@ -378,8 +448,8 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
       "nota": "",
-      "precio": 548,
-      "precio_volumen": 535,
+      "precio": 547.56,
+      "precio_volumen": 534.52,
       "regla": "combinable"
     },
     {
@@ -388,8 +458,8 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
       "nota": "",
-      "precio": 571,
-      "precio_volumen": 557,
+      "precio": 570.73,
+      "precio_volumen": 557.14,
       "regla": "combinable"
     },
     {
@@ -397,7 +467,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "T-03 REFRIGERATION",
-      "nota": "Liquidación",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 579,
       "precio_volumen": 555,
       "regla": "combinable"
@@ -407,7 +477,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "28\" 18 CF Adjustable Door Bins",
-      "nota": "Liquidación",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 635,
       "precio_volumen": 625,
       "regla": "combinable"
@@ -418,8 +488,18 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "30\" 19 CF Total Coverage Cooling",
       "nota": "",
-      "precio": 605,
-      "precio_volumen": 590,
+      "precio": 615,
+      "precio_volumen": 595,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRTX3019SZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "30\" 19 CF Total Coverage Cooling",
+      "nota": "",
+      "precio": 655,
+      "precio_volumen": 645,
       "regla": "combinable"
     },
     {
@@ -427,7 +507,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
-      "nota": "Liquidación",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 638,
       "precio_volumen": 620,
       "regla": "combinable"
@@ -447,7 +527,7 @@
       "marca": "AMANA",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "SXS 36\" 25 CF",
-      "nota": "Exceso",
+      "nota": "Exceso, Solo inv disp en Lewar",
       "precio": 1013,
       "precio_volumen": 978,
       "regla": "combinable"
@@ -458,8 +538,8 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "FRENCH DOOR 30\" 20 CF",
       "nota": "",
-      "precio": 1063,
-      "precio_volumen": 1038,
+      "precio": 1065,
+      "precio_volumen": 1050,
       "regla": "combinable"
     },
     {
@@ -480,6 +560,26 @@
       "nota": "",
       "precio": 1160,
       "precio_volumen": 1145,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRSF5536RZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "T-03 REFRIGERATION",
+      "nota": "",
+      "precio": 1399,
+      "precio_volumen": 1379,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRSC5536RZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "T-03 REFRIGERATION",
+      "nota": "",
+      "precio": 1299,
+      "precio_volumen": 1279,
       "regla": "combinable"
     },
     {
@@ -533,13 +633,43 @@
       "regla": "combinable"
     },
     {
+      "modelo": "WM1807W",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "1.1 CF WHITE",
+      "nota": "",
+      "precio": 56,
+      "precio_volumen": 54,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "LWMC30309LB",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": ".9 CF Black",
+      "nota": "",
+      "precio": 66.23,
+      "precio_volumen": 63,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WM3911D",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-04 MWO",
+      "descripcion": "1.0 Silver",
+      "nota": "",
+      "precio": 132.47,
+      "precio_volumen": 129,
+      "regla": "combinable"
+    },
+    {
       "modelo": "WMMS3130RS",
       "marca": "WHIRLPOOL",
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 243,
-      "precio_volumen": 237,
+      "precio": 242.68,
+      "precio_volumen": 236.9,
       "regla": "combinable"
     },
     {
@@ -548,8 +678,8 @@
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 235,
-      "precio_volumen": 230,
+      "precio": 235.37,
+      "precio_volumen": 229.76,
       "regla": "combinable"
     },
     {
@@ -558,8 +688,8 @@
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 251,
-      "precio_volumen": 245,
+      "precio": 251.22,
+      "precio_volumen": 245.24,
       "regla": "combinable"
     },
     {
@@ -569,7 +699,7 @@
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
       "precio": 400,
-      "precio_volumen": 390,
+      "precio_volumen": 390.48,
       "regla": "combinable"
     },
     {
@@ -578,8 +708,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 417,
-      "precio_volumen": 407,
+      "precio": 417.07,
+      "precio_volumen": 407.14,
       "regla": "combinable"
     },
     {
@@ -588,8 +718,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 388,
-      "precio_volumen": 379,
+      "precio": 387.8,
+      "precio_volumen": 378.57,
       "regla": "combinable"
     },
     {
@@ -598,8 +728,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 356,
-      "precio_volumen": 348,
+      "precio": 356.1,
+      "precio_volumen": 347.62,
       "regla": "combinable"
     },
     {
@@ -608,8 +738,8 @@
       "categoria": "HOODS",
       "descripcion": "30-inch wall hood",
       "nota": "",
-      "precio": 117,
-      "precio_volumen": 114,
+      "precio": 117.07,
+      "precio_volumen": 114.29,
       "regla": "combinable"
     },
     {
@@ -617,7 +747,7 @@
       "marca": "KITCHENAID",
       "categoria": "COOKTOPS",
       "descripcion": "COOKTOPS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1073,
       "precio_volumen": null,
       "regla": "combinable"
@@ -627,7 +757,7 @@
       "marca": "KITCHENAID",
       "categoria": "COOKTOPS",
       "descripcion": "COOKTOPS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1312,
       "precio_volumen": null,
       "regla": "combinable"
@@ -637,7 +767,7 @@
       "marca": "KITCHENAID",
       "categoria": "COOKTOPS",
       "descripcion": "COOKTOPS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 637,
       "precio_volumen": null,
       "regla": "combinable"
@@ -647,7 +777,7 @@
       "marca": "KITCHENAID",
       "categoria": "COOKTOPS",
       "descripcion": "COOKTOPS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 599,
       "precio_volumen": null,
       "regla": "combinable"
@@ -657,7 +787,7 @@
       "marca": "KITCHENAID",
       "categoria": "REFRIGERATORS",
       "descripcion": "REFRIGERATORS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 4381,
       "precio_volumen": null,
       "regla": "combinable"
@@ -667,7 +797,7 @@
       "marca": "KITCHENAID",
       "categoria": "RANGES",
       "descripcion": "RANGES",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1897,
       "precio_volumen": null,
       "regla": "combinable"
@@ -677,7 +807,7 @@
       "marca": "KITCHENAID",
       "categoria": "RANGES",
       "descripcion": "RANGES",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1935,
       "precio_volumen": null,
       "regla": "combinable"
@@ -687,7 +817,7 @@
       "marca": "KITCHENAID",
       "categoria": "REFRIGERATORS",
       "descripcion": "WINE CELLAR",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1622,
       "precio_volumen": null,
       "regla": "combinable"
@@ -697,7 +827,7 @@
       "marca": "KITCHENAID",
       "categoria": "HOODS",
       "descripcion": "HOOD 30\" Retractable Downdraft",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 842,
       "precio_volumen": null,
       "regla": "combinable"
@@ -707,7 +837,7 @@
       "marca": "KITCHENAID",
       "categoria": "ICE MAKER",
       "descripcion": "ICE MAKER",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1533,
       "precio_volumen": null,
       "regla": "combinable"
@@ -717,7 +847,7 @@
       "marca": "MAYTAG",
       "categoria": "DRYERS",
       "descripcion": "DRYERS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 743,
       "precio_volumen": null,
       "regla": "combinable"
@@ -727,7 +857,7 @@
       "marca": "MAYTAG",
       "categoria": "RANGES",
       "descripcion": "RANGES",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 645,
       "precio_volumen": null,
       "regla": "combinable"
@@ -737,7 +867,7 @@
       "marca": "MAYTAG",
       "categoria": "DRYERS",
       "descripcion": "DRYERS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 615,
       "precio_volumen": null,
       "regla": "combinable"
@@ -747,7 +877,7 @@
       "marca": "MAYTAG",
       "categoria": "ACCESORIES",
       "descripcion": "ACCESORIES",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 83,
       "precio_volumen": null,
       "regla": "combinable"
@@ -757,7 +887,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "HOODS",
       "descripcion": "HOODS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 553,
       "precio_volumen": null,
       "regla": "combinable"
@@ -767,7 +897,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "COOKTOPS INDUCTION",
       "descripcion": "COOKTOPS INDUCTION",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 764,
       "precio_volumen": null,
       "regla": "combinable"
@@ -777,7 +907,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "RANGES",
       "descripcion": "RANGES",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1119,
       "precio_volumen": null,
       "regla": "combinable"
@@ -787,7 +917,7 @@
       "marca": "WHIRLPOOL",
       "categoria": "OVENS",
       "descripcion": "OVENS",
-      "nota": "Solo inv disp en Lewar",
+      "nota": "Liquidación, Solo inv disp en Lewar",
       "precio": 1213,
       "precio_volumen": null,
       "regla": "combinable"
