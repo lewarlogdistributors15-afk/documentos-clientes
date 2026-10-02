@@ -20,6 +20,7 @@ async function submitOrderEmail(data,bytes,receipt){
   from_name:'Lewar LogDistributors · Expo Muebles',
   reply_to:data.correo,
   email:data.correo,
+  cc:'rolivencia@lewardistributors.com,lewarcorpcredito@lewardistributors.com,invoice@lewardistributors.com',
   'Número de orden':data.id,
   'Versión':data.version,
   'Estado':data.status,
