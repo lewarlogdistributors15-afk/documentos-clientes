@@ -1,0 +1,26 @@
+{
+  "name": "Expo Muebles · Lewar LogDistributors",
+  "short_name": "Expo Muebles",
+  "description": "App para registrar, procesar y administrar pedidos de la Expo Muebles de Puerto Rico y el Caribe.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f7f8",
+  "theme_color": "#080808",
+  "lang": "es-PR",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {"name": "Nuevo pedido", "short_name": "Nuevo pedido", "url": "./"},
+    {"name": "Órdenes", "short_name": "Órdenes", "url": "./admin-ordenes.html"}
+  ]
+}
