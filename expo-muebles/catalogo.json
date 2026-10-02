@@ -1,6 +1,6 @@
 {
   "version": "2026-10-02",
-  "vigencia": "92 modelos · precios de convención actualizados",
+  "vigencia": "93 modelos · precios de convención actualizados",
   "productos": [
     {
       "modelo": "NTW4519JW",
@@ -580,6 +580,16 @@
       "nota": "",
       "precio": 1299,
       "precio_volumen": 1279,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRFF3136SZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "T-03 REFRIGERATION",
+      "nota": "",
+      "precio": 1359,
+      "precio_volumen": 1339,
       "regla": "combinable"
     },
     {
