@@ -1,4 +1,4 @@
-const CACHE = "lewar-expo-20261003-wmc30309lb";
+const CACHE = "lewar-expo-20261003-processfix";
 const CORE = [
   "./",
   "./index.html",
