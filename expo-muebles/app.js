@@ -60,7 +60,7 @@ function calculate(){
  if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (máximo 2 decimales, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'
 }
 async function load(){try{
- const response=await fetch('./catalogo.json?v=20261002',{cache:'no-store'});if(!response.ok)throw Error();
+ const response=await fetch('./catalogo.json?v=20261003-live',{cache:'no-store'});if(!response.ok)throw Error();
  const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();
  const groups=new Map();
  for(const p of products){
@@ -153,7 +153,7 @@ $('enviar').addEventListener('click',async()=>{
  for(const id of ['cliente','contacto','telefono','correo','vendedor']){if(!field(id)||!$(id).reportValidity()){$(id).focus();return}}
  const data={cliente:field('cliente'),tipo:field('tipo'),contacto:field('contacto'),telefono:field('telefono'),correo:field('correo'),vendedor:field('vendedor'),nota:field('nota'),lines:order.lines.filter(l=>l.quantity),total:order.total};
  const fingerprint=JSON.stringify(data);
- if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:editOrder?editOrder.id:'EXPO26-'+companyRef(field('cliente'))+'-'+crypto.randomUUID().replaceAll('-','').slice(0,6).toUpperCase(),date:editOrder?.date||now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
+ if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:editOrder?editOrder.id:'EXPO26-'+companyRef(field('cliente'))+'-'+crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase(),date:editOrder?.date||now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
  if(editOrder&&!field('edit-reason')){$('edit-reason').focus();$('estado').textContent='Indica el motivo de la modificación.';return}
  Object.assign(data,{id:pendingOrder.id,date:pendingOrder.date});sending=true;$('enviar').disabled=true;$('estado').textContent='Guardando pedido '+data.id+'…';
  const controls=[...document.querySelectorAll('input,select,textarea,button')].filter(el=>!el.disabled&&el.id!=='enviar');controls.forEach(el=>el.disabled=true);
