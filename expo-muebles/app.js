@@ -11,6 +11,39 @@ function newUuid(){
  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)});
 }
 
+async function verifyPricePin(pin){
+ sessionStorage.setItem('lewar-pin',pin);
+ try{
+  await recordRequest('login',{});
+  return true;
+ }catch(error){
+  sessionStorage.removeItem('lewar-pin');
+  return false;
+ }
+}
+async function unlockPrices(){
+ const gate=$('price-gate'),content=$('portal-content'),footer=$('portal-footer'),pinInput=$('price-pin'),button=$('price-unlock'),status=$('price-gate-status');
+ const pin=pinInput.value.trim();
+ if(!/^\d{4}$/.test(pin)){status.textContent='Ingresa un PIN válido de 4 dígitos.';status.className='gate-status status error';pinInput.focus();return}
+ button.disabled=true;status.textContent='Verificando acceso…';status.className='gate-status status';
+ const ok=await verifyPricePin(pin);
+ if(!ok){status.textContent='PIN incorrecto. Verifica e intenta nuevamente.';status.className='gate-status status error';button.disabled=false;pinInput.select();return}
+ gate.hidden=true;content.hidden=false;footer.hidden=false;
+ await load();
+}
+async function initPriceGate(){
+ const gate=$('price-gate'),content=$('portal-content'),footer=$('portal-footer'),pinInput=$('price-pin'),button=$('price-unlock'),status=$('price-gate-status');
+ content.hidden=true;footer.hidden=true;gate.hidden=false;
+ button.addEventListener('click',unlockPrices);
+ pinInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();unlockPrices()}});
+ const existing=sessionStorage.getItem('lewar-pin');
+ if(existing&&/^\d{4}$/.test(existing)){
+  status.textContent='Verificando sesión…';
+  if(await verifyPricePin(existing)){gate.hidden=true;content.hidden=false;footer.hidden=false;await load();return}
+ }
+ pinInput.focus();
+}
+
 function manualLine(entry){
  const unit=Math.round(Number(entry.price)*100)/100;
  return {
@@ -179,4 +212,4 @@ $('enviar').addEventListener('click',async()=>{
   location.href='./pedido-recibido.html';
  }catch(error){submitted=false;$('estado').textContent=(pendingOrder?.saved?'La orden está guardada, pero no se pudo preparar el comprobante: ':'No se guardó el pedido: ')+error.message;controls.forEach(el=>el.disabled=false)}
  finally{sending=false;$('enviar').disabled=submitted}
-});load();
+});initPriceGate();
