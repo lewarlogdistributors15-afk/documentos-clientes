@@ -79,13 +79,15 @@ Deno.serve(async (req) => {
 
       const q = (u.searchParams.get("q") || "").trim().toLowerCase();
       const offset = Math.max(0, Number(u.searchParams.get("offset") || "0"));
-      const limit = 101;
-
-      const { data: rows, error } = await db
+      const pageSize = 100;
+      const baseQuery = db
         .from("expo_orders")
         .select("*")
-        .order("created_at", { ascending: false })
-        .range(offset, offset + limit - 1);
+        .order("created_at", { ascending: false });
+
+      const { data: rows, error } = q
+        ? await baseQuery.limit(2000)
+        : await baseQuery.range(offset, offset + pageSize);
       if (error) throw error;
 
       let orders = (rows || []).map((r: any) => ({
@@ -101,11 +103,16 @@ Deno.serve(async (req) => {
             .filter(Boolean)
             .some((v) => String(v).toLowerCase().includes(q))
         );
+        return json(req, {
+          orders: orders.slice(offset, offset + pageSize),
+          more: orders.length > offset + pageSize,
+          email: "Acceso por PIN Lewar",
+        });
       }
 
       return json(req, {
-        orders: orders.slice(0, 100),
-        more: orders.length > 100,
+        orders: orders.slice(0, pageSize),
+        more: orders.length > pageSize,
         email: "Acceso por PIN Lewar",
       });
     }
