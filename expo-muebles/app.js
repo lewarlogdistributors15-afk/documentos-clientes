@@ -102,7 +102,7 @@ function calculate(){
  if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (máximo 2 decimales, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'
 }
 async function load(){try{
- const response=await fetch('./catalogo.json?v=20261003-live',{cache:'no-store'});if(!response.ok)throw Error();
+ const response=await fetch('./catalogo.json?v=20261003-artx2419sw',{cache:'no-store'});if(!response.ok)throw Error();
  const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();
  const groups=new Map();
  for(const p of products){
