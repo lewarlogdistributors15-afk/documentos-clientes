@@ -2,7 +2,7 @@ const EMAIL_SERVICE_ENABLED=true;
 const $=id=>document.getElementById(id),usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 let products=[],order,invalid=false,sending=false,submitted=false,pendingOrder=null,editOrder=null,manualEntries=[];try{editOrder=JSON.parse(sessionStorage.getItem('lewar-edit-order'))}catch{}
 function newUuid(){
- if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.newUuid();
+ if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();
  const bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
  const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
  return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
