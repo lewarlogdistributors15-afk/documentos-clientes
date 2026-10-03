@@ -1,5 +1,9 @@
 const RECORD_API='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/registro';
-async function recordRequest(action,body){const pin=sessionStorage.getItem('lewar-pin');const res=await fetch(RECORD_API,{method:'POST',headers:{'Content-Type':'application/json',...(pin?{'x-lewar-pin':pin}:{})},body:JSON.stringify({action,...body}),signal:AbortSignal.timeout(25000)});const result=await res.json();if(!res.ok)throw Error(result.error||'No se pudo guardar la orden');return result;}
+async function fetchWithTimeout(url,options,ms){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),ms);
+ try{return await fetch(url,{...(options||{}),signal:controller.signal})}finally{clearTimeout(timer)}
+}
+async function recordRequest(action,body){const pin=sessionStorage.getItem('lewar-pin');const res=await fetchWithTimeout(RECORD_API,{method:'POST',headers:{'Content-Type':'application/json',...(pin?{'x-lewar-pin':pin}:{})},body:JSON.stringify({action,...body})},25000);const result=await res.json();if(!res.ok)throw Error(result.error||'No se pudo guardar la orden');return result;}
 async function orderPdf(data){const res=await fetch('./lewar-logo.png');if(!res.ok)throw Error('No se pudo cargar el logo');return createOrderPdf(data,await res.arrayBuffer())}
 const orderMoney=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 function bytesToBase64(bytes){let binary='';const step=0x8000;for(let i=0;i<bytes.length;i+=step)binary+=String.fromCharCode(...bytes.subarray(i,i+step));return btoa(binary)}
@@ -41,7 +45,7 @@ async function submitOrderEmail(data,bytes,receipt){
  };
  for(const [name,value] of Object.entries(fields))form.append(name,String(value??''));
  form.append('attachment',new File([new Blob([bytes],{type:'application/pdf'})],data.id+'-v'+data.version+'.pdf',{type:'application/pdf'}));
- const res=await fetch('https://formly.email/submit',{method:'POST',body:form,signal:AbortSignal.timeout(30000)});
+ const res=await fetchWithTimeout('https://formly.email/submit',{method:'POST',body:form},30000);
  let result={};try{result=await res.json()}catch{}
  if(!res.ok||result.success===false)throw Error(result.message||'El servicio de correo no confirmó el envío');
  try{await recordRequest('receipt',{id:data.id,version:data.version,receipt});sessionStorage.removeItem('order-receipt')}catch{}
