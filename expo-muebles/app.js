@@ -208,7 +208,15 @@ $('enviar').addEventListener('click',async()=>{
   const bytes=await orderPdf(saved);
   const download=$('descargar-pedido');if(download.href.startsWith('blob:'))URL.revokeObjectURL(download.href);download.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));download.download=saved.id+'-v'+saved.version+'.pdf';download.style.display='block';
   queueOrderEmail(saved,bytes,pendingOrder.receipt);
-  sessionStorage.removeItem('lewar-edit-order');submitted=true;$('enviar').textContent='Pedido guardado';$('estado').textContent='Pedido confirmado. El correo con PDF se enviará aparte.';
+  sessionStorage.removeItem('lewar-edit-order');submitted=true;$('enviar').textContent='Pedido guardado';$('estado').textContent='Orden guardada. Confirmando envío del correo con PDF…';
+  try{
+   await submitOrderEmail(saved,bytes,pendingOrder.receipt);
+   sessionStorage.removeItem('queued-order-email');
+   $('estado').textContent='Pedido confirmado y correo procesado. Abriendo comprobante…';
+  }catch(emailError){
+   sessionStorage.setItem('last-email-error',String(emailError&&emailError.message||emailError||'Error de correo'));
+   $('estado').textContent='Pedido guardado. El correo no confirmó en el primer intento; se reintentará automáticamente.';
+  }
   location.href='./pedido-recibido.html';
  }catch(error){submitted=false;$('estado').textContent=(pendingOrder?.saved?'La orden está guardada, pero no se pudo preparar el comprobante: ':'No se guardó el pedido: ')+error.message;controls.forEach(el=>el.disabled=false)}
  finally{sending=false;$('enviar').disabled=submitted}
