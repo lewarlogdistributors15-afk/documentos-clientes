@@ -1,6 +1,12 @@
 const EMAIL_SERVICE_ENABLED=true;
 const $=id=>document.getElementById(id),usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 let products=[],order,invalid=false,sending=false,submitted=false,pendingOrder=null,editOrder=null,manualEntries=[];try{editOrder=JSON.parse(sessionStorage.getItem('lewar-edit-order'))}catch{}
+function newUuid(){
+ if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.newUuid();
+ const bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+ const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+ return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
+}
 
 function manualLine(entry){
  const unit=Math.round(Number(entry.price)*100)/100;
@@ -26,7 +32,7 @@ function addManualEntry(){
  if(!model){$('manual-modelo').focus();$('estado').textContent='Escribe el modelo del artículo manual.';return}
  if(!Number.isInteger(quantity)||quantity<1||quantity>999){$('manual-cantidad').focus();$('estado').textContent='La cantidad manual debe ser entre 1 y 999.';return}
  if(!Number.isFinite(price)||price<0||price>999999.99){$('manual-precio').focus();$('estado').textContent='Escribe un precio unitario manual válido.';return}
- manualEntries.push({id:crypto.randomUUID(),modelo:model,quantity,price:Math.round(price*100)/100,note});
+ manualEntries.push({id:newUuid(),modelo:model,quantity,price:Math.round(price*100)/100,note});
  $('manual-modelo').value='';$('manual-cantidad').value='1';$('manual-precio').value='';$('manual-nota').value='';
  renderManualEntries();calculate();$('manual-modelo').focus();
 }
@@ -107,7 +113,7 @@ async function load(){try{
   for(const line of editOrder.lines){
    const qty=$('qty-'+line.product.modelo);
    if(line.manualEntry||!qty){
-    manualEntries.push({id:crypto.randomUUID(),modelo:line.product.modelo,quantity:line.quantity,price:line.unit,note:line.product.descripcion==='Artículo añadido manualmente'?'':(line.product.descripcion||'')});
+    manualEntries.push({id:newUuid(),modelo:line.product.modelo,quantity:line.quantity,price:line.unit,note:line.product.descripcion==='Artículo añadido manualmente'?'':(line.product.descripcion||'')});
    }else{
     qty.value=line.quantity;
     if(line.manual)$('manual-'+line.product.modelo).value=line.unit
@@ -150,15 +156,16 @@ const categoryMeta={
 function categoryInfo(raw){return categoryMeta[raw]||['99',raw||'Otros']}
 $('enviar').addEventListener('click',async()=>{
  if(sending||submitted)return;calculate();if(invalid||!order.units)return;
- for(const id of ['cliente','contacto','telefono','correo','vendedor']){if(!field(id)||!$(id).reportValidity()){$(id).focus();return}}
+ const requiredLabels={cliente:'Nombre comercial',contacto:'Persona de contacto',telefono:'Teléfono',correo:'Correo electrónico',vendedor:'Vendedor'};
+ for(const id of ['cliente','contacto','telefono','correo','vendedor']){if(!field(id)||!$(id).reportValidity()){$(id).focus();$('estado').textContent='Completa correctamente el campo: '+requiredLabels[id]+'.';return}}
  const data={cliente:field('cliente'),tipo:field('tipo'),contacto:field('contacto'),telefono:field('telefono'),correo:field('correo'),vendedor:field('vendedor'),nota:field('nota'),lines:order.lines.filter(l=>l.quantity),total:order.total};
  const fingerprint=JSON.stringify(data);
- if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:editOrder?editOrder.id:'EXPO26-'+companyRef(field('cliente'))+'-'+crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase(),date:editOrder?.date||now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
+ if(!pendingOrder||pendingOrder.fingerprint!==fingerprint){const now=new Date();pendingOrder={fingerprint,id:editOrder?editOrder.id:'EXPO26-'+companyRef(field('cliente'))+'-'+newUuid().replace(/-/g,'').slice(0,8).toUpperCase(),date:editOrder?.date||now.toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'})}}
  if(editOrder&&!field('edit-reason')){$('edit-reason').focus();$('estado').textContent='Indica el motivo de la modificación.';return}
  Object.assign(data,{id:pendingOrder.id,date:pendingOrder.date});sending=true;$('enviar').disabled=true;$('estado').textContent='Guardando pedido '+data.id+'…';
  const controls=[...document.querySelectorAll('input,select,textarea,button')].filter(el=>!el.disabled&&el.id!=='enviar');controls.forEach(el=>el.disabled=true);
  try{
-  if(!pendingOrder.requestKey){pendingOrder.requestKey=crypto.randomUUID();pendingOrder.receipt=crypto.randomUUID()+crypto.randomUUID()}
+  if(!pendingOrder.requestKey){pendingOrder.requestKey=newUuid();pendingOrder.receipt=newUuid()+newUuid()}
   if(!pendingOrder.saved){pendingOrder.saved=await recordRequest(editOrder?'edit':'create',editOrder?{id:editOrder.id,version:editOrder.version,order:data,reason:field('edit-reason')}:{requestKey:pendingOrder.requestKey,receipt:pendingOrder.receipt,order:data});if(pendingOrder.saved.receipt)pendingOrder.receipt=pendingOrder.saved.receipt}
   const saved=pendingOrder.saved.order;Object.assign(data,saved);
   $('estado').textContent='Orden guardada. Preparando comprobante…';
