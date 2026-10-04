@@ -114,6 +114,23 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .top-official-logo{width:44px;height:44px;flex:0 0 44px;margin-right:-10px}
 @media(max-width:820px){.login-official-logo{top:18px;right:18px;width:82px;height:82px}.top-official-logo{width:38px;height:38px;flex-basis:38px}}
 
+
+/* Catalog divisions from Lewar source catalogs */
+.divisionTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 10px}
+.divisionTab{border:1px solid #d7e0ea;background:#fff;border-radius:8px;padding:12px 14px;text-align:left;color:#344054;min-height:62px}
+.divisionTab b{display:block;font-size:14px;color:#142238;margin-bottom:4px}
+.divisionTab span{display:block;font-size:10px;color:#748196;line-height:1.3}
+.divisionTab.active{border-color:#0b6fdc;background:#eaf4ff;box-shadow:0 0 0 1px #0b6fdc}
+.divisionTab.active b{color:#075fb8}
+.catalogSourceNote{font-size:11px;color:#667085;margin:0 0 12px;padding:9px 11px;background:#f8fafc;border:1px solid #e4e9ef;border-radius:6px}
+.realProductPhoto{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:auto}
+.detailMainImage .realProductPhoto{max-width:88%;max-height:390px}
+.thumb .realProductPhoto{max-width:92%;max-height:54px}
+.catalogSourceBadge{font-size:9px;color:#526275;background:#f1f5f9;border-radius:4px;padding:3px 6px;width:max-content;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.noPrice{font-size:14px;color:#344054;font-weight:800;min-height:23px;display:flex;align-items:center}
+.addBtn.infoOnly{background:#e7f1fd;color:#0b65c3}
+@media(max-width:820px){.divisionTabs{grid-template-columns:1fr}.divisionTab{min-height:auto}}
+
 </style>
 </head>
 <body>
@@ -213,7 +230,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       </section>
 
       <section id="view-catalog" class="hidden">
-        <div class="catalogHeader"><h1>Catálogo de Productos</h1><span class="demoPill">PRECIOS DEMO</span></div>
+        <div class="catalogHeader"><h1>Catálogo de Productos</h1><span class="demoPill">PRECIOS POR CLIENTE</span></div>
+        <div class="divisionTabs" role="tablist" aria-label="Divisiones del catálogo">
+          <button class="divisionTab active" data-division="large" onclick="setDivision('large',this)"><b>Large Appliances</b><span>Whirlpool · Maytag · Amana</span></button>
+          <button class="divisionTab" data-division="small" onclick="setDivision('small',this)"><b>Small Appliances</b><span>Black+Decker · PowerXL · Remington · Milexus</span></button>
+          <button class="divisionTab" data-division="coriat" onclick="setDivision('coriat',this)"><b>Coriat Commercial</b><span>Equipo profesional para cocina comercial</span></button>
+        </div>
+        <div id="catalogSourceNote" class="catalogSourceNote"></div>
+
         <div class="filters">
           <input id="catalogSearch" placeholder="Buscar producto..." oninput="renderCatalog()">
           <select id="categoryFilter" onchange="renderCatalog()"><option value="">Todas las categorías</option></select>
@@ -293,8 +317,22 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   </div>
 </div>
 
+<script src="../expo-muebles/fotos-catalogo.js"></script>
+<script src="./catalog-small-1.js"></script>
+<script src="./catalog-small-2.js"></script>
+<script src="./catalog-small-3.js"></script>
+<script src="./catalog-coriat-1.js"></script>
+<script src="./catalog-coriat-2.js"></script>
+<script src="./catalog-coriat-3.js"></script>
+<script src="./catalog-coriat-4.js"></script>
 <script>
 const PRODUCTS=[{"flag":"","brand":"AMANA","category":"T-01 WASHERS","sku":"NTW4519JW","capacity":"3.5 CF TOP LOAD","map":489,"convention":370,"volume":365},{"flag":"","brand":"AMANA","category":"T-07 DRYERS","sku":"NED4655EW","capacity":"6.5 CF ELECTRIC DRYER","map":459,"convention":370,"volume":365},{"flag":"","brand":"AMANA","category":"T-07 DRYERS","sku":"NGD4655EW","capacity":"6.5 CF GAS DRYER","map":469,"convention":375,"volume":365},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4955HW","capacity":"3.8 CF TOP LOAD","map":null,"convention":389,"volume":379},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"DRYERS","sku":"WGD4815EW","capacity":"DRYERS","map":null,"convention":385,"volume":null},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4105SW","capacity":"4.0 CF TOP LOAD","map":519,"convention":399,"volume":389},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4107SW","capacity":"4.2 - 4.3 CF TOP LOAD","map":569,"convention":445,"volume":435},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"WED4105SW","capacity":"7.0 CF ELECTRIC / ADAPTIVE DRY","map":549,"convention":429,"volume":419},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"WGD4105SW","capacity":"7.0 CF GAS / ADAPTIVE DRY","map":549,"convention":429,"volume":419},{"flag":"","brand":"MAYTAG","category":"T-01 WASHERS","sku":"MVW4005SW","capacity":"3.8 CF TOP LOAD","map":569,"convention":445,"volume":435},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MED4005SW","capacity":"7.0 CF ELEC. WRINKLE PREVENT","map":549,"convention":420,"volume":410},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"MGD4005SW","capacity":"7.0 CF GAS WRINKLE PREVENT","map":549,"convention":420,"volume":410},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"DRYERS","sku":"WED5010LW","capacity":"7.0 CF ELECT. MOISTURE SENSING DRY","map":599,"convention":499,"volume":null},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"DRYERS","sku":"WGD5010LW","capacity":"7.0 CF GAS MOISTURE SENSING DRY","map":599,"convention":499,"volume":null},{"flag":"","brand":"MAYTAG","category":"T-01 WASHERS","sku":"MVWP586GW","capacity":"3.5 CF TOP L. 5 YEAR WA.","map":899,"convention":699,"volume":689},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MEDP586KW","capacity":"7.4 CF ELEC. COMMERCIAL GRADE RESIDENCIAL","map":809,"convention":645,"volume":635},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MGDP586KW","capacity":"7.4 CF GAS COMMERCIAL GRADE RESIDENCIAL","map":809,"convention":645,"volume":635},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWW1002B","capacity":"20\" 4 BURNERS","map":269,"convention":188,"volume":182},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWW1002Q","capacity":"20\" 4 BURNERS","map":269,"convention":188,"volume":182},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"LAGR2110B","capacity":"30\" 6 BURNERS PORCELAIN COOKTOP","map":379,"convention":290,"volume":280},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"LAGR4130G","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":419,"convention":320,"volume":315},{"flag":"Exceso","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR3100Q","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":489,"convention":365,"volume":360},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR3100B","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":509,"convention":385,"volume":375},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR7000S","capacity":"30\" 6 BURNERS 5.1 CF OVEN WITH CAPELO GLASS TOP","map":529,"convention":null,"volume":null},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AGR6303MMS","capacity":"","map":null,"convention":535,"volume":525},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AEP222VAW","capacity":"20\" 2.6 CF ELECTRIC 4 BURNER","map":559,"convention":437,"volume":427},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AER6303MMS","capacity":"30\" 4.8 CF ELECT. Temp Assure™ Cooking System","map":719,"convention":580,"volume":570},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RW","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":719,"convention":565,"volume":555},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RB","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":709,"convention":565,"volume":555},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RS","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":739,"convention":595,"volume":585},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFRE1330D","capacity":"30\" SLIDE-IN Tecnologia Ever Clean","map":729,"convention":580,"volume":570},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFRE2450D","capacity":"30\" SLIDE-IN Tecnologia Ever Clean","map":null,"convention":615,"volume":599},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT02409D","capacity":"9 CF XPERT INVERTER","map":399,"convention":320,"volume":310},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT1130M","capacity":"11.3 CF XPERT ENERGY","map":599,"convention":470,"volume":460},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT1133M","capacity":"11.3 CF XPERT ENERGY DISP.","map":609,"convention":475,"volume":465},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT112CZJW","capacity":"24\" 11.6 CF COUNTER DEPTH","map":619,"convention":485,"volume":475},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT112CZJZ","capacity":"24\" 11.6 CF COUNTER DEPTH","map":649,"convention":505,"volume":495},{"flag":"","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ARTX2419SW","capacity":"19 CF ENERGY STAR","map":699,"convention":548,"volume":535},{"flag":"","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ARTX2419SZ","capacity":"19 CF ENERGY STAR","map":729,"convention":571,"volume":557},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT108FFDM","capacity":"","map":null,"convention":579,"volume":555},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT518SZFM","capacity":"28\" 18 CF Adjustable Door Bins","map":779,"convention":635,"volume":625},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRTX3019SW","capacity":"30\" 19 CF Total Coverage Cooling","map":779,"convention":605,"volume":590},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRTX5419SZ","capacity":"19 CF ENERGY STAR","map":859,"convention":638,"volume":620},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRS312SNHM","capacity":"SXS 33\" 22 CF","map":999,"convention":785,"volume":775},{"flag":"Exceso","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ASI2575GRS","capacity":"SXS 36\" 25 CF","map":1349,"convention":1013,"volume":978},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRF560SEHZ","capacity":"FRENCH DOOR 30\" 20 CF","map":1359,"convention":1063,"volume":1038},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRS325SDHZ","capacity":"SXS 36\" 25 CF","map":1399,"convention":1125,"volume":1110},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRQA59CNKZ","capacity":"36\" 19.4 CF COUNTER DEPTH 4 DOOR","map":1479,"convention":1160,"volume":1145},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRFF3436RZ","capacity":"25 cf Max. Ice Capacity 3.7lb","map":2089,"convention":1599,"volume":1579},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRFF3536SZ","capacity":"30 cf Indoor Ice","map":1699,"convention":1340,"volume":1320},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1807B","capacity":".7 CF BLACK","map":69,"convention":56,"volume":54},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1811D","capacity":"1.1 CF SILVER","map":114,"convention":83,"volume":80},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1811B","capacity":"1.1 CF BLACK","map":109,"convention":83,"volume":80},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RS","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":243,"volume":237},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RW","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":235,"volume":230},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RZ","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":251,"volume":245},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCE55US0HB","capacity":"30-inch Electric Ceramic","map":null,"convention":400,"volume":390},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCE55US0HS","capacity":"30-inch Electric Ceramic","map":null,"convention":417,"volume":407},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCGK5030PS","capacity":"30-inch Electric Ceramic","map":null,"convention":388,"volume":379},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCGK5030PB","capacity":"30-inch Electric Ceramic","map":null,"convention":356,"volume":348},{"flag":"","brand":"WHIRLPOOL","category":"HOODS","sku":"WH7610D","capacity":"30-inch wall hood","map":null,"convention":117,"volume":114},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCED600GBL","capacity":"COOKTOPS","map":null,"convention":1073,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCED606GBL","capacity":"COOKTOPS","map":null,"convention":1312,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCES556HBL","capacity":"COOKTOPS","map":null,"convention":637,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCGS550ESS","capacity":"COOKTOPS","map":null,"convention":599,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"REFRIGERATORS","sku":"KRFC704FPS","capacity":"REFRIGERATORS","map":null,"convention":4381,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"RANGES","sku":"KSEB900ESS","capacity":"RANGES","map":null,"convention":1897,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"RANGES","sku":"KSGB900ESS","capacity":"RANGES","map":null,"convention":1935,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"REFRIGERATORS","sku":"KUWR214KSB","capacity":"WINE CELLAR","map":null,"convention":1622,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"HOODS","sku":"KXD4630YSS","capacity":"HOOD 30\" Retractable Downdraft","map":null,"convention":842,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"ICE MAKER","sku":"LKUIX535PPS","capacity":"ICE MAKER","map":null,"convention":1533,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"DRYERS","sku":"MED6500MW","capacity":"DRYERS","map":null,"convention":743,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"RANGES","sku":"MER4600LS","capacity":"RANGES","map":null,"convention":645,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"DRYERS","sku":"MGD6500MBK","capacity":"DRYERS","map":null,"convention":615,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"ACCESORIES","sku":"MTK2230PZ","capacity":"ACCESORIES","map":null,"convention":83,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"HOODS","sku":"UVL5430JSS","capacity":"HOODS","map":null,"convention":553,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"COOKTOPS INDUCTION","sku":"WCI55US0JB","capacity":"COOKTOPS INDUCTION","map":null,"convention":764,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"RANGES","sku":"WEG745H0LZ","capacity":"RANGES","map":null,"convention":1119,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"OVENS","sku":"WOS72EC7HS","capacity":"OVENS","map":null,"convention":1213,"volume":null}];
+
+const LARGE_PRODUCTS=PRODUCTS.map(p=>({...p,division:"large",sourceCatalog:"Lewar Equipos Large Appl 4.9.2026",sourceUrl:"https://docs.google.com/presentation/d/1kpt_9ldwkTcIowv3ekGBkflQuq1TqpmIHJcauzLyZEw/edit"}));
+const SMALL_PRODUCTS=[...(window.LEWAR_SMALL_1||[]),...(window.LEWAR_SMALL_2||[]),...(window.LEWAR_SMALL_3||[])];
+const CORIAT_PRODUCTS=[...(window.LEWAR_CORIAT_1||[]),...(window.LEWAR_CORIAT_2||[]),...(window.LEWAR_CORIAT_3||[]),...(window.LEWAR_CORIAT_4||[])];
+const ALL_PRODUCTS=[...LARGE_PRODUCTS,...SMALL_PRODUCTS,...CORIAT_PRODUCTS];
+let currentDivision="large";
 const CLIENTS={
  la15:{user:"muebleriala15",name:"Mueblería La 15",level:"A",term:"NET 30",credit:15000,balance:6580,seller:"Luis Donate",factor:.985},
  ahorro:{user:"ahorromuebles",name:"Ahorro Muebles",level:"A+",term:"NET 30",credit:25000,balance:4100,seller:"Carlos Negrón",factor:.97},
@@ -313,7 +351,7 @@ let orders=JSON.parse(localStorage.getItem("lewarOrders")||"null")||[
 ];
 let favorites=JSON.parse(localStorage.getItem("lewarFav")||"[]");
 let overrides=JSON.parse(localStorage.getItem("lewarOverrides")||"{}");
-let selectedSku=PRODUCTS[0]?.sku||"";
+let selectedSku=ALL_PRODUCTS[0]?.sku||"";
 
 function money(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(Number(v)||0)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
@@ -324,7 +362,7 @@ function clientPrice(p,key=currentKey){
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
 function availableUnits(p){let n=0;for(const c of p.sku)n+=c.charCodeAt(0);return 6+(n%31)}
-function desc(p){return p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
+function desc(p){return p.name||p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
 
 function kind(p){const c=(p.category+" "+p.capacity).toUpperCase();if(c.includes("WASH"))return"washer";if(c.includes("DRY"))return"dryer";if(c.includes("REFRIG")||c.includes("WINE"))return"fridge";if(c.includes("RANGE")||c.includes("OVEN"))return"range";if(c.includes("MWO")||c.includes("MICRO"))return"micro";if(c.includes("COOKTOP"))return"cooktop";if(c.includes("HOOD"))return"hood";return"appliance"}
 function svg(p,size="card"){
@@ -338,6 +376,28 @@ function svg(p,size="card"){
   if(k==="cooktop")return '<svg '+common+'><g transform="rotate(-8 70 90)"><rect x="18" y="68" width="104" height="55" rx="3" fill="#1f2428" stroke="#69737b"/><circle cx="45" cy="88" r="13" fill="none" stroke="#aab2b8" stroke-width="3"/><circle cx="93" cy="88" r="13" fill="none" stroke="#aab2b8" stroke-width="3"/><circle cx="70" cy="108" r="9" fill="none" stroke="#aab2b8" stroke-width="3"/></g></svg>';
   if(k==="hood")return '<svg '+common+'><path d="M30 58h80l-11 35H41z" fill="#d5dadd" stroke="#879199"/><rect x="59" y="25" width="22" height="35" fill="#c4cacf" stroke="#879199"/><path d="M40 98h60" stroke="#65717b" stroke-width="4"/></svg>';
   return '<svg '+common+'><rect x="40" y="35" width="60" height="120" rx="8" fill="#e0e4e8" stroke="#8d98a2"/><circle cx="70" cy="67" r="13" fill="#8b969f"/><rect x="50" y="100" width="40" height="30" rx="3" fill="#c3c9ce"/></svg>'
+}
+
+
+function divisionProducts(){return ALL_PRODUCTS.filter(p=>p.division===currentDivision)}
+function divisionLabel(d){return d==="small"?"Small Appliances":d==="coriat"?"Coriat Commercial":"Large Appliances"}
+function availabilityText(p){return p.availabilityLabel||("Disponible: "+availableUnits(p)+" unidades")}
+function productVisual(p,size="card"){
+  const cls=size==="detail"?"realProductPhoto detailPhoto":"realProductPhoto";
+  if(p.image){
+    return '<img class="'+cls+'" src="'+esc(p.image)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><span style="display:none">'+svg(p,size)+'</span>';
+  }
+  if(typeof productPhotos!=="undefined" && productPhotos && productPhotos[p.sku]){
+    return '<img class="'+cls+'" src="'+productPhotos[p.sku]+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy">';
+  }
+  return svg(p,size);
+}
+function setDivision(d,btn){
+  currentDivision=d;
+  document.querySelectorAll(".divisionTab").forEach(x=>x.classList.toggle("active",x.dataset.division===d));
+  const q=document.getElementById("catalogSearch"); if(q)q.value="";
+  buildFilters();
+  renderCatalog();
 }
 
 function login(){
@@ -357,37 +417,55 @@ function init(){
  document.getElementById("credit").textContent=money(c.credit);document.getElementById("available").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("term").textContent=c.term;document.getElementById("seller").textContent=c.seller;
  document.getElementById("accountBalance").textContent=money(c.balance);document.getElementById("accountAvail").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("accountTerm").textContent=c.term;
  document.getElementById("adminNav").classList.toggle("hidden",currentKey!=="admin");
- buildFilters();renderDashboard();renderCatalog();renderCart();renderOrders();renderFavorites();renderProfile();renderAdmin();updateCartBubble();
- document.getElementById("bannerArt").innerHTML=PRODUCTS.slice(0,5).map(p=>'<div style="height:150px;width:90px">'+svg(p)+'</div>').join("");
+ currentDivision="large";buildFilters();renderDashboard();renderCatalog();renderCart();renderOrders();renderFavorites();renderProfile();renderAdmin();updateCartBubble();
+ document.getElementById("bannerArt").innerHTML=LARGE_PRODUCTS.slice(0,5).map(p=>'<div style="height:150px;width:90px">'+productVisual(p)+'</div>').join("");
  if(currentKey==="admin")showView("admin");
 }
 function buildFilters(){
- const cats=[...new Set(PRODUCTS.map(p=>p.category).filter(Boolean))].sort(),brands=[...new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))].sort();
+ const pool=divisionProducts();
+ const cats=[...new Set(pool.map(p=>p.category).filter(Boolean))].sort(),brands=[...new Set(pool.map(p=>p.brand).filter(Boolean))].sort();
  document.getElementById("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  document.getElementById("brandFilter").innerHTML='<option value="">Todas las marcas</option>'+brands.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
- document.getElementById("adminClientSelect").innerHTML=Object.entries(CLIENTS).filter(([k])=>k!=="admin").map(([k,c])=>'<option value="'+k+'">'+esc(c.name)+'</option>').join("");
+ const admin=document.getElementById("adminClientSelect");
+ if(admin&&!admin.options.length)admin.innerHTML=Object.entries(CLIENTS).filter(([k])=>k!=="admin").map(([k,v])=>'<option value="'+k+'">'+esc(v.name)+'</option>').join("");
+ const note=document.getElementById("catalogSourceNote");
+ if(note){
+   const source=currentDivision==="large"?"Lewar Equipos Large Appl 4.9.2026":currentDivision==="small"?"Small Appliance B&D Actualizado Abr 9, 2026":"Coriat Catalogo Commercial";
+   note.textContent=divisionLabel(currentDivision)+" · "+pool.length+" productos · Fuente: "+source+". Los equipos sin precio muestran “Precio según cuenta” hasta que la gerente asigne el precio.";
+ }
 }
-
 function productCard(p){
- const price=clientPrice(p), regular=Number(p.map||p.convention||price), fav=favorites.includes(p.sku);
- return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail">Disponible: '+availableUnits(p)+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+svg(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="priceOld">'+(regular?money(regular):"")+'</div><div class="priceNow">'+(price?money(price):"Consultar")+'</div><div class="cardActions"><select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button></div></article>';
+ const price=clientPrice(p),regular=Number(p.map||p.convention||0),fav=favorites.includes(p.sku);
+ const regularHtml=(regular&&price)?'<div class="priceOld">'+money(regular)+'</div>':'<div class="priceOld">&nbsp;</div>';
+ const priceHtml=price?'<div class="priceNow">'+money(price)+'</div>':'<div class="noPrice">Precio según cuenta</div>';
+ const action=price?'<select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button>':'<button class="addBtn infoOnly" style="grid-column:1/-1" onclick="openProduct(\''+esc(p.sku)+'\')">Ver ficha</button>';
+ return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+'<div class="cardActions">'+action+'</div></article>';
 }
 function renderDashboard(){
- const priced=PRODUCTS.filter(p=>clientPrice(p)>0);
+ const priced=LARGE_PRODUCTS.filter(p=>clientPrice(p)>0);
  document.getElementById("buyAgain").innerHTML=priced.slice(0,4).map(productCard).join("");
  document.getElementById("featured").innerHTML=priced.slice(4,12).map(productCard).join("");
 }
 function renderCatalog(){
  const q=(document.getElementById("catalogSearch").value||"").toLowerCase(),cat=document.getElementById("categoryFilter").value,brand=document.getElementById("brandFilter").value,sort=document.getElementById("sortFilter").value;
- let arr=PRODUCTS.filter(p=>(!q||[p.sku,p.brand,p.category,p.capacity].join(" ").toLowerCase().includes(q))&&(!cat||p.category===cat)&&(!brand||p.brand===brand));
- if(sort==="low")arr.sort((a,b)=>clientPrice(a)-clientPrice(b));else if(sort==="high")arr.sort((a,b)=>clientPrice(b)-clientPrice(a));
+ let arr=divisionProducts().filter(p=>(!q||[p.sku,p.brand,p.category,p.capacity,p.name,(p.specs||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!cat||p.category===cat)&&(!brand||p.brand===brand));
+ if(sort==="low")arr.sort((a,b)=>(clientPrice(a)||999999)-(clientPrice(b)||999999));else if(sort==="high")arr.sort((a,b)=>clientPrice(b)-clientPrice(a));
+ const note=document.getElementById("catalogSourceNote");
+ if(note){
+   const source=currentDivision==="large"?"Lewar Equipos Large Appl 4.9.2026":currentDivision==="small"?"Small Appliance B&D Actualizado Abr 9, 2026":"Coriat Catalogo Commercial";
+   note.textContent=divisionLabel(currentDivision)+" · "+arr.length+" productos visibles · Fuente: "+source+". Los productos sin precio quedan pendientes de asignación en la base por cliente.";
+ }
  document.getElementById("catalogGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">No se encontraron productos.</div>';
 }
 function globalSearch(v){showView("catalog");document.getElementById("catalogSearch").value=v;renderCatalog()}
 function openProduct(sku){selectedSku=sku;renderDetail();showView("detail")}
 function renderDetail(){
- const p=PRODUCTS.find(x=>x.sku===selectedSku);if(!p)return;const price=clientPrice(p),regular=Number(p.map||p.convention||price);
- document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="thumbCol">'+[1,2,3,4,5].map(()=>'<div class="thumb">'+svg(p)+'</div>').join("")+'</div><div class="detailMainImage">'+svg(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock">● Disponible: '+availableUnits(p)+' unidades</div><h3>Descripción</h3><ul><li>'+esc(desc(p))+'</li><li>Producto distribuido por Lewar LogDistributors</li><li>Acceso a precio personalizado por cuenta</li><li>Disponibilidad sujeta a confirmación</li><li>Garantía según marca y modelo</li></ul><div class="detailPriceBlock"><div class="reg">Precio regular distribuidor: <s>'+money(regular)+'</s></div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" onclick="addDetailToCart()">Agregar al carrito</button></div><div class="volumeBox"><h4>Descuentos por cantidad · ejemplo</h4><div class="volumeRow"><span>1 – 4 unidades</span><b>'+money(price)+' c/u</b></div><div class="volumeRow"><span>5 – 9 unidades</span><b>'+money(Math.max(1,price-10))+' c/u</b></div><div class="volumeRow"><span>10+ unidades</span><b>'+money(Math.max(1,price-20))+' c/u</b></div></div></div></div></div>';
+ const p=ALL_ALL_PRODUCTS.find(x=>x.sku===selectedSku);if(!p)return;
+ const price=clientPrice(p),regular=Number(p.map||p.convention||0);
+ const specs=(p.specs&&p.specs.length?p.specs:[desc(p),"Producto distribuido por Lewar LogDistributors","Disponibilidad sujeta a confirmación","Garantía según marca y modelo"]).map(x=>'<li>'+esc(x)+'</li>').join("");
+ const thumbs=[1,2,3,4].map(()=>'<div class="thumb">'+productVisual(p)+'</div>').join("");
+ const priceBlock=price?'<div class="reg">'+(regular?'Precio regular distribuidor: <s>'+money(regular)+'</s>':'')+'</div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" onclick="addDetailToCart()">Agregar al carrito</button></div>':'<div class="clientPrice">Precio para '+esc(CLIENTS[currentKey].name)+': <strong style="font-size:18px;color:#344054">Pendiente de asignar</strong></div><p class="lead">La gerente puede asignar este precio por cliente desde la hoja maestra de Google Drive.</p>';
+ document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="thumbCol">'+thumbs+'</div><div class="detailMainImage">'+productVisual(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock">● '+esc(availabilityText(p))+'</div><div class="catalogSourceBadge">Fuente: '+esc(p.sourceCatalog||"Catálogo Lewar")+'</div><h3>Información del producto</h3><ul>'+specs+'</ul><div class="detailPriceBlock">'+priceBlock+'</div></div></div>';
 }
 function detailQty(d){const el=document.getElementById("detailQty");el.textContent=Math.max(1,Number(el.textContent)+d)}
 function addDetailToCart(){const q=Number(document.getElementById("detailQty").textContent)||1;cart[selectedSku]=(cart[selectedSku]||0)+q;saveCart();renderCart();updateCartBubble();showView("cart")}
@@ -399,13 +477,13 @@ function removeCart(sku){delete cart[sku];saveCart();renderCart();updateCartBubb
 function renderCart(){
  const entries=Object.entries(cart),wrap=document.getElementById("cartWrap");let subtotal=0;
  if(!entries.length){wrap.innerHTML='<div class="empty">Tu carrito está vacío.</div>';document.getElementById("cartTotals").innerHTML='';return}
- wrap.innerHTML='<table class="cartTable"><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>'+entries.map(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku),price=clientPrice(p),total=price*q;subtotal+=total;return '<tr><td><div class="cartProduct"><div class="miniArt">'+svg(p)+'</div><div><b>'+esc(p.brand+" "+p.sku)+'</b><div class="muted">'+esc(desc(p))+'</div></div></div></td><td>'+money(price)+'</td><td><div class="stepper"><button onclick="changeCart(\''+esc(sku)+'\',-1)">−</button><span>'+q+'</span><button onclick="changeCart(\''+esc(sku)+'\',1)">+</button></div></td><td><b>'+money(total)+'</b></td><td><button class="remove" onclick="removeCart(\''+esc(sku)+'\')">⌫</button></td></tr>'}).join("")+'</tbody></table>';
+ wrap.innerHTML='<table class="cartTable"><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>'+entries.map(([sku,q])=>{const p=ALL_PRODUCTS.find(x=>x.sku===sku),price=clientPrice(p),total=price*q;subtotal+=total;return '<tr><td><div class="cartProduct"><div class="miniArt">'+svg(p)+'</div><div><b>'+esc(p.brand+" "+p.sku)+'</b><div class="muted">'+esc(desc(p))+'</div></div></div></td><td>'+money(price)+'</td><td><div class="stepper"><button onclick="changeCart(\''+esc(sku)+'\',-1)">−</button><span>'+q+'</span><button onclick="changeCart(\''+esc(sku)+'\',1)">+</button></div></td><td><b>'+money(total)+'</b></td><td><button class="remove" onclick="removeCart(\''+esc(sku)+'\')">⌫</button></td></tr>'}).join("")+'</tbody></table>';
  const totalQty=Object.values(cart).reduce((a,b)=>a+b,0),discount=totalQty>=10?50:0,total=subtotal-discount;
  document.getElementById("cartTotals").innerHTML='<div class="sumrow"><span>Subtotal</span><b>'+money(subtotal)+'</b></div><div class="sumrow discount"><span>Descuento por volumen</span><b>'+(discount?'-'+money(discount):money(0))+'</b></div><div class="sumrow total"><span>Total</span><span>'+money(total)+'</span></div>';
 }
 function placeOrder(){
  const entries=Object.entries(cart);if(!entries.length){alert("El carrito está vacío.");return}
- let total=0;entries.forEach(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku);total+=clientPrice(p)*q});
+ let total=0;entries.forEach(([sku,q])=>{const p=ALL_PRODUCTS.find(x=>x.sku===sku);total+=clientPrice(p)*q});
  const id="LW-"+new Date().getFullYear()+"-"+String(Math.floor(1000+Math.random()*8999));
  orders.unshift({id,date:new Date().toLocaleDateString("en-US"),status:"Procesando",total});
  localStorage.setItem("lewarOrders",JSON.stringify(orders));cart={};saveCart();updateCartBubble();renderCart();renderOrders();showView("orders");alert("Orden demo registrada como "+id+". No fue enviada a SAP ni a facturación.");
@@ -415,12 +493,12 @@ function renderOrders(){
  document.getElementById("ordersWrap").innerHTML='<table class="orderTable"><thead><tr><th># Orden</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead><tbody>'+orders.map(o=>'<tr><td><b>'+esc(o.id)+'</b></td><td>'+esc(o.date)+'</td><td><span class="status '+statusClass(o.status)+'">'+esc(o.status)+'</span></td><td><b>'+money(o.total)+'</b></td><td><button class="pdfBtn" onclick="alert(\'PDF disponible al integrar el generador de órdenes.\')">Ver PDF</button></td></tr>').join("")+'</tbody></table>';
 }
 function toggleFav(sku){favorites=favorites.includes(sku)?favorites.filter(x=>x!==sku):[...favorites,sku];localStorage.setItem("lewarFav",JSON.stringify(favorites));renderDashboard();renderCatalog();renderFavorites()}
-function renderFavorites(){const arr=PRODUCTS.filter(p=>favorites.includes(p.sku));document.getElementById("favoritesGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">Aún no has añadido productos a favoritos.</div>'}
+function renderFavorites(){const arr=ALL_PRODUCTS.filter(p=>favorites.includes(p.sku));document.getElementById("favoritesGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">Aún no has añadido productos a favoritos.</div>'}
 function renderProfile(){const c=CLIENTS[currentKey];document.getElementById("profilePanel").innerHTML='<h3>'+esc(c.name)+'</h3><p><b>Nivel de precio:</b> '+esc(c.level)+'</p><p><b>Término:</b> '+esc(c.term)+'</p><p><b>Vendedor:</b> '+esc(c.seller)+'</p><p class="lead">Los datos de dirección, contacto y documentos de registro se conectarían al expediente real del cliente.</p>'}
 function renderAdmin(){
  if(!document.getElementById("adminClientSelect").options.length)return;
  const key=document.getElementById("adminClientSelect").value||"la15",c=CLIENTS[key];document.getElementById("adminClientName").textContent=c.name;
- document.getElementById("adminPriceRows").innerHTML=PRODUCTS.slice(0,16).map(p=>'<tr><td><b>'+esc(p.brand+" "+p.sku)+'</b></td><td>'+money(basePrice(p))+'</td><td><input class="priceInput" id="ap-'+cid(p.sku)+'" type="number" step="0.01" value="'+clientPrice(p,key)+'"></td><td><button class="saveSmall" onclick="saveOverride(\''+key+'\',\''+esc(p.sku)+'\')">Guardar</button></td></tr>').join("");
+ document.getElementById("adminPriceRows").innerHTML=ALL_PRODUCTS.slice(0,16).map(p=>'<tr><td><b>'+esc(p.brand+" "+p.sku)+'</b></td><td>'+money(basePrice(p))+'</td><td><input class="priceInput" id="ap-'+cid(p.sku)+'" type="number" step="0.01" value="'+clientPrice(p,key)+'"></td><td><button class="saveSmall" onclick="saveOverride(\''+key+'\',\''+esc(p.sku)+'\')">Guardar</button></td></tr>').join("");
 }
 function saveOverride(key,sku){const v=document.getElementById("ap-"+cid(sku)).value;if(!overrides[key])overrides[key]={};overrides[key][sku]=v;localStorage.setItem("lewarOverrides",JSON.stringify(overrides));alert("Precio demo actualizado para "+CLIENTS[key].name+" · "+sku)}
 function showView(v,btn){
