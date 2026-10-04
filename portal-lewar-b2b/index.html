@@ -107,12 +107,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 @media(max-width:1100px){.products{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:55px 280px 1fr}.detailMainImage{min-height:360px}.cartBottom{grid-template-columns:1fr}}
 @media(max-width:820px){.loginScreen{grid-template-columns:1fr}.loginVisual{min-height:300px;padding:32px}.loginVisual .logo{margin-top:30px}.layout{grid-template-columns:1fr}.sidebar{display:none}.topbar .logo{width:auto}.topSearch{display:none}.content{padding:18px}.products{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}.thumbCol{display:none}.detailMainImage{border-right:0;border-bottom:1px solid var(--line)}.adminLayout{grid-template-columns:1fr}.adminSide{display:flex;overflow:auto}.adminSide button{white-space:nowrap;width:auto}.banner{grid-template-columns:1fr;height:auto}.bannerArt{min-height:170px}.bannerBrands{display:none}}
 @media(max-width:520px){.products{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.topbar{padding:0 14px}.userTop>div:last-child{display:none}.loginCardWrap{padding:20px}.loginCard{padding:24px}.filters{grid-template-columns:1fr}.cartTable thead{display:none}.cartTable,.cartTable tbody,.cartTable tr,.cartTable td{display:block;width:100%}.cartTable tr{padding:10px 0;border-bottom:1px solid var(--line)}.cartTable td{border:0;padding:5px}.orderTable{font-size:9px}.bannerCopy h2{font-size:27px}}
+
+/* Official Lewar logo — added without changing portal colors */
+.official-lewar-logo{object-fit:contain;display:block;mix-blend-mode:screen;filter:contrast(1.04) saturate(1.05);pointer-events:none}
+.login-official-logo{position:absolute;top:28px;right:34px;width:118px;height:118px;z-index:2}
+.top-official-logo{width:44px;height:44px;flex:0 0 44px;margin-right:-10px}
+@media(max-width:820px){.login-official-logo{top:18px;right:18px;width:82px;height:82px}.top-official-logo{width:38px;height:38px;flex-basis:38px}}
+
 </style>
 </head>
 <body>
 
 <section id="loginScreen" class="loginScreen">
-  <div class="loginVisual">
+  <div class="loginVisual"><img class="official-lewar-logo login-official-logo" src="../expo-muebles/lewar-logo.png" alt="Lewar LogDistributors">
     <div>
       <div class="logo">LEWAR<small>LOGDISTRIBUTORS</small></div>
       <h1>Portal de Clientes</h1>
@@ -146,7 +153,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 </section>
 
 <div id="app" class="app hidden">
-  <header class="topbar">
+  <header class="topbar"><img class="official-lewar-logo top-official-logo" src="../expo-muebles/lewar-logo.png" alt="Lewar LogDistributors">
     <div class="logo">LEWAR<small>LOGDISTRIBUTORS</small></div>
     <div class="topSearch"><input id="globalSearch" placeholder="Buscar por modelo, categoría o marca..." oninput="globalSearch(this.value)"><span class="mag">⌕</span></div>
     <div class="topActions">
