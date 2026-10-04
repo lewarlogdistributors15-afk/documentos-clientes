@@ -8,12 +8,18 @@ async function orderPdf(data){const res=await fetch('./lewar-logo.png');if(!res.
 const orderMoney=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
 function bytesToBase64(bytes){let binary='';const step=0x8000;for(let i=0;i<bytes.length;i+=step)binary+=String.fromCharCode(...bytes.subarray(i,i+step));return btoa(binary)}
 function base64ToBytes(b64){return Uint8Array.from(atob(b64),c=>c.charCodeAt(0))}
+function durableSet(key,value){try{localStorage.setItem(key,value);return true}catch{}try{sessionStorage.setItem(key,value);return true}catch{}return false}
+function durableGet(key){try{const value=localStorage.getItem(key);if(value!==null)return value}catch{}try{return sessionStorage.getItem(key)}catch{}return null}
+function durableRemove(key){try{localStorage.removeItem(key)}catch{}try{sessionStorage.removeItem(key)}catch{}}
+function hasQueuedOrderEmail(){return !!durableGet('queued-order-email')}
 function queueOrderEmail(data,bytes,receipt){
  const pdfBase64=bytesToBase64(bytes);
  sessionStorage.setItem('ultimo-pedido',JSON.stringify({id:data.id,total:orderMoney(data.total/100)}));
  sessionStorage.setItem('ultimo-pedido-pdf',pdfBase64);
  sessionStorage.setItem('order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
- sessionStorage.setItem('queued-order-email',JSON.stringify({data,receipt}));
+ durableSet('queued-order-email',JSON.stringify({data,receipt}));
+ durableSet('queued-order-pdf',pdfBase64);
+ durableSet('queued-order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
 }
 async function submitOrderEmail(data,bytes,receipt){
  const kind=data.status==='cancelada'?'CANCELACIÓN':data.version>1?'MODIFICACIÓN':'PEDIDO';
@@ -48,14 +54,46 @@ async function submitOrderEmail(data,bytes,receipt){
  const res=await fetchWithTimeout('https://formly.email/submit',{method:'POST',body:form},30000);
  let result={};try{result=await res.json()}catch{}
  if(!res.ok||result.success===false)throw Error(result.message||'El servicio de correo no confirmó el envío');
- try{await recordRequest('receipt',{id:data.id,version:data.version,receipt});sessionStorage.removeItem('order-receipt')}catch{}
+ durableSet('queued-order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
+ try{
+  await recordRequest('receipt',{id:data.id,version:data.version,receipt});
+  durableRemove('queued-order-receipt');
+  sessionStorage.removeItem('order-receipt');
+ }catch{}
+ durableRemove('queued-order-email');
+ durableRemove('queued-order-pdf');
  return result;
 }
+async function retryQueuedReceipt(){
+ const raw=durableGet('queued-order-receipt');
+ if(!raw)return {skipped:true};
+ if(!sessionStorage.getItem('lewar-pin'))return {skipped:true,reason:'no-pin'};
+ const receipt=JSON.parse(raw);
+ await recordRequest('receipt',receipt);
+ durableRemove('queued-order-receipt');
+ sessionStorage.removeItem('order-receipt');
+ return {success:true};
+}
 async function sendQueuedOrderEmail(){
- const queued=JSON.parse(sessionStorage.getItem('queued-order-email')||'null');
- const b64=sessionStorage.getItem('ultimo-pedido-pdf');
- if(!queued||!b64)return {skipped:true};
+ const queued=JSON.parse(durableGet('queued-order-email')||'null');
+ let b64=durableGet('queued-order-pdf')||sessionStorage.getItem('ultimo-pedido-pdf');
+ if(!queued)return {skipped:true};
+ if(!b64&&typeof orderPdf==='function'){
+  const bytes=await orderPdf(queued.data);
+  b64=bytesToBase64(bytes);
+  durableSet('queued-order-pdf',b64);
+ }
+ if(!b64)throw Error('No se pudo recuperar el PDF pendiente para reenviarlo');
  const result=await submitOrderEmail(queued.data,base64ToBytes(b64),queued.receipt);
- sessionStorage.removeItem('queued-order-email');
+ durableRemove('queued-order-email');
+ durableRemove('queued-order-pdf');
  return result;
+}
+async function recoverPendingDelivery(){
+ const out={receipt:null,email:null};
+ try{out.receipt=await retryQueuedReceipt()}catch(error){out.receipt={error:String(error&&error.message||error)}}
+ if(hasQueuedOrderEmail()){
+  try{out.email=await sendQueuedOrderEmail()}catch(error){out.email={error:String(error&&error.message||error)}}
+ }
+ return out;
 }
