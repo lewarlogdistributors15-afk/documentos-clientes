@@ -29,6 +29,7 @@ async function unlockPrices(){
  const ok=await verifyPricePin(pin);
  if(!ok){status.textContent='PIN incorrecto. Verifica e intenta nuevamente.';status.className='gate-status status error';button.disabled=false;pinInput.select();return}
  gate.hidden=true;content.hidden=false;footer.hidden=false;
+ recoverPendingDelivery().catch(()=>{});
  await load();
 }
 async function initPriceGate(){
@@ -39,7 +40,7 @@ async function initPriceGate(){
  const existing=sessionStorage.getItem('lewar-pin');
  if(existing&&/^\d{4}$/.test(existing)){
   status.textContent='Verificando sesión…';
-  if(await verifyPricePin(existing)){gate.hidden=true;content.hidden=false;footer.hidden=false;await load();return}
+  if(await verifyPricePin(existing)){gate.hidden=true;content.hidden=false;footer.hidden=false;recoverPendingDelivery().catch(()=>{});await load();return}
  }
  pinInput.focus();
 }
