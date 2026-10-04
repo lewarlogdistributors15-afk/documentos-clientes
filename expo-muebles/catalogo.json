@@ -1,6 +1,6 @@
 {
   "version": "2026-10-04",
-  "vigencia": "94 modelos · precios de convención redondeados al dólar",
+  "vigencia": "95 modelos · precios de convención redondeados al dólar",
   "productos": [
     {
       "modelo": "NTW4519JW",
@@ -506,10 +506,20 @@
       "modelo": "WRTX3021TW",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
-      "descripcion": "33\" 21.3 CF TOP FREEZER · TOTAL COVERAGE COOLING",
+      "descripcion": "33\" 21.3 CF TOP FREEZER · TOTAL COVERAGE COOLING · WHITE",
       "nota": "",
-      "precio": 659,
-      "precio_volumen": 635,
+      "precio": 655,
+      "precio_volumen": 645,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRTX3021TZ",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "33\" 21.3 CF TOP FREEZER · TOTAL COVERAGE COOLING · FINGERPRINT-RESISTANT STAINLESS",
+      "nota": "",
+      "precio": 665,
+      "precio_volumen": 655,
       "regla": "combinable"
     },
     {
