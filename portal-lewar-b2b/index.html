@@ -131,6 +131,36 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .addBtn.infoOnly{background:#e7f1fd;color:#0b65c3}
 @media(max-width:820px){.divisionTabs{grid-template-columns:1fr}.divisionTab{min-height:auto}}
 
+
+/* Uniform catalog image alignment */
+.productImage{height:168px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:14px 10px 8px!important;overflow:hidden!important}
+.productImage .realProductPhoto{width:100%!important;height:128px!important;max-width:150px!important;max-height:128px!important;object-fit:contain!important;object-position:center center!important;margin:auto!important}
+.productImage .appliance{width:112px!important;height:132px!important;max-height:132px!important}
+.detailMainImage{align-items:center!important;justify-items:center!important;padding:18px!important}
+.detailMainImage .realProductPhoto{width:100%!important;height:390px!important;max-width:330px!important;max-height:390px!important;object-fit:contain!important;object-position:center!important}
+.thumb{overflow:hidden;padding:4px}.thumb .realProductPhoto{width:48px!important;height:48px!important;object-fit:contain!important;object-position:center!important}
+.miniArt{overflow:hidden}.miniArt .realProductPhoto{width:40px!important;height:46px!important;object-fit:contain!important}
+
+/* Admin client price editor */
+.adminPriceTools{display:grid;grid-template-columns:1.4fr .9fr .9fr auto;gap:8px;margin:12px 0}
+.adminPriceTools input,.adminPriceTools select,.adminBulkBar input,.adminBulkBar select{height:36px;border:1px solid var(--line);border-radius:6px;background:white;padding:0 10px;font-size:11px}
+.adminCheck{display:flex;align-items:center;gap:6px;font-size:11px;color:#556274;padding:0 4px;white-space:nowrap}
+.adminBulkBar{display:grid;grid-template-columns:1fr 210px 95px auto auto;gap:8px;align-items:center;background:#f7f9fc;border:1px solid var(--line);border-radius:7px;padding:10px;margin-bottom:10px}
+.adminBulkBar div b{display:block;font-size:11px}.adminBulkBar div span{display:block;font-size:9px;color:#718096;margin-top:2px}
+.adminPriceSummary{display:flex;align-items:center;gap:14px;font-size:10px;color:#667085;margin:8px 0}
+.adminPriceSummary .primary{margin-left:auto;padding:8px 12px;font-size:10px}
+.adminPriceTableWrap{max-height:570px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.adminPriceTable{min-width:850px}.adminPriceTable thead th{position:sticky;top:0;z-index:2;background:#f5f7f9}
+.adminPriceTable td{vertical-align:middle}.selectCol{width:32px;text-align:center!important}
+.adminPriceTable .priceInput{width:104px;text-align:right;font-weight:800}
+.adminPriceTable tr.changed{background:#fff9dc}.adminPriceTable tr.selected{outline:1px solid #bcdcff;outline-offset:-1px}
+.adminDivisionPill{display:inline-block;padding:3px 6px;border-radius:10px;background:#edf3fa;color:#45576b;font-size:9px;white-space:nowrap}
+.adminDiff.pos{color:#b42318}.adminDiff.neg{color:#15803d}.adminDiff.zero{color:#667085}
+.adminStatus{font-size:9px;padding:3px 6px;border-radius:9px;background:#eef2f6;color:#536273;white-space:nowrap}.adminStatus.changed{background:#fff0b8;color:#7a5700}
+.adminHelp{margin-top:10px;padding:10px 12px;border:1px solid #e4e9ef;border-radius:6px;background:#fafbfd;color:#657083;font-size:10px;line-height:1.5}
+@media(max-width:980px){.adminPriceTools{grid-template-columns:1fr 1fr}.adminBulkBar{grid-template-columns:1fr 1fr}.adminBulkBar div{grid-column:1/-1}}
+@media(max-width:620px){.adminPriceTools{grid-template-columns:1fr}.adminBulkBar{grid-template-columns:1fr}.adminPriceSummary{flex-wrap:wrap}.adminPriceSummary .primary{margin-left:0}}
+
 </style>
 </head>
 <body>
@@ -288,27 +318,59 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <section id="view-profile" class="hidden"><div class="sectionHead"><h2>Mi perfil</h2></div><div id="profilePanel" class="panel"></div></section>
 
       <section id="view-admin" class="hidden">
-        <div class="adminIntro"><h1>Panel administrativo (Lewar)</h1><span class="demoPill">ADMIN DEMO</span></div>
+        <div class="adminIntro">
+          <div><h1>Precios por cliente</h1><div class="lead" style="margin:4px 0 0">Editor rápido para revisar y preparar cambios. La base maestra oficial permanece en Google Drive.</div></div>
+          <a class="primary" style="text-decoration:none" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1K-B6GbBeh0Ng-gXOhuzoRVNTETXBPn0MfQedX8ldgus/edit#gid=2070203600">Abrir base maestra ↗</a>
+        </div>
         <div class="adminLayout">
           <div class="adminSide">
-            <button class="active">Clientes</button><button>Catálogo</button><button>Precios</button><button>Inventario</button><button>Órdenes</button><button>Promociones</button><button>Vendedores</button><button>Reportes</button>
+            <button>Clientes</button><button>Catálogo</button><button class="active">Precios</button><button>Inventario</button><button>Órdenes</button><button>Promociones</button><button>Vendedores</button><button>Reportes</button>
           </div>
           <div class="adminMain">
-            <div class="adminClientHead"><h2>Cliente: <span id="adminClientName"></span></h2><select id="adminClientSelect" onchange="renderAdmin()"></select></div>
-            <div class="adminTabs"><button>Información</button><button class="active">Precios especiales</button><button>Historial</button><button>Estado de cuenta</button></div>
-            <table class="adminTable"><thead><tr><th>Producto</th><th>Precio base</th><th>Precio del cliente</th><th>Acción</th></tr></thead><tbody id="adminPriceRows"></tbody></table>
-            <div class="adminBrands">
-              <h3>Marcas disponibles para este cliente</h3>
-              <div class="brandGrid">
-                <div class="brandTile"><span class="brandMark brand-whirlpool">Whirlpool</span></div>
-                <div class="brandTile"><span class="brandMark brand-maytag">MAYTAG</span></div>
-                <div class="brandTile"><span class="brandMark brand-amana">AMANA</span></div>
-                <div class="brandTile"><span class="brandMark brand-blackdecker">BLACK+<br>DECKER</span></div>
-                <div class="brandTile"><span class="brandMark brand-powerxl">PowerXL</span></div>
-                <div class="brandTile"><span class="brandMark brand-remington">REMINGTON</span></div>
-                <div class="brandTile"><span class="brandMark brand-milexus">MiLEXUS</span></div>
-                <div class="brandTile"><span class="brandMark brand-coriat">CORIAT</span></div>
-              </div>
+            <div class="adminClientHead">
+              <div><div class="muted">Cliente</div><h2 id="adminClientName">—</h2></div>
+              <select id="adminClientSelect" onchange="renderAdmin()"></select>
+            </div>
+
+            <div class="adminPriceTools">
+              <input id="adminSearch" placeholder="Buscar SKU, modelo, marca..." oninput="renderAdminPrices()">
+              <select id="adminDivision" onchange="renderAdminPrices()">
+                <option value="">Todas las divisiones</option>
+                <option value="large">Large Appliances</option>
+                <option value="small">Small Appliances</option>
+                <option value="coriat">Coriat Commercial</option>
+              </select>
+              <select id="adminBrand" onchange="renderAdminPrices()"><option value="">Todas las marcas</option></select>
+              <label class="adminCheck"><input id="adminOnlyChanged" type="checkbox" onchange="renderAdminPrices()"> Solo modificados</label>
+            </div>
+
+            <div class="adminBulkBar">
+              <div><b>Cambio masivo</b><span>Marca productos con ✓ y aplica el ajuste.</span></div>
+              <select id="adminBulkMode">
+                <option value="percent">Descuento % sobre precio base</option>
+                <option value="delta">Sumar / restar $</option>
+                <option value="fixed">Precio fijo</option>
+              </select>
+              <input id="adminBulkValue" type="number" step="0.01" placeholder="Valor">
+              <button class="secondary" onclick="applyAdminBulk()">Aplicar seleccionados</button>
+              <button class="secondary" onclick="clearAdminSelected()">Limpiar precio</button>
+            </div>
+
+            <div class="adminPriceSummary">
+              <span id="adminVisibleCount">0 productos</span>
+              <span id="adminDraftCount">0 cambios en borrador</span>
+              <button class="primary" onclick="saveAdminDrafts()">Guardar borrador</button>
+            </div>
+
+            <div class="adminPriceTableWrap">
+              <table class="adminTable adminPriceTable">
+                <thead><tr><th class="selectCol"><input id="adminSelectAll" type="checkbox" onchange="toggleAdminAll(this.checked)"></th><th>División</th><th>Producto</th><th>Precio base</th><th>Precio cliente</th><th>Diferencia</th><th>Estado</th></tr></thead>
+                <tbody id="adminPriceRows"></tbody>
+              </table>
+            </div>
+
+            <div class="adminHelp">
+              <b>Cómo usarlo:</b> selecciona el cliente, busca el modelo y escribe el precio. Para cambios oficiales y permanentes, usa “Abrir base maestra” y registra el precio en la pestaña PRECIOS_CLIENTE. Esta pantalla guarda un borrador local para revisión rápida.
             </div>
           </div>
         </div>
@@ -332,6 +394,7 @@ const LARGE_PRODUCTS=PRODUCTS.map(p=>({...p,division:"large",sourceCatalog:"Lewa
 const SMALL_PRODUCTS=[...(window.LEWAR_SMALL_1||[]),...(window.LEWAR_SMALL_2||[]),...(window.LEWAR_SMALL_3||[])];
 const CORIAT_PRODUCTS=[...(window.LEWAR_CORIAT_1||[]),...(window.LEWAR_CORIAT_2||[]),...(window.LEWAR_CORIAT_3||[]),...(window.LEWAR_CORIAT_4||[])];
 const ALL_PRODUCTS=[...LARGE_PRODUCTS,...SMALL_PRODUCTS,...CORIAT_PRODUCTS];
+const MASTER_CLIENTS=[{"id":"CLI-001","name":"AHORRO MUEBLES","seller":"Reynaldo Olivencia","term":"","active":true,"level":"","username":"ahorromuebles"},{"id":"CLI-002","name":"Almacenes Arilope, Inc.","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"almacenesarilopeinc"},{"id":"CLI-003","name":"Arocho Repair (Arocho Enseres y Más)","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"arochorepairarochoensere"},{"id":"CLI-004","name":"Arona Home Essentials","seller":"José Ruiz","term":"","active":true,"level":"","username":"aronahomeessentials"},{"id":"CLI-005","name":"Brother's Furniture Discount","seller":"Luis Donate","term":"","active":true,"level":"","username":"brothersfurniturediscoun"},{"id":"CLI-006","name":"Brother's Furniture Discount / López Torres LLC","seller":"Luis Donate","term":"","active":true,"level":"","username":"brothersfurniturediscoun"},{"id":"CLI-007","name":"Cabo Rojo Discount House Inc.","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"caborojodiscounthouseinc"},{"id":"CLI-008","name":"Camacho Muebles & Enseres - Yauco","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"camachomueblesenseresyau"},{"id":"CLI-009","name":"Carrasquillo Discount Inc.","seller":"Luis Donate","term":"","active":true,"level":"","username":"carrasquillodiscountinc"},{"id":"CLI-010","name":"Casa Moderna","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"casamoderna"},{"id":"CLI-011","name":"Casa Muebles","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"casamuebles"},{"id":"CLI-012","name":"Casa Muebles (La Subasta de Guayama Inc.)","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"casamuebleslasubastadegu"},{"id":"CLI-013","name":"Cash Outlet - Hormigueros","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"cashoutlethormigueros"},{"id":"CLI-014","name":"Cash Outlet - Rincón","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"cashoutletrincon"},{"id":"CLI-015","name":"Colón Appliance Parts","seller":"Luis Donate","term":"","active":true,"level":"","username":"colonapplianceparts"},{"id":"CLI-016","name":"Comercial Nevárez Inc.","seller":"José Ruiz","term":"","active":true,"level":"","username":"comercialnevarezinc"},{"id":"CLI-017","name":"El Resuelve Inc.","seller":"Luis Donate","term":"","active":true,"level":"","username":"elresuelveinc"},{"id":"CLI-018","name":"Enseres Chino LLC","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"ensereschinollc"},{"id":"CLI-019","name":"Enseres Gabinetes Express","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"enseresgabinetesexpress"},{"id":"CLI-020","name":"Enseres PR","seller":"Luis Donate","term":"","active":true,"level":"","username":"enserespr"},{"id":"CLI-021","name":"Mattress y Algo Más","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mattressyalgomas"},{"id":"CLI-022","name":"Me Salvé Inc.","seller":"José Ruiz","term":"","active":true,"level":"","username":"mesalveinc"},{"id":"CLI-023","name":"Milan Home Appliance Center (Maytag) - Sabana Grande","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"milanhomeappliancecenter"},{"id":"CLI-024","name":"Mueblería Columbia","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriacolumbia"},{"id":"CLI-025","name":"Mueblería Columbia Inc.","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriacolumbiainc"},{"id":"CLI-026","name":"Mueblería del Río / Lijas Gas","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriadelriolijasgas"},{"id":"CLI-027","name":"Mueblería El Duque","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriaelduque"},{"id":"CLI-028","name":"Mueblería Hermanos Rivera","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriahermanosrivera"},{"id":"CLI-029","name":"Mueblería Ileanita","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriaileanita"},{"id":"CLI-030","name":"Mueblería La 15","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriala15"},{"id":"CLI-031","name":"Mueblería La Novia Elegante & Junior Discount","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mueblerialanoviaelegante"},{"id":"CLI-032","name":"Mueblería La Reina del Hogar","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mueblerialareinadelhogar"},{"id":"CLI-033","name":"Mueblería Multimarcas Express","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriamultimarcasexpr"},{"id":"CLI-034","name":"Mueblería Novoa Inc.","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mueblerianovoainc"},{"id":"CLI-035","name":"Mueblería Ofelia","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriaofelia"},{"id":"CLI-036","name":"Mueblería Super Discount - Lajas","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriasuperdiscountla"},{"id":"CLI-037","name":"Mueblería Super Discount - San Germán","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriasuperdiscountsa"},{"id":"CLI-038","name":"Mueblería TAR","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriatar"},{"id":"CLI-039","name":"Mueblería Tu Casa Nueva","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriatucasanueva"},{"id":"CLI-040","name":"Mueblería Yabucoeña","seller":"Luis Donate","term":"","active":true,"level":"","username":"muebleriayabucoena"},{"id":"CLI-041","name":"Mueblería Zaida","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriazaida"},{"id":"CLI-042","name":"Mueblerías Camacho Inc. - San Germán","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"muebleriascamachoincsang"},{"id":"CLI-043","name":"Muebles por Menos","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mueblespormenos"},{"id":"CLI-044","name":"Muebles Selectos - Aguada","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"mueblesselectosaguada"},{"id":"CLI-045","name":"MVP Imports LLC","seller":"Luis Donate","term":"","active":true,"level":"","username":"mvpimportsllc"},{"id":"CLI-046","name":"Progressive Sales & Service Inc.","seller":"José Ruiz","term":"","active":true,"level":"","username":"progressivesalesservicei"},{"id":"CLI-047","name":"Retozando Negociamos","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"retozandonegociamos"},{"id":"CLI-048","name":"Retozando Negociamos Inc.","seller":"Julio Gonzalez","term":"","active":true,"level":"","username":"retozandonegociamosinc"},{"id":"CLI-049","name":"RM Discount (RM Muebles y Enseres Inc.)","seller":"José Ruiz","term":"","active":true,"level":"","username":"rmdiscountrmmueblesyense"},{"id":"CLI-050","name":"Rosas Depot LLC","seller":"José Ruiz","term":"","active":true,"level":"","username":"rosasdepotllc"},{"id":"CLI-051","name":"Sammy's S.E. Electronics","seller":"José Ruiz","term":"","active":true,"level":"","username":"sammysseelectronics"},{"id":"CLI-052","name":"Soto Xtra Hardware, Inc.","seller":"Luis Donate","term":"","active":true,"level":"","username":"sotoxtrahardwareinc"},{"id":"CLI-053","name":"Valdes Corporation","seller":"Luis Donate","term":"","active":true,"level":"","username":"valdescorporation"},{"id":"CLI-054","name":"Zayas Comercial Inc.","seller":"Luis Donate","term":"","active":true,"level":"","username":"zayascomercialinc"}];
 let currentDivision="large";
 const CLIENTS={
  la15:{user:"muebleriala15",name:"Mueblería La 15",level:"A",term:"NET 30",credit:15000,balance:6580,seller:"Luis Donate",factor:.985},
@@ -427,7 +490,7 @@ function buildFilters(){
  document.getElementById("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  document.getElementById("brandFilter").innerHTML='<option value="">Todas las marcas</option>'+brands.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
  const admin=document.getElementById("adminClientSelect");
- if(admin&&!admin.options.length)admin.innerHTML=Object.entries(CLIENTS).filter(([k])=>k!=="admin").map(([k,v])=>'<option value="'+k+'">'+esc(v.name)+'</option>').join("");
+ if(admin&&!admin.options.length)admin.innerHTML=MASTER_CLIENTS.filter(x=>x.active).map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");
  const note=document.getElementById("catalogSourceNote");
  if(note){
    const source=currentDivision==="large"?"Lewar Equipos Large Appl 4.9.2026":currentDivision==="small"?"Small Appliance B&D Actualizado Abr 9, 2026":"Coriat Catalogo Commercial";
@@ -460,7 +523,7 @@ function renderCatalog(){
 function globalSearch(v){showView("catalog");document.getElementById("catalogSearch").value=v;renderCatalog()}
 function openProduct(sku){selectedSku=sku;renderDetail();showView("detail")}
 function renderDetail(){
- const p=ALL_ALL_PRODUCTS.find(x=>x.sku===selectedSku);if(!p)return;
+ const p=ALL_PRODUCTS.find(x=>x.sku===selectedSku);if(!p)return;
  const price=clientPrice(p),regular=Number(p.map||p.convention||0);
  const specs=(p.specs&&p.specs.length?p.specs:[desc(p),"Producto distribuido por Lewar LogDistributors","Disponibilidad sujeta a confirmación","Garantía según marca y modelo"]).map(x=>'<li>'+esc(x)+'</li>').join("");
  const thumbs=[1,2,3,4].map(()=>'<div class="thumb">'+productVisual(p)+'</div>').join("");
@@ -495,12 +558,112 @@ function renderOrders(){
 function toggleFav(sku){favorites=favorites.includes(sku)?favorites.filter(x=>x!==sku):[...favorites,sku];localStorage.setItem("lewarFav",JSON.stringify(favorites));renderDashboard();renderCatalog();renderFavorites()}
 function renderFavorites(){const arr=ALL_PRODUCTS.filter(p=>favorites.includes(p.sku));document.getElementById("favoritesGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">Aún no has añadido productos a favoritos.</div>'}
 function renderProfile(){const c=CLIENTS[currentKey];document.getElementById("profilePanel").innerHTML='<h3>'+esc(c.name)+'</h3><p><b>Nivel de precio:</b> '+esc(c.level)+'</p><p><b>Término:</b> '+esc(c.term)+'</p><p><b>Vendedor:</b> '+esc(c.seller)+'</p><p class="lead">Los datos de dirección, contacto y documentos de registro se conectarían al expediente real del cliente.</p>'}
-function renderAdmin(){
- if(!document.getElementById("adminClientSelect").options.length)return;
- const key=document.getElementById("adminClientSelect").value||"la15",c=CLIENTS[key];document.getElementById("adminClientName").textContent=c.name;
- document.getElementById("adminPriceRows").innerHTML=ALL_PRODUCTS.slice(0,16).map(p=>'<tr><td><b>'+esc(p.brand+" "+p.sku)+'</b></td><td>'+money(basePrice(p))+'</td><td><input class="priceInput" id="ap-'+cid(p.sku)+'" type="number" step="0.01" value="'+clientPrice(p,key)+'"></td><td><button class="saveSmall" onclick="saveOverride(\''+key+'\',\''+esc(p.sku)+'\')">Guardar</button></td></tr>').join("");
+
+let adminPriceDrafts=JSON.parse(localStorage.getItem("lewarAdminPriceDrafts")||"{}");
+let adminSelected=new Set();
+
+function adminClient(){
+ const id=document.getElementById("adminClientSelect")?.value||"CLI-030";
+ return MASTER_CLIENTS.find(x=>x.id===id)||MASTER_CLIENTS[0];
 }
-function saveOverride(key,sku){const v=document.getElementById("ap-"+cid(sku)).value;if(!overrides[key])overrides[key]={};overrides[key][sku]=v;localStorage.setItem("lewarOverrides",JSON.stringify(overrides));alert("Precio demo actualizado para "+CLIENTS[key].name+" · "+sku)}
+function adminDraftValue(clientId,sku){
+ const v=adminPriceDrafts?.[clientId]?.[sku];
+ return v===undefined||v===null?"":v;
+}
+function ensureAdminBrandOptions(){
+ const el=document.getElementById("adminBrand"); if(!el)return;
+ const prev=el.value;
+ const brands=[...new Set(ALL_PRODUCTS.map(p=>p.brand).filter(Boolean))].sort();
+ el.innerHTML='<option value="">Todas las marcas</option>'+brands.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+ if(brands.includes(prev))el.value=prev;
+}
+function renderAdmin(){
+ const select=document.getElementById("adminClientSelect"); if(!select)return;
+ if(!select.options.length){
+   select.innerHTML=MASTER_CLIENTS.filter(x=>x.active).map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");
+   if(MASTER_CLIENTS.some(x=>x.id==="CLI-030"))select.value="CLI-030";
+ }
+ ensureAdminBrandOptions();
+ const cl=adminClient();
+ document.getElementById("adminClientName").textContent=cl?cl.name:"—";
+ renderAdminPrices();
+}
+function renderAdminPrices(){
+ const client=adminClient(); if(!client)return;
+ const q=(document.getElementById("adminSearch")?.value||"").toLowerCase();
+ const div=document.getElementById("adminDivision")?.value||"";
+ const brand=document.getElementById("adminBrand")?.value||"";
+ const onlyChanged=!!document.getElementById("adminOnlyChanged")?.checked;
+ let arr=ALL_PRODUCTS.filter(p=>
+   (!q||[p.sku,p.brand,p.category,p.name,p.capacity].join(" ").toLowerCase().includes(q))&&
+   (!div||p.division===div)&&(!brand||p.brand===brand)&&
+   (!onlyChanged||adminDraftValue(client.id,p.sku)!=="")
+ );
+ arr.sort((a,b)=>(a.division||"").localeCompare(b.division||"")||(a.brand||"").localeCompare(b.brand||"")||a.sku.localeCompare(b.sku));
+ document.getElementById("adminVisibleCount").textContent=arr.length+" productos visibles";
+ const changedCount=Object.keys(adminPriceDrafts[client.id]||{}).filter(k=>adminPriceDrafts[client.id][k]!=="").length;
+ document.getElementById("adminDraftCount").textContent=changedCount+" cambios en borrador";
+ const body=document.getElementById("adminPriceRows");
+ body.innerHTML=arr.map(p=>{
+   const base=basePrice(p)||0;
+   const draft=adminDraftValue(client.id,p.sku);
+   const price=draft===""?"":Number(draft);
+   const diff=price===""||!base?null:price-base;
+   const isChanged=draft!=="";
+   const isSelected=adminSelected.has(p.sku);
+   return '<tr class="'+(isChanged?'changed ':'')+(isSelected?'selected':'')+'">'+
+     '<td class="selectCol"><input type="checkbox" '+(isSelected?'checked':'')+' onchange="toggleAdminSku(\''+esc(p.sku)+'\',this.checked)"></td>'+
+     '<td><span class="adminDivisionPill">'+esc(divisionLabel(p.division))+'</span></td>'+
+     '<td><b>'+esc(p.sku)+'</b><div class="muted">'+esc((p.brand||"")+" · "+desc(p))+'</div></td>'+
+     '<td>'+(base?money(base):'—')+'</td>'+
+     '<td><input class="priceInput" id="admin-price-'+cid(p.sku)+'" type="number" min="0" step="0.01" value="'+esc(draft)+'" placeholder="'+(base?base.toFixed(2):'0.00')+'" oninput="setAdminDraft(\''+esc(p.sku)+'\',this.value)"></td>'+
+     '<td class="adminDiff '+(diff===null?'zero':diff>0?'pos':diff<0?'neg':'zero')+'">'+(diff===null?'—':(diff>0?'+':'')+money(diff))+'</td>'+
+     '<td><span class="adminStatus '+(isChanged?'changed':'')+'">'+(isChanged?'Borrador':'Sin cambio')+'</span></td>'+
+   '</tr>';
+ }).join("")||'<tr><td colspan="7"><div class="empty">No hay productos que coincidan con los filtros.</div></td></tr>';
+}
+function setAdminDraft(sku,value){
+ const client=adminClient(); if(!client)return;
+ if(!adminPriceDrafts[client.id])adminPriceDrafts[client.id]={};
+ adminPriceDrafts[client.id][sku]=value===""?"":Number(value);
+ localStorage.setItem("lewarAdminPriceDrafts",JSON.stringify(adminPriceDrafts));
+ renderAdminPrices();
+}
+function toggleAdminSku(sku,checked){checked?adminSelected.add(sku):adminSelected.delete(sku);renderAdminPrices()}
+function toggleAdminAll(checked){
+ document.querySelectorAll("#adminPriceRows input[type=checkbox]").forEach(el=>{
+   const row=el.closest("tr"),sku=row?.querySelector("b")?.textContent;
+   if(sku){checked?adminSelected.add(sku):adminSelected.delete(sku)}
+ });
+ renderAdminPrices();
+}
+function applyAdminBulk(){
+ const client=adminClient(),mode=document.getElementById("adminBulkMode").value,val=Number(document.getElementById("adminBulkValue").value);
+ if(!client||!Number.isFinite(val)||!adminSelected.size){alert("Selecciona productos y escribe un valor.");return}
+ if(!adminPriceDrafts[client.id])adminPriceDrafts[client.id]={};
+ for(const sku of adminSelected){
+   const p=ALL_PRODUCTS.find(x=>x.sku===sku);if(!p)continue;
+   const base=basePrice(p)||0;
+   let price;
+   if(mode==="percent"){if(!base)continue;price=base*(1-val/100)}
+   else if(mode==="delta"){price=Math.max(0,(adminDraftValue(client.id,sku)!==""?Number(adminDraftValue(client.id,sku)):base)+val)}
+   else price=Math.max(0,val);
+   adminPriceDrafts[client.id][sku]=Math.round(price*100)/100;
+ }
+ localStorage.setItem("lewarAdminPriceDrafts",JSON.stringify(adminPriceDrafts));renderAdminPrices();
+}
+function clearAdminSelected(){
+ const client=adminClient();if(!client)return;
+ if(!adminPriceDrafts[client.id])adminPriceDrafts[client.id]={};
+ for(const sku of adminSelected)delete adminPriceDrafts[client.id][sku];
+ localStorage.setItem("lewarAdminPriceDrafts",JSON.stringify(adminPriceDrafts));renderAdminPrices();
+}
+function saveAdminDrafts(){
+ localStorage.setItem("lewarAdminPriceDrafts",JSON.stringify(adminPriceDrafts));
+ const client=adminClient(),n=Object.keys(adminPriceDrafts[client.id]||{}).filter(k=>adminPriceDrafts[client.id][k]!=="").length;
+ alert("Borrador guardado para "+client.name+": "+n+" precio(s). Para hacerlos oficiales, regístralos en la base maestra de Google Drive.");
+}
+
 function showView(v,btn){
  document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
