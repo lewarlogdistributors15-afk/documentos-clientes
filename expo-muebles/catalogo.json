@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-02",
-  "vigencia": "93 modelos · precios de convención actualizados",
+  "version": "2026-10-04",
+  "vigencia": "94 modelos · precios de convención redondeados al dólar",
   "productos": [
     {
       "modelo": "NTW4519JW",
@@ -198,7 +198,7 @@
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 6 BURNERS PORCELAIN COOKTOP",
       "nota": "",
-      "precio": 290.24,
+      "precio": 291,
       "precio_volumen": 280,
       "regla": "combinable"
     },
@@ -449,7 +449,7 @@
       "descripcion": "19 CF ENERGY STAR",
       "nota": "",
       "precio": 535,
-      "precio_volumen": 534.52,
+      "precio_volumen": 535,
       "regla": "combinable"
     },
     {
@@ -458,8 +458,8 @@
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
       "nota": "",
-      "precio": 570.73,
-      "precio_volumen": 557.14,
+      "precio": 571,
+      "precio_volumen": 558,
       "regla": "combinable"
     },
     {
@@ -500,6 +500,16 @@
       "nota": "",
       "precio": 655,
       "precio_volumen": 645,
+      "regla": "combinable"
+    },
+    {
+      "modelo": "WRTX3021TW",
+      "marca": "WHIRLPOOL",
+      "categoria": "T-03 REFRIGERATION",
+      "descripcion": "33\" 21.3 CF TOP FREEZER · TOTAL COVERAGE COOLING",
+      "nota": "",
+      "precio": 659,
+      "precio_volumen": 635,
       "regla": "combinable"
     },
     {
@@ -658,7 +668,7 @@
       "categoria": "T-04 MWO",
       "descripcion": ".9 CF Black",
       "nota": "",
-      "precio": 66.23,
+      "precio": 67,
       "precio_volumen": 63,
       "regla": "combinable"
     },
@@ -668,7 +678,7 @@
       "categoria": "T-04 MWO",
       "descripcion": "1.0 Silver",
       "nota": "",
-      "precio": 132.47,
+      "precio": 133,
       "precio_volumen": 129,
       "regla": "combinable"
     },
@@ -678,8 +688,8 @@
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 242.68,
-      "precio_volumen": 236.9,
+      "precio": 243,
+      "precio_volumen": 237,
       "regla": "combinable"
     },
     {
@@ -688,8 +698,8 @@
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 235.37,
-      "precio_volumen": 229.76,
+      "precio": 236,
+      "precio_volumen": 230,
       "regla": "combinable"
     },
     {
@@ -698,8 +708,8 @@
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
       "nota": "",
-      "precio": 251.22,
-      "precio_volumen": 245.24,
+      "precio": 252,
+      "precio_volumen": 246,
       "regla": "combinable"
     },
     {
@@ -709,7 +719,7 @@
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
       "precio": 400,
-      "precio_volumen": 390.48,
+      "precio_volumen": 391,
       "regla": "combinable"
     },
     {
@@ -718,8 +728,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 417.07,
-      "precio_volumen": 407.14,
+      "precio": 418,
+      "precio_volumen": 408,
       "regla": "combinable"
     },
     {
@@ -728,8 +738,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 387.8,
-      "precio_volumen": 378.57,
+      "precio": 388,
+      "precio_volumen": 379,
       "regla": "combinable"
     },
     {
@@ -738,8 +748,8 @@
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
       "nota": "",
-      "precio": 356.1,
-      "precio_volumen": 347.62,
+      "precio": 357,
+      "precio_volumen": 348,
       "regla": "combinable"
     },
     {
@@ -748,8 +758,8 @@
       "categoria": "HOODS",
       "descripcion": "30-inch wall hood",
       "nota": "",
-      "precio": 117.07,
-      "precio_volumen": 114.29,
+      "precio": 118,
+      "precio_volumen": 115,
       "regla": "combinable"
     },
     {
