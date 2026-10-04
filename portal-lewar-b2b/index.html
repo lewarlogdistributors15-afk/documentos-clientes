@@ -72,6 +72,34 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 /* admin */
 .adminIntro{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.adminIntro h1{margin:0;font-size:24px}.adminLayout{display:grid;grid-template-columns:240px 1fr;gap:14px}.adminSide{background:white;border:1px solid var(--line);border-radius:7px;padding:8px}.adminSide button{width:100%;border:0;background:transparent;padding:10px;text-align:left;border-radius:5px;font-size:12px}.adminSide button.active{background:#e8f2ff;color:#0a64c5;font-weight:800}.adminMain{background:white;border:1px solid var(--line);border-radius:7px;padding:17px}.adminTabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-bottom:14px}.adminTabs button{border:0;background:transparent;padding:0 0 10px;color:#637083;font-size:11px}.adminTabs button.active{color:#0b69cf;border-bottom:2px solid #0b69cf;font-weight:800}.adminClientHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.adminClientHead h2{font-size:17px;margin:0}.adminClientHead select{height:34px;border:1px solid var(--line);border-radius:5px;padding:0 8px}.adminTable{width:100%;border-collapse:collapse;font-size:11px}.adminTable th{text-align:left;background:#f5f7f9;padding:9px}.adminTable td{padding:9px;border-bottom:1px solid #edf0f3}.priceInput{width:90px;height:29px;border:1px solid var(--line);border-radius:4px;padding:0 7px}.saveSmall{border:0;background:#e7f1ff;color:#0b65c3;border-radius:4px;padding:5px 8px;font-weight:700}.demoPill{background:#fff4ce;color:#7a5700;padding:5px 8px;border-radius:5px;font-size:10px;font-weight:800}
 
+
+/* brand portfolio */
+.brandsBlock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px 16px;margin:14px 0 18px}
+.brandsTitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.brandsTitle h2{font-size:17px;margin:0}.brandsTitle span{font-size:10px;color:#738195}
+.brandGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.brandTile{height:62px;border:1px solid #e5eaf0;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
+.brandMark{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;font-weight:900;transform-origin:center}
+.brand-whirlpool{font-size:20px;font-weight:700;color:#151515;font-family:Arial,sans-serif;position:relative;padding:0 4px}
+.brand-whirlpool:after{content:"";position:absolute;width:64px;height:20px;border:2px solid #f4b000;border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;transform:rotate(-8deg);top:-7px;left:11px}
+.brand-maytag{font-size:15px;color:#fff;background:#18395e;border:3px double #cbd5df;padding:7px 11px;box-shadow:inset 0 0 0 1px #fff}
+.brand-amana{font-size:20px;letter-spacing:4px;color:#e41f26;font-family:Arial,sans-serif}
+.brand-blackdecker{font-size:12px;line-height:1.02;color:#fff;background:#ef7d00;border:2px solid #171717;padding:7px 9px;text-align:center;letter-spacing:.4px}
+.brand-powerxl{font-size:19px;font-style:italic;color:#111;font-family:Arial Black,Arial,sans-serif}
+.brand-remington{font-size:16px;color:#111;font-family:Georgia,serif;font-weight:500;position:relative;padding-right:8px}
+.brand-remington:after{content:"";width:4px;height:20px;background:#d71920;display:inline-block;margin-left:6px;vertical-align:middle}
+.brand-milexus{font-size:20px;color:#2444a8;letter-spacing:.8px;font-family:Arial,sans-serif}
+.brand-coriat{font-size:16px;color:#e31e24;border:2px solid #e31e24;padding:4px 10px;letter-spacing:2px;font-family:Arial,sans-serif}
+.loginBrandPanel{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.loginBrandPanel .loginBrandTitle{text-align:center;font-size:11px;font-weight:800;color:#4e5b6c;margin-bottom:10px}
+.loginBrandGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.loginBrandGrid .brandTile{height:45px;padding:5px}
+.loginBrandGrid .brand-whirlpool{font-size:14px}.loginBrandGrid .brand-whirlpool:after{width:44px;height:14px;left:7px;top:-5px}
+.loginBrandGrid .brand-maytag{font-size:10px;padding:5px 7px}.loginBrandGrid .brand-amana{font-size:13px;letter-spacing:2px}.loginBrandGrid .brand-blackdecker{font-size:8px;padding:5px 6px}.loginBrandGrid .brand-powerxl{font-size:13px}.loginBrandGrid .brand-remington{font-size:11px}.loginBrandGrid .brand-remington:after{height:14px;width:3px}.loginBrandGrid .brand-milexus{font-size:14px}.loginBrandGrid .brand-coriat{font-size:11px;padding:3px 6px;letter-spacing:1px}
+.adminBrands{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}.adminBrands h3{font-size:13px;margin:0 0 10px}.adminBrands .brandGrid{grid-template-columns:repeat(4,1fr)}.adminBrands .brandTile{height:50px}
+@media(max-width:900px){.brandGrid{grid-template-columns:repeat(2,1fr)}.adminBrands .brandGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.loginBrandGrid{grid-template-columns:repeat(2,1fr)}.brandTile{height:55px}.brandsTitle h2{font-size:16px}}
+
 /* appliance art */
 .appliance{display:block;max-width:100%;max-height:100%}.appliance *{vector-effect:non-scaling-stroke}
 
@@ -100,6 +128,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <div class="loginMeta"><label><input type="checkbox" checked> Recordarme</label><a href="#" onclick="return forgot()">¿Olvidaste tu contraseña?</a></div>
       <button class="primary loginBtn" onclick="login()">Entrar</button>
       <div class="demoHint"><b>Acceso piloto</b> · Usa <b>muebleriala15</b>, <b>ahorromuebles</b>, <b>casamuebles</b>, <b>clientecod</b> o <b>admin</b>. Contraseña: <b>LEWAR2026</b>. Los precios son demostrativos y no representan cotizaciones vigentes.</div>
+      <div class="loginBrandPanel">
+        <div class="loginBrandTitle">Nuestras marcas</div>
+        <div class="loginBrandGrid">
+          <div class="brandTile"><span class="brandMark brand-whirlpool">Whirlpool</span></div>
+          <div class="brandTile"><span class="brandMark brand-maytag">MAYTAG</span></div>
+          <div class="brandTile"><span class="brandMark brand-amana">AMANA</span></div>
+          <div class="brandTile"><span class="brandMark brand-blackdecker">BLACK+<br>DECKER</span></div>
+          <div class="brandTile"><span class="brandMark brand-powerxl">PowerXL</span></div>
+          <div class="brandTile"><span class="brandMark brand-remington">REMINGTON</span></div>
+          <div class="brandTile"><span class="brandMark brand-milexus">MiLEXUS</span></div>
+          <div class="brandTile"><span class="brandMark brand-coriat">CORIAT</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -143,6 +184,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
           <div class="bannerCopy"><h2>Tecnología que <em>impulsa tu negocio.</em></h2><p>Las mejores marcas en línea blanca, con precios especiales para tu empresa.</p></div>
           <div id="bannerArt" class="bannerArt"></div>
           <div class="bannerBrands">MARCAS LÍDERES<br>PARA GRANDES NEGOCIOS<br><b>Whirlpool</b><b>Maytag</b><b>Amana</b></div>
+        </div>
+        <div class="brandsBlock">
+          <div class="brandsTitle"><h2>Nuestras marcas</h2><span>Portafolio Lewar LogDistributors</span></div>
+          <div class="brandGrid">
+            <div class="brandTile"><span class="brandMark brand-whirlpool">Whirlpool</span></div>
+            <div class="brandTile"><span class="brandMark brand-maytag">MAYTAG</span></div>
+            <div class="brandTile"><span class="brandMark brand-amana">AMANA</span></div>
+            <div class="brandTile"><span class="brandMark brand-blackdecker">BLACK+<br>DECKER</span></div>
+            <div class="brandTile"><span class="brandMark brand-powerxl">PowerXL</span></div>
+            <div class="brandTile"><span class="brandMark brand-remington">REMINGTON</span></div>
+            <div class="brandTile"><span class="brandMark brand-milexus">MiLEXUS</span></div>
+            <div class="brandTile"><span class="brandMark brand-coriat">CORIAT</span></div>
+          </div>
         </div>
 
         <div class="sectionHead"><h2>Comprar nuevamente</h2><button onclick="showView('catalog')">Ver todos →</button></div>
@@ -212,6 +266,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             <div class="adminClientHead"><h2>Cliente: <span id="adminClientName"></span></h2><select id="adminClientSelect" onchange="renderAdmin()"></select></div>
             <div class="adminTabs"><button>Información</button><button class="active">Precios especiales</button><button>Historial</button><button>Estado de cuenta</button></div>
             <table class="adminTable"><thead><tr><th>Producto</th><th>Precio base</th><th>Precio del cliente</th><th>Acción</th></tr></thead><tbody id="adminPriceRows"></tbody></table>
+            <div class="adminBrands">
+              <h3>Marcas disponibles para este cliente</h3>
+              <div class="brandGrid">
+                <div class="brandTile"><span class="brandMark brand-whirlpool">Whirlpool</span></div>
+                <div class="brandTile"><span class="brandMark brand-maytag">MAYTAG</span></div>
+                <div class="brandTile"><span class="brandMark brand-amana">AMANA</span></div>
+                <div class="brandTile"><span class="brandMark brand-blackdecker">BLACK+<br>DECKER</span></div>
+                <div class="brandTile"><span class="brandMark brand-powerxl">PowerXL</span></div>
+                <div class="brandTile"><span class="brandMark brand-remington">REMINGTON</span></div>
+                <div class="brandTile"><span class="brandMark brand-milexus">MiLEXUS</span></div>
+                <div class="brandTile"><span class="brandMark brand-coriat">CORIAT</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
