@@ -19,7 +19,6 @@ function queueOrderEmail(data,bytes,receipt){
  sessionStorage.setItem('order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
  durableSet('queued-order-email',JSON.stringify({data,receipt}));
  durableSet('queued-order-pdf',pdfBase64);
- durableSet('queued-order-receipt',JSON.stringify({id:data.id,version:data.version,receipt}));
 }
 async function submitOrderEmail(data,bytes,receipt){
  const kind=data.status==='cancelada'?'CANCELACIÓN':data.version>1?'MODIFICACIÓN':'PEDIDO';
