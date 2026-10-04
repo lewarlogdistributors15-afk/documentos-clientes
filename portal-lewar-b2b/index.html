@@ -3,145 +3,359 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Portal B2B | Lewar LogDistributors</title>
+<title>Lewar LogDistributors · Portal de Clientes</title>
 <meta name="description" content="Portal B2B de Lewar LogDistributors">
 <style>
-:root{--navy:#082b55;--navy2:#061d39;--blue:#0b6ee8;--bg:#f4f7fb;--text:#142238;--muted:#6b778c;--line:#dfe6ef;--ok:#1f9d61;--warn:#e9a400;--danger:#d93025;--card:#fff}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit}.hidden{display:none!important}.shell{min-height:100vh}.top{height:70px;background:var(--navy);color:#fff;display:flex;align-items:center;padding:0 24px;gap:22px;position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0002}.brand{font-weight:900;letter-spacing:2px;font-size:22px;white-space:nowrap}.brand small{display:block;font-size:8px;letter-spacing:4px;font-weight:700}.search{flex:1;max-width:720px;position:relative}.search input{width:100%;border:0;border-radius:10px;padding:13px 16px;background:#fff}.acct{margin-left:auto;text-align:right;font-size:13px}.acct b{display:block;font-size:14px}.layout{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 70px)}.side{background:linear-gradient(180deg,var(--navy2),var(--navy));color:#fff;padding:20px 12px;position:sticky;top:70px;height:calc(100vh - 70px)}.navbtn{width:100%;border:0;background:transparent;color:#dce7f7;padding:12px 14px;border-radius:9px;text-align:left;margin:4px 0;cursor:pointer}.navbtn:hover,.navbtn.active{background:#ffffff18;color:#fff}.demoBadge{margin:18px 8px;padding:10px;border:1px solid #ffffff35;border-radius:10px;font-size:11px;color:#d7e5f7}.main{padding:26px;min-width:0}.hero{background:linear-gradient(135deg,#0a376b,#0d74d8);color:#fff;padding:30px;border-radius:18px;display:flex;justify-content:space-between;gap:20px;align-items:center;box-shadow:0 12px 35px #0a376b25}.hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0;max-width:650px;color:#dbeaff}.heroIcon{font-size:72px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.stat span{font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:5px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0}.toolbar select,.toolbar input{padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}.toolbar .grow{flex:1;min-width:220px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:330px;box-shadow:0 4px 16px #17324c0b}.pic{height:118px;background:linear-gradient(145deg,#f7f9fc,#e9eef6);display:grid;place-items:center;font-size:58px;border-bottom:1px solid var(--line)}.body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}.brandname{font-size:11px;font-weight:800;color:var(--blue);letter-spacing:.6px}.sku{font-size:18px;font-weight:900}.cap{font-size:12px;color:var(--muted);min-height:32px}.tag{display:inline-block;font-size:10px;padding:4px 7px;border-radius:20px;background:#eef5ff;color:#145ea9;width:max-content}.tag.warn{background:#fff5d8;color:#8a5b00}.priceRow{margin-top:auto;border-top:1px solid var(--line);padding-top:10px}.old{font-size:11px;color:#8793a6;text-decoration:line-through}.price{font-size:24px;font-weight:900;color:#cf1f2c}.actions{display:flex;gap:8px;margin-top:8px}.qty{width:58px;border:1px solid var(--line);border-radius:8px;padding:9px}.add{flex:1;border:0;border-radius:8px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin:10px 0 14px}.sectionTitle h2{margin:0}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}.cartRow,.orderRow{display:grid;grid-template-columns:1.4fr .7fr .55fr .7fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.muted{color:var(--muted);font-size:12px}.total{font-size:24px;font-weight:900;text-align:right;margin-top:18px}.btn{border:0;background:var(--blue);color:#fff;padding:11px 16px;border-radius:9px;font-weight:800;cursor:pointer}.btn.secondary{background:#edf3fb;color:#174b82}.btn.danger{background:#b42318}.loginWrap{min-height:100vh;background:linear-gradient(135deg,#03162c,#0c4c8f);display:grid;place-items:center;padding:24px}.login{width:min(920px,100%);background:#fff;border-radius:22px;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;box-shadow:0 30px 80px #0005}.loginArt{background:linear-gradient(160deg,#071d39,#0c4d8f);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}.loginArt h1{font-size:42px;margin:0}.loginArt p{color:#c9ddf5;max-width:360px}.loginForm{padding:46px}.loginForm h2{font-size:28px;margin:0 0 8px}.field{margin:16px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.field input,.field select{width:100%;padding:13px;border:1px solid var(--line);border-radius:9px}.notice{background:#fff7df;border:1px solid #f4d77e;border-radius:10px;padding:12px;font-size:12px;color:#694f00;margin:16px 0}.adminGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.adminTable{width:100%;border-collapse:collapse;font-size:12px}.adminTable th,.adminTable td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.pill{padding:4px 7px;border-radius:20px;background:#e7f7ee;color:#147844;font-size:10px}.empty{padding:50px;text-align:center;color:var(--muted)}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:none}.stats{grid-template-columns:1fr 1fr}.login{grid-template-columns:1fr}.loginArt{min-height:240px}.acct{display:none}.main{padding:16px}.heroIcon{display:none}.cartRow,.orderRow{grid-template-columns:1fr 1fr}.adminGrid{grid-template-columns:1fr}}
-@media(max-width:560px){.stats{grid-template-columns:1fr}.top{padding:0 12px}.brand{font-size:16px}.main{padding:12px}.hero{padding:22px}.hero h1{font-size:23px}.loginForm,.loginArt{padding:28px}}
+:root{
+  --navy:#052b53;--navy2:#082f5b;--blue:#0b6fdc;--blue2:#0a61c1;
+  --bg:#f5f7fa;--surface:#fff;--text:#101828;--muted:#667085;--line:#e3e8ef;
+  --green:#1f9d55;--red:#df161d;--soft:#f2f6fb;--shadow:0 4px 18px rgba(15,35,60,.07)
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.logo{font-weight:950;letter-spacing:2px;line-height:.9;font-size:25px}.logo small{display:block;font-size:8px;letter-spacing:2.3px;margin-top:6px;font-weight:700}
+
+/* LOGIN */
+.loginScreen{min-height:100vh;display:grid;grid-template-columns:minmax(330px,1.08fr) minmax(420px,.92fr);background:#071f38}
+.loginVisual{position:relative;min-height:100vh;padding:54px 58px;color:white;background:
+ linear-gradient(90deg,rgba(2,17,32,.55),rgba(2,17,32,.42)),
+ url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1800&q=82") center/cover no-repeat}
+.loginVisual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,15,28,.05),rgba(2,15,28,.55));pointer-events:none}
+.loginVisual>*{position:relative;z-index:1}.loginVisual .logo{font-size:48px;margin-top:78px}.loginVisual .logo small{font-size:17px;letter-spacing:3px}
+.loginVisual h1{font-size:28px;margin:30px 0 8px}.loginVisual p{font-size:18px;line-height:1.65;max-width:520px;color:#eef6ff}
+.loginDots{font-size:16px;letter-spacing:.8px}.loginCardWrap{background:#f6f8fb;display:grid;place-items:center;padding:36px}
+.loginCard{background:white;border:1px solid var(--line);width:min(460px,100%);padding:34px;border-radius:14px;box-shadow:0 18px 50px rgba(0,25,56,.16)}
+.loginCard h2{font-size:27px;margin:0 0 8px}.loginCard .sub{color:var(--muted);font-size:13px;margin-bottom:24px}.field{margin:16px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border:1px solid #cfd7e3;border-radius:8px;background:#f8fbff;outline:none}.field input:focus{border-color:#78aeea;box-shadow:0 0 0 3px #dbeeff}
+.loginMeta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#4b5565;margin:11px 0 22px}.loginMeta a{color:var(--blue);text-decoration:none}
+.primary{border:0;border-radius:7px;background:var(--blue);color:white;font-weight:800;padding:12px 17px}.primary:hover{background:var(--blue2)}
+.loginBtn{width:100%;font-size:16px}.demoHint{margin-top:18px;background:#f7f9fc;border:1px solid var(--line);border-radius:9px;padding:12px;color:#667085;font-size:11px;line-height:1.45}
+.demoHint b{color:#243b53}
+
+/* APP */
+.app{min-height:100vh}.topbar{height:68px;background:var(--navy);color:white;display:flex;align-items:center;gap:22px;padding:0 28px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px #071b2d25}
+.topbar .logo{width:210px}.topSearch{flex:1;max-width:690px;position:relative}.topSearch input{width:100%;height:38px;border:0;border-radius:5px;padding:0 43px 0 14px;outline:none}.topSearch .mag{position:absolute;right:14px;top:8px;color:#183d65;font-size:19px}
+.topActions{margin-left:auto;display:flex;align-items:center;gap:18px}.cartTop{position:relative;font-size:22px}.cartBubble{position:absolute;right:-9px;top:-10px;background:#ef2329;border:2px solid var(--navy);color:white;border-radius:20px;min-width:19px;height:19px;line-height:15px;text-align:center;font-size:10px;font-weight:800}
+.userTop{display:flex;align-items:center;gap:9px;border-left:1px solid #ffffff3d;padding-left:17px}.avatar{width:35px;height:35px;border-radius:50%;background:#eff5fc;color:#123b67;display:grid;place-items:center;font-weight:900}.userTop b{display:block;font-size:12px}.userTop span{font-size:10px;color:#d5e3f0}
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);min-height:calc(100vh - 68px)}
+.sidebar{background:white;border-right:1px solid #e4e8ed;padding:16px 10px;position:sticky;top:68px;height:calc(100vh - 68px);overflow:auto}
+.nav{width:100%;border:0;background:transparent;color:#344054;border-radius:5px;padding:10px 12px;display:flex;align-items:center;gap:11px;font-size:13px;text-align:left;margin:2px 0}.nav:hover{background:#f3f7fb}.nav.active{background:#e7f2ff;color:#0a66cf;font-weight:800}.nav .ico{width:18px;text-align:center}
+.helpBox{position:absolute;left:14px;right:14px;bottom:16px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11px;line-height:1.5;color:#4b5565}.helpBox b{display:block;color:#1f2937;margin-bottom:4px}
+.content{padding:24px 28px 44px;min-width:0}
+
+/* DASHBOARD */
+.pageTitle{margin:0 0 6px;font-size:28px}.lead{margin:0 0 18px;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.stat{background:white;border:1px solid var(--line);border-radius:7px;padding:13px 15px;display:flex;align-items:center;gap:11px;min-height:68px}
+.statIcon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#e8f2ff;color:#0968ce;font-size:17px}.stat:nth-child(2) .statIcon{background:#e7f8ec;color:#148c4c}.stat:nth-child(3) .statIcon{background:#f4ebff;color:#7746aa}.stat:nth-child(4) .statIcon{background:#edf4ff;color:#105ca7}
+.stat span{font-size:11px;color:#657083}.stat strong{display:block;font-size:16px;margin-top:3px}
+.banner{height:212px;border-radius:8px;overflow:hidden;background:linear-gradient(92deg,#0b3564 0,#0a3562 42%,#eaf1f8 42%,#f6f8fb 100%);display:grid;grid-template-columns:42% 58%;margin:0 0 17px;position:relative}
+.bannerCopy{padding:31px 35px;color:white;display:flex;flex-direction:column;justify-content:center}.bannerCopy h2{font-size:33px;line-height:1.05;margin:0 0 9px}.bannerCopy h2 em{font-style:normal;color:#5cc2ff}.bannerCopy p{font-size:13px;line-height:1.45;color:#e6f1fb;margin:0;max-width:340px}
+.bannerArt{display:flex;align-items:end;justify-content:center;gap:3px;padding:22px 18px 10px;overflow:hidden}.bannerBrands{position:absolute;right:22px;top:23px;text-align:right;color:#133e69;font-size:11px;letter-spacing:.8px;font-weight:800}.bannerBrands b{font-size:17px;margin-left:10px;color:#06356b}
+.sectionHead{display:flex;align-items:center;justify-content:space-between;margin:16px 0 11px}.sectionHead h2{margin:0;font-size:20px}.sectionHead button,.linkBtn{border:0;background:transparent;color:var(--blue);font-weight:700;font-size:12px}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.productCard{background:white;border:1px solid var(--line);border-radius:7px;padding:10px;min-width:0;box-shadow:0 1px 2px rgba(15,35,60,.02);transition:.15s}.productCard:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.productImage{height:145px;display:grid;place-items:center;position:relative;background:white;cursor:pointer}.avail{position:absolute;top:0;left:0;background:#e4f7e9;color:#188749;padding:3px 7px;border-radius:5px;font-size:9px;font-weight:800}.heart{position:absolute;top:0;right:2px;border:0;background:transparent;color:#587087;font-size:19px}
+.productBrand{font-size:9px;font-weight:900;color:#4a6076;text-transform:uppercase;margin-top:7px}.productSku{font-size:12px;font-weight:900;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.productDesc{height:30px;color:#58667a;font-size:10px;line-height:1.35;overflow:hidden}.priceOld{color:#8792a0;text-decoration:line-through;font-size:10px;margin-top:5px}.priceNow{font-weight:950;color:var(--red);font-size:20px;line-height:1.1;margin:2px 0 7px}.cardActions{display:grid;grid-template-columns:52px 1fr;gap:7px}.qty{border:1px solid #d9e0e7;border-radius:5px;height:31px;padding:0 7px;background:white}.addBtn{border:0;border-radius:5px;background:#0b70de;color:white;font-size:10px;font-weight:800}
+
+/* catalog */
+.catalogHeader{display:flex;justify-content:space-between;align-items:center}.catalogHeader h1{font-size:25px;margin:0}.filters{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;gap:10px;margin:13px 0}.filters input,.filters select{height:38px;border:1px solid #d7dee7;border-radius:6px;background:white;padding:0 11px;color:#475467;font-size:12px}
+
+/* product detail */
+.back{border:0;background:transparent;color:#0b6fdc;font-weight:700;margin-bottom:14px}.detail{background:white;border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;grid-template-columns:62px 360px 1fr;gap:20px}
+.thumbCol{display:flex;flex-direction:column;gap:9px}.thumb{height:58px;border:1px solid var(--line);border-radius:5px;display:grid;place-items:center;background:#fafbfd}.detailMainImage{min-height:430px;display:grid;place-items:center;border-right:1px solid var(--line)}.detailInfo h1{font-size:24px;margin:7px 0 4px}.detailSub{color:#607085;font-size:14px}.stock{font-size:12px;color:var(--green);font-weight:800;margin:12px 0}.detailInfo h3{font-size:13px;margin:17px 0 8px}.detailInfo ul{padding-left:18px;margin:0;color:#4d5d70;font-size:12px;line-height:1.8}.detailPriceBlock{margin-top:22px;border-top:1px solid var(--line);padding-top:17px}.detailPriceBlock .reg{font-size:13px;color:#536273}.detailPriceBlock .reg s{font-weight:800}.clientPrice{font-size:13px;font-weight:800;margin-top:6px}.clientPrice strong{font-size:25px;color:var(--red);margin-left:8px}.detailBuy{display:flex;gap:10px;margin:14px 0}.stepper{display:grid;grid-template-columns:35px 45px 35px;border:1px solid var(--line);border-radius:5px;overflow:hidden}.stepper button,.stepper span{border:0;background:white;display:grid;place-items:center;height:38px}.stepper span{border-left:1px solid var(--line);border-right:1px solid var(--line)}.detailBuy .primary{min-width:190px}
+.volumeBox{max-width:430px;border:1px solid #bfdcff;border-radius:6px;overflow:hidden;margin-top:13px}.volumeBox h4{background:#e8f3ff;padding:8px 11px;margin:0;font-size:11px;color:#0a5eb2}.volumeRow{display:flex;justify-content:space-between;padding:7px 11px;font-size:11px;border-top:1px solid #edf1f5}
+
+/* cart */
+.panel{background:white;border:1px solid var(--line);border-radius:7px;padding:18px}.cartTable{width:100%;border-collapse:collapse;font-size:12px}.cartTable th{text-align:left;color:#667085;font-size:10px;border-bottom:1px solid var(--line);padding:9px}.cartTable td{padding:12px 9px;border-bottom:1px solid #edf0f4;vertical-align:middle}.cartProduct{display:flex;align-items:center;gap:10px}.miniArt{width:42px;height:50px;display:grid;place-items:center}.remove{border:0;background:transparent;color:#6b7280;font-size:18px}.cartBottom{display:grid;grid-template-columns:1fr 330px;gap:30px;margin-top:18px}.notes label{display:block;font-size:11px;color:#566274;margin-bottom:6px}.notes textarea{width:100%;height:100px;border:1px solid var(--line);border-radius:6px;padding:11px;resize:vertical}.totals{font-size:12px}.sumrow{display:flex;justify-content:space-between;padding:8px 0}.sumrow.discount{color:var(--red)}.sumrow.total{border-top:1px solid var(--line);font-size:18px;font-weight:950;margin-top:6px;padding-top:13px}.cartBtns{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}.secondary{border:0;background:#e9f2fd;color:#0a5da9;padding:11px 17px;border-radius:6px;font-weight:800}
+
+/* orders */
+.orderFilters{display:flex;justify-content:flex-end;gap:8px;margin-bottom:11px}.orderFilters select,.orderFilters input{height:35px;border:1px solid var(--line);border-radius:5px;padding:0 9px;font-size:11px;background:white}.orderTable{width:100%;border-collapse:collapse;font-size:11px}.orderTable th{text-align:left;background:#f6f7f9;padding:11px;border-bottom:1px solid #e1e5ea}.orderTable td{padding:11px;border-bottom:1px solid #e7ebf0}.status{display:inline-block;padding:4px 9px;border-radius:5px;font-size:10px}.ok{background:#dcf5e6;color:#167548}.transit{background:#e6f1ff;color:#0b62b5}.cancelled{background:#ffe4e5;color:#b42328}.pdfBtn{border:0;background:#e8f2ff;color:#075db7;padding:5px 8px;border-radius:4px;font-weight:700}
+
+/* admin */
+.adminIntro{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.adminIntro h1{margin:0;font-size:24px}.adminLayout{display:grid;grid-template-columns:240px 1fr;gap:14px}.adminSide{background:white;border:1px solid var(--line);border-radius:7px;padding:8px}.adminSide button{width:100%;border:0;background:transparent;padding:10px;text-align:left;border-radius:5px;font-size:12px}.adminSide button.active{background:#e8f2ff;color:#0a64c5;font-weight:800}.adminMain{background:white;border:1px solid var(--line);border-radius:7px;padding:17px}.adminTabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-bottom:14px}.adminTabs button{border:0;background:transparent;padding:0 0 10px;color:#637083;font-size:11px}.adminTabs button.active{color:#0b69cf;border-bottom:2px solid #0b69cf;font-weight:800}.adminClientHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.adminClientHead h2{font-size:17px;margin:0}.adminClientHead select{height:34px;border:1px solid var(--line);border-radius:5px;padding:0 8px}.adminTable{width:100%;border-collapse:collapse;font-size:11px}.adminTable th{text-align:left;background:#f5f7f9;padding:9px}.adminTable td{padding:9px;border-bottom:1px solid #edf0f3}.priceInput{width:90px;height:29px;border:1px solid var(--line);border-radius:4px;padding:0 7px}.saveSmall{border:0;background:#e7f1ff;color:#0b65c3;border-radius:4px;padding:5px 8px;font-weight:700}.demoPill{background:#fff4ce;color:#7a5700;padding:5px 8px;border-radius:5px;font-size:10px;font-weight:800}
+
+/* appliance art */
+.appliance{display:block;max-width:100%;max-height:100%}.appliance *{vector-effect:non-scaling-stroke}
+
+.empty{text-align:center;padding:45px;color:#7a8697;font-size:13px}
+@media(max-width:1100px){.products{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:55px 280px 1fr}.detailMainImage{min-height:360px}.cartBottom{grid-template-columns:1fr}}
+@media(max-width:820px){.loginScreen{grid-template-columns:1fr}.loginVisual{min-height:300px;padding:32px}.loginVisual .logo{margin-top:30px}.layout{grid-template-columns:1fr}.sidebar{display:none}.topbar .logo{width:auto}.topSearch{display:none}.content{padding:18px}.products{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}.thumbCol{display:none}.detailMainImage{border-right:0;border-bottom:1px solid var(--line)}.adminLayout{grid-template-columns:1fr}.adminSide{display:flex;overflow:auto}.adminSide button{white-space:nowrap;width:auto}.banner{grid-template-columns:1fr;height:auto}.bannerArt{min-height:170px}.bannerBrands{display:none}}
+@media(max-width:520px){.products{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.topbar{padding:0 14px}.userTop>div:last-child{display:none}.loginCardWrap{padding:20px}.loginCard{padding:24px}.filters{grid-template-columns:1fr}.cartTable thead{display:none}.cartTable,.cartTable tbody,.cartTable tr,.cartTable td{display:block;width:100%}.cartTable tr{padding:10px 0;border-bottom:1px solid var(--line)}.cartTable td{border:0;padding:5px}.orderTable{font-size:9px}.bannerCopy h2{font-size:27px}}
 </style>
 </head>
 <body>
-<div id="loginScreen" class="loginWrap">
-  <div class="login">
-    <section class="loginArt">
-      <div><div class="brand" style="font-size:30px">LEWAR<small>LOGDISTRIBUTORS</small></div><h1 style="margin-top:45px">Portal de Clientes</h1><p>Catálogo mayorista, precios personalizados, órdenes y herramientas para clientes de Lewar.</p></div>
-      <div class="muted" style="color:#c9ddf5">Versión piloto independiente · No modifica Expo Muebles ni otros portales.</div>
-    </section>
-    <section class="loginForm">
-      <h2>Acceso de demostración</h2>
-      <p class="muted">Selecciona un perfil para comprobar cómo cambian los precios y condiciones.</p>
-      <div class="notice"><b>DEMO:</b> Los precios mostrados no deben considerarse vigentes. El archivo fuente disponible contiene especiales que vencieron el 25 de septiembre de 2026.</div>
-      <div class="field"><label>Cliente</label><select id="demoClient">
-        <option value="la15">Mueblería La 15</option>
-        <option value="ahorro">Ahorro Muebles</option>
-        <option value="casa">Casa Muebles</option>
-        <option value="cod">Cliente COD</option>
-        <option value="admin">Administración Lewar</option>
-      </select></div>
-      <div class="field"><label>Código demo</label><input id="demoCode" value="LEWAR2026" autocomplete="off"></div>
-      <button class="btn" style="width:100%" onclick="login()">Entrar al portal</button>
-      <p class="muted" style="margin-top:18px">La versión de producción requerirá autenticación segura en servidor; este acceso solo es para validar el diseño y el flujo.</p>
-    </section>
+
+<section id="loginScreen" class="loginScreen">
+  <div class="loginVisual">
+    <div>
+      <div class="logo">LEWAR<small>LOGDISTRIBUTORS</small></div>
+      <h1>Portal de Clientes</h1>
+      <p class="loginDots">Catálogo&nbsp; · &nbsp;Precios exclusivos<br>Órdenes&nbsp; · &nbsp;Estado de cuenta</p>
+    </div>
   </div>
-</div>
+  <div class="loginCardWrap">
+    <div class="loginCard">
+      <h2>Iniciar sesión</h2>
+      <div class="sub">Accede a tu cuenta mayorista de Lewar.</div>
+      <div class="field"><label>Usuario o correo</label><input id="loginUser" value="muebleriala15" autocomplete="username"></div>
+      <div class="field"><label>Contraseña</label><input id="loginPass" type="password" value="LEWAR2026" autocomplete="current-password"></div>
+      <div class="loginMeta"><label><input type="checkbox" checked> Recordarme</label><a href="#" onclick="return forgot()">¿Olvidaste tu contraseña?</a></div>
+      <button class="primary loginBtn" onclick="login()">Entrar</button>
+      <div class="demoHint"><b>Acceso piloto</b> · Usa <b>muebleriala15</b>, <b>ahorromuebles</b>, <b>casamuebles</b>, <b>clientecod</b> o <b>admin</b>. Contraseña: <b>LEWAR2026</b>. Los precios son demostrativos y no representan cotizaciones vigentes.</div>
+    </div>
+  </div>
+</section>
 
-<div id="app" class="shell hidden">
-<header class="top">
-  <div class="brand">LEWAR<small>LOGDISTRIBUTORS</small></div>
-  <div class="search"><input id="topSearch" placeholder="Buscar productos, marcas o modelos..." oninput="setSearch(this.value)"></div>
-  <div class="acct"><b id="acctName"></b><span id="acctTerm"></span></div>
-</header>
-<div class="layout">
-  <aside class="side">
-    <button class="navbtn active" data-view="home" onclick="showView('home',this)">⌂ &nbsp; Inicio</button>
-    <button class="navbtn" data-view="catalog" onclick="showView('catalog',this)">▣ &nbsp; Catálogo</button>
-    <button class="navbtn" data-view="cart" onclick="showView('cart',this)">🛒 &nbsp; Carrito <span id="cartCount"></span></button>
-    <button class="navbtn" data-view="orders" onclick="showView('orders',this)">▤ &nbsp; Mis órdenes</button>
-    <button class="navbtn" data-view="account" onclick="showView('account',this)">▦ &nbsp; Estado de cuenta</button>
-    <button id="adminNav" class="navbtn hidden" data-view="admin" onclick="showView('admin',this)">⚙ &nbsp; Administración</button>
-    <button class="navbtn" onclick="logout()">↪ &nbsp; Cerrar sesión</button>
-    <div class="demoBadge"><b>MODO DEMO</b><br>Catálogo importado de la hoja de convención. Precios no vigentes.</div>
-  </aside>
-  <main class="main">
-    <section id="view-home">
-      <div class="hero"><div><h1 id="welcome"></h1><p id="welcomeSub"></p></div><div class="heroIcon">🏪</div></div>
-      <div class="stats">
-        <div class="stat"><span>Límite de crédito</span><strong id="credit"></strong></div>
-        <div class="stat"><span>Balance disponible</span><strong id="available"></strong></div>
-        <div class="stat"><span>Término</span><strong id="term"></strong></div>
-        <div class="stat"><span>Vendedor asignado</span><strong id="seller"></strong></div>
-      </div>
-      <div class="sectionTitle"><h2>Productos destacados</h2><button class="btn secondary" onclick="showView('catalog')">Ver catálogo completo</button></div>
-      <div id="featured" class="grid"></div>
-    </section>
+<div id="app" class="app hidden">
+  <header class="topbar">
+    <div class="logo">LEWAR<small>LOGDISTRIBUTORS</small></div>
+    <div class="topSearch"><input id="globalSearch" placeholder="Buscar por modelo, categoría o marca..." oninput="globalSearch(this.value)"><span class="mag">⌕</span></div>
+    <div class="topActions">
+      <div class="cartTop" onclick="showView('cart')">🛒<span id="cartBubble" class="cartBubble">0</span></div>
+      <div class="userTop"><div class="avatar">🏬</div><div><b id="topName"></b><span id="topRole">Cliente</span></div><div>⌄</div></div>
+    </div>
+  </header>
 
-    <section id="view-catalog" class="hidden">
-      <div class="sectionTitle"><h2>Catálogo de productos</h2><span class="muted"><span id="productCount"></span> productos</span></div>
-      <div class="toolbar">
-        <input class="grow" id="catalogSearch" placeholder="Buscar modelo, marca, categoría..." oninput="renderCatalog()">
-        <select id="brandFilter" onchange="renderCatalog()"><option value="">Todas las marcas</option></select>
-        <select id="catFilter" onchange="renderCatalog()"><option value="">Todas las categorías</option></select>
-        <select id="sortFilter" onchange="renderCatalog()"><option value="sku">Modelo A-Z</option><option value="priceAsc">Precio menor</option><option value="priceDesc">Precio mayor</option></select>
-      </div>
-      <div id="catalogGrid" class="grid"></div>
-    </section>
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="nav active" data-view="home" onclick="showView('home',this)"><span class="ico">⌂</span>Inicio</button>
+      <button class="nav" data-view="catalog" onclick="showView('catalog',this)"><span class="ico">▣</span>Catálogo</button>
+      <button class="nav" data-view="orders" onclick="showView('orders',this)"><span class="ico">▤</span>Mis órdenes</button>
+      <button class="nav" data-view="account" onclick="showView('account',this)"><span class="ico">▧</span>Estado de cuenta</button>
+      <button class="nav" data-view="promos" onclick="showView('promos',this)"><span class="ico">◇</span>Promociones</button>
+      <button class="nav" data-view="favorites" onclick="showView('favorites',this)"><span class="ico">♡</span>Favoritos</button>
+      <button class="nav" data-view="profile" onclick="showView('profile',this)"><span class="ico">♙</span>Mi perfil</button>
+      <button id="adminNav" class="nav hidden" data-view="admin" onclick="showView('admin',this)"><span class="ico">⚙</span>Administración</button>
+      <button class="nav" onclick="logout()"><span class="ico">↪</span>Cerrar sesión</button>
+      <div class="helpBox"><b>¿Necesita ayuda?</b>Nuestro equipo está listo para apoyarle.</div>
+    </aside>
 
-    <section id="view-cart" class="hidden">
-      <div class="sectionTitle"><h2>Carrito de compra</h2><button class="btn secondary" onclick="showView('catalog')">Seguir comprando</button></div>
-      <div class="panel"><div id="cartRows"></div><div id="cartTotal" class="total"></div><div style="text-align:right;margin-top:12px"><button class="btn" onclick="placeOrder()">Enviar orden demo a Lewar</button></div></div>
-    </section>
+    <main class="content">
+      <section id="view-home">
+        <h1 id="welcome" class="pageTitle"></h1>
+        <p class="lead">Estos son sus precios exclusivos de Lewar LogDistributors.</p>
+        <div class="stats">
+          <div class="stat"><div class="statIcon">▣</div><div><span>Límite de crédito</span><strong id="credit"></strong></div></div>
+          <div class="stat"><div class="statIcon">$</div><div><span>Balance disponible</span><strong id="available"></strong></div></div>
+          <div class="stat"><div class="statIcon">▦</div><div><span>Término</span><strong id="term"></strong></div></div>
+          <div class="stat"><div class="statIcon">●</div><div><span>Vendedor asignado</span><strong id="seller"></strong></div></div>
+        </div>
 
-    <section id="view-orders" class="hidden">
-      <div class="sectionTitle"><h2>Mis órdenes</h2></div>
-      <div class="panel" id="ordersPanel"></div>
-    </section>
+        <div class="banner">
+          <div class="bannerCopy"><h2>Tecnología que <em>impulsa tu negocio.</em></h2><p>Las mejores marcas en línea blanca, con precios especiales para tu empresa.</p></div>
+          <div id="bannerArt" class="bannerArt"></div>
+          <div class="bannerBrands">MARCAS LÍDERES<br>PARA GRANDES NEGOCIOS<br><b>Whirlpool</b><b>Maytag</b><b>Amana</b></div>
+        </div>
 
-    <section id="view-account" class="hidden">
-      <div class="sectionTitle"><h2>Estado de cuenta</h2></div>
-      <div class="stats">
-        <div class="stat"><span>Balance actual</span><strong id="balance"></strong></div>
-        <div class="stat"><span>Crédito disponible</span><strong id="available2"></strong></div>
-        <div class="stat"><span>Término autorizado</span><strong id="term2"></strong></div>
-        <div class="stat"><span>Cuenta</span><strong>Activa</strong></div>
-      </div>
-      <div class="panel"><b>Vista piloto</b><p class="muted">En producción, aquí se mostrarán facturas abiertas, vencimientos, créditos, pagos y documentos asociados a la cuenta del cliente.</p></div>
-    </section>
+        <div class="sectionHead"><h2>Comprar nuevamente</h2><button onclick="showView('catalog')">Ver todos →</button></div>
+        <div id="buyAgain" class="products"></div>
+        <div class="sectionHead"><h2>Catálogo destacado</h2><button onclick="showView('catalog')">Ver todo el catálogo →</button></div>
+        <div id="featured" class="products"></div>
+      </section>
 
-    <section id="view-admin" class="hidden">
-      <div class="sectionTitle"><h2>Administración Lewar</h2><span class="pill">Acceso administrador</span></div>
-      <div class="adminGrid">
-        <div class="panel"><h3>Perfiles de precio</h3><table class="adminTable"><thead><tr><th>Cliente</th><th>Nivel</th><th>Término</th></tr></thead><tbody id="adminClients"></tbody></table></div>
-        <div class="panel"><h3>Catálogo</h3><p><b id="adminProducts"></b> productos importados</p><p class="muted">Preparado para manejar precios base, descuentos por cliente, inventario, promociones y excepciones por SKU.</p><button class="btn secondary" onclick="showView('catalog')">Revisar catálogo</button></div>
-      </div>
-    </section>
-  </main>
-</div>
+      <section id="view-catalog" class="hidden">
+        <div class="catalogHeader"><h1>Catálogo de Productos</h1><span class="demoPill">PRECIOS DEMO</span></div>
+        <div class="filters">
+          <input id="catalogSearch" placeholder="Buscar producto..." oninput="renderCatalog()">
+          <select id="categoryFilter" onchange="renderCatalog()"><option value="">Todas las categorías</option></select>
+          <select id="brandFilter" onchange="renderCatalog()"><option value="">Todas las marcas</option></select>
+          <select id="sortFilter" onchange="renderCatalog()"><option value="popular">Ordenar por: Más populares</option><option value="low">Precio: menor a mayor</option><option value="high">Precio: mayor a menor</option></select>
+        </div>
+        <div id="catalogGrid" class="products"></div>
+      </section>
+
+      <section id="view-detail" class="hidden">
+        <button class="back" onclick="showView('catalog')">← Volver al catálogo</button>
+        <div id="detailWrap"></div>
+      </section>
+
+      <section id="view-cart" class="hidden">
+        <div class="sectionHead"><h2>Tu carrito de compra</h2><span class="demoPill">ORDEN DE PRUEBA</span></div>
+        <div class="panel">
+          <div id="cartWrap"></div>
+          <div class="cartBottom">
+            <div class="notes"><label>Notas para Lewar (opcional)</label><textarea id="orderNotes" placeholder="Agregar instrucciones especiales..."></textarea></div>
+            <div id="cartTotals" class="totals"></div>
+          </div>
+          <div class="cartBtns"><button class="secondary" onclick="showView('catalog')">Seguir comprando</button><button class="primary" onclick="placeOrder()">Enviar orden a Lewar</button></div>
+        </div>
+      </section>
+
+      <section id="view-orders" class="hidden">
+        <div class="sectionHead"><h2>Mis órdenes</h2></div>
+        <div class="panel">
+          <div class="orderFilters"><select><option>Todas las órdenes</option></select><input type="date"><input type="date"></div>
+          <div id="ordersWrap"></div>
+        </div>
+      </section>
+
+      <section id="view-account" class="hidden">
+        <div class="sectionHead"><h2>Estado de cuenta</h2></div>
+        <div class="stats">
+          <div class="stat"><div class="statIcon">$</div><div><span>Balance actual</span><strong id="accountBalance"></strong></div></div>
+          <div class="stat"><div class="statIcon">▣</div><div><span>Crédito disponible</span><strong id="accountAvail"></strong></div></div>
+          <div class="stat"><div class="statIcon">▦</div><div><span>Término autorizado</span><strong id="accountTerm"></strong></div></div>
+          <div class="stat"><div class="statIcon">✓</div><div><span>Estado</span><strong>Activa</strong></div></div>
+        </div>
+        <div class="panel"><h3>Facturas y pagos</h3><p class="lead">Esta versión visual está preparada para conectar facturas abiertas, vencimientos, pagos y créditos cuando se integre la fuente oficial.</p></div>
+      </section>
+
+      <section id="view-promos" class="hidden"><div class="sectionHead"><h2>Promociones</h2></div><div class="panel"><div class="empty">Las promociones activas aparecerán aquí.</div></div></section>
+      <section id="view-favorites" class="hidden"><div class="sectionHead"><h2>Favoritos</h2></div><div id="favoritesGrid" class="products"></div></section>
+      <section id="view-profile" class="hidden"><div class="sectionHead"><h2>Mi perfil</h2></div><div id="profilePanel" class="panel"></div></section>
+
+      <section id="view-admin" class="hidden">
+        <div class="adminIntro"><h1>Panel administrativo (Lewar)</h1><span class="demoPill">ADMIN DEMO</span></div>
+        <div class="adminLayout">
+          <div class="adminSide">
+            <button class="active">Clientes</button><button>Catálogo</button><button>Precios</button><button>Inventario</button><button>Órdenes</button><button>Promociones</button><button>Vendedores</button><button>Reportes</button>
+          </div>
+          <div class="adminMain">
+            <div class="adminClientHead"><h2>Cliente: <span id="adminClientName"></span></h2><select id="adminClientSelect" onchange="renderAdmin()"></select></div>
+            <div class="adminTabs"><button>Información</button><button class="active">Precios especiales</button><button>Historial</button><button>Estado de cuenta</button></div>
+            <table class="adminTable"><thead><tr><th>Producto</th><th>Precio base</th><th>Precio del cliente</th><th>Acción</th></tr></thead><tbody id="adminPriceRows"></tbody></table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 </div>
 
 <script>
 const PRODUCTS=[{"flag":"","brand":"AMANA","category":"T-01 WASHERS","sku":"NTW4519JW","capacity":"3.5 CF TOP LOAD","map":489,"convention":370,"volume":365},{"flag":"","brand":"AMANA","category":"T-07 DRYERS","sku":"NED4655EW","capacity":"6.5 CF ELECTRIC DRYER","map":459,"convention":370,"volume":365},{"flag":"","brand":"AMANA","category":"T-07 DRYERS","sku":"NGD4655EW","capacity":"6.5 CF GAS DRYER","map":469,"convention":375,"volume":365},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4955HW","capacity":"3.8 CF TOP LOAD","map":null,"convention":389,"volume":379},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"DRYERS","sku":"WGD4815EW","capacity":"DRYERS","map":null,"convention":385,"volume":null},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4105SW","capacity":"4.0 CF TOP LOAD","map":519,"convention":399,"volume":389},{"flag":"","brand":"WHIRLPOOL","category":"T-01 WASHERS","sku":"WTW4107SW","capacity":"4.2 - 4.3 CF TOP LOAD","map":569,"convention":445,"volume":435},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"WED4105SW","capacity":"7.0 CF ELECTRIC / ADAPTIVE DRY","map":549,"convention":429,"volume":419},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"WGD4105SW","capacity":"7.0 CF GAS / ADAPTIVE DRY","map":549,"convention":429,"volume":419},{"flag":"","brand":"MAYTAG","category":"T-01 WASHERS","sku":"MVW4005SW","capacity":"3.8 CF TOP LOAD","map":569,"convention":445,"volume":435},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MED4005SW","capacity":"7.0 CF ELEC. WRINKLE PREVENT","map":549,"convention":420,"volume":410},{"flag":"","brand":"WHIRLPOOL","category":"T-07 DRYERS","sku":"MGD4005SW","capacity":"7.0 CF GAS WRINKLE PREVENT","map":549,"convention":420,"volume":410},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"DRYERS","sku":"WED5010LW","capacity":"7.0 CF ELECT. MOISTURE SENSING DRY","map":599,"convention":499,"volume":null},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"DRYERS","sku":"WGD5010LW","capacity":"7.0 CF GAS MOISTURE SENSING DRY","map":599,"convention":499,"volume":null},{"flag":"","brand":"MAYTAG","category":"T-01 WASHERS","sku":"MVWP586GW","capacity":"3.5 CF TOP L. 5 YEAR WA.","map":899,"convention":699,"volume":689},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MEDP586KW","capacity":"7.4 CF ELEC. COMMERCIAL GRADE RESIDENCIAL","map":809,"convention":645,"volume":635},{"flag":"","brand":"MAYTAG","category":"T-07 DRYERS","sku":"MGDP586KW","capacity":"7.4 CF GAS COMMERCIAL GRADE RESIDENCIAL","map":809,"convention":645,"volume":635},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWW1002B","capacity":"20\" 4 BURNERS","map":269,"convention":188,"volume":182},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWW1002Q","capacity":"20\" 4 BURNERS","map":269,"convention":188,"volume":182},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"LAGR2110B","capacity":"30\" 6 BURNERS PORCELAIN COOKTOP","map":379,"convention":290,"volume":280},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"LAGR4130G","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":419,"convention":320,"volume":315},{"flag":"Exceso","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR3100Q","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":489,"convention":365,"volume":360},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR3100B","capacity":"30\" 6 BURNERS 5.1 CF OVEN","map":509,"convention":385,"volume":375},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFR7000S","capacity":"30\" 6 BURNERS 5.1 CF OVEN WITH CAPELO GLASS TOP","map":529,"convention":null,"volume":null},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AGR6303MMS","capacity":"","map":null,"convention":535,"volume":525},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AEP222VAW","capacity":"20\" 2.6 CF ELECTRIC 4 BURNER","map":559,"convention":437,"volume":427},{"flag":"","brand":"AMANA","category":"T-02 RANGES","sku":"AER6303MMS","capacity":"30\" 4.8 CF ELECT. Temp Assure™ Cooking System","map":719,"convention":580,"volume":570},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RW","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":719,"convention":565,"volume":555},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RB","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":709,"convention":565,"volume":555},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"WFES3030RS","capacity":"30\" 5.3 CF ELECT ENERGY STAR","map":739,"convention":595,"volume":585},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFRE1330D","capacity":"30\" SLIDE-IN Tecnologia Ever Clean","map":729,"convention":580,"volume":570},{"flag":"","brand":"WHIRLPOOL","category":"T-02 RANGES","sku":"LWFRE2450D","capacity":"30\" SLIDE-IN Tecnologia Ever Clean","map":null,"convention":615,"volume":599},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT02409D","capacity":"9 CF XPERT INVERTER","map":399,"convention":320,"volume":310},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT1130M","capacity":"11.3 CF XPERT ENERGY","map":599,"convention":470,"volume":460},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WT1133M","capacity":"11.3 CF XPERT ENERGY DISP.","map":609,"convention":475,"volume":465},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT112CZJW","capacity":"24\" 11.6 CF COUNTER DEPTH","map":619,"convention":485,"volume":475},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT112CZJZ","capacity":"24\" 11.6 CF COUNTER DEPTH","map":649,"convention":505,"volume":495},{"flag":"","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ARTX2419SW","capacity":"19 CF ENERGY STAR","map":699,"convention":548,"volume":535},{"flag":"","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ARTX2419SZ","capacity":"19 CF ENERGY STAR","map":729,"convention":571,"volume":557},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT108FFDM","capacity":"","map":null,"convention":579,"volume":555},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRT518SZFM","capacity":"28\" 18 CF Adjustable Door Bins","map":779,"convention":635,"volume":625},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRTX3019SW","capacity":"30\" 19 CF Total Coverage Cooling","map":779,"convention":605,"volume":590},{"flag":"Liquidación","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRTX5419SZ","capacity":"19 CF ENERGY STAR","map":859,"convention":638,"volume":620},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRS312SNHM","capacity":"SXS 33\" 22 CF","map":999,"convention":785,"volume":775},{"flag":"Exceso","brand":"AMANA","category":"T-03 REFRIGERATION","sku":"ASI2575GRS","capacity":"SXS 36\" 25 CF","map":1349,"convention":1013,"volume":978},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRF560SEHZ","capacity":"FRENCH DOOR 30\" 20 CF","map":1359,"convention":1063,"volume":1038},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRS325SDHZ","capacity":"SXS 36\" 25 CF","map":1399,"convention":1125,"volume":1110},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRQA59CNKZ","capacity":"36\" 19.4 CF COUNTER DEPTH 4 DOOR","map":1479,"convention":1160,"volume":1145},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRFF3436RZ","capacity":"25 cf Max. Ice Capacity 3.7lb","map":2089,"convention":1599,"volume":1579},{"flag":"","brand":"WHIRLPOOL","category":"T-03 REFRIGERATION","sku":"WRFF3536SZ","capacity":"30 cf Indoor Ice","map":1699,"convention":1340,"volume":1320},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1807B","capacity":".7 CF BLACK","map":69,"convention":56,"volume":54},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1811D","capacity":"1.1 CF SILVER","map":114,"convention":83,"volume":80},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WM1811B","capacity":"1.1 CF BLACK","map":109,"convention":83,"volume":80},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RS","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":243,"volume":237},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RW","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":235,"volume":230},{"flag":"","brand":"WHIRLPOOL","category":"T-04 MWO","sku":"WMMS3130RZ","capacity":"30-inch Microhood - 1.7 cu. ft.","map":null,"convention":251,"volume":245},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCE55US0HB","capacity":"30-inch Electric Ceramic","map":null,"convention":400,"volume":390},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCE55US0HS","capacity":"30-inch Electric Ceramic","map":null,"convention":417,"volume":407},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCGK5030PS","capacity":"30-inch Electric Ceramic","map":null,"convention":388,"volume":379},{"flag":"","brand":"WHIRLPOOL","category":"COOKTOPS","sku":"WCGK5030PB","capacity":"30-inch Electric Ceramic","map":null,"convention":356,"volume":348},{"flag":"","brand":"WHIRLPOOL","category":"HOODS","sku":"WH7610D","capacity":"30-inch wall hood","map":null,"convention":117,"volume":114},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCED600GBL","capacity":"COOKTOPS","map":null,"convention":1073,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCED606GBL","capacity":"COOKTOPS","map":null,"convention":1312,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCES556HBL","capacity":"COOKTOPS","map":null,"convention":637,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"COOKTOPS","sku":"KCGS550ESS","capacity":"COOKTOPS","map":null,"convention":599,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"REFRIGERATORS","sku":"KRFC704FPS","capacity":"REFRIGERATORS","map":null,"convention":4381,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"RANGES","sku":"KSEB900ESS","capacity":"RANGES","map":null,"convention":1897,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"RANGES","sku":"KSGB900ESS","capacity":"RANGES","map":null,"convention":1935,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"REFRIGERATORS","sku":"KUWR214KSB","capacity":"WINE CELLAR","map":null,"convention":1622,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"HOODS","sku":"KXD4630YSS","capacity":"HOOD 30\" Retractable Downdraft","map":null,"convention":842,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"KITCHENAID","category":"ICE MAKER","sku":"LKUIX535PPS","capacity":"ICE MAKER","map":null,"convention":1533,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"DRYERS","sku":"MED6500MW","capacity":"DRYERS","map":null,"convention":743,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"RANGES","sku":"MER4600LS","capacity":"RANGES","map":null,"convention":645,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"DRYERS","sku":"MGD6500MBK","capacity":"DRYERS","map":null,"convention":615,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"MAYTAG","category":"ACCESORIES","sku":"MTK2230PZ","capacity":"ACCESORIES","map":null,"convention":83,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"HOODS","sku":"UVL5430JSS","capacity":"HOODS","map":null,"convention":553,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"COOKTOPS INDUCTION","sku":"WCI55US0JB","capacity":"COOKTOPS INDUCTION","map":null,"convention":764,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"RANGES","sku":"WEG745H0LZ","capacity":"RANGES","map":null,"convention":1119,"volume":null},{"flag":"Solo inv disp en Lewar","brand":"WHIRLPOOL","category":"OVENS","sku":"WOS72EC7HS","capacity":"OVENS","map":null,"convention":1213,"volume":null}];
 const CLIENTS={
-  la15:{name:"Mueblería La 15",level:"A",term:"NET 30",credit:15000,balance:6580,seller:"Luis Donate",factor:.985},
-  ahorro:{name:"Ahorro Muebles",level:"A+",term:"NET 30",credit:25000,balance:4100,seller:"Carlos Negrón",factor:.97},
-  casa:{name:"Casa Muebles",level:"B",term:"NET 30",credit:12000,balance:3250,seller:"Luis Donate",factor:1.0},
-  cod:{name:"Cliente COD",level:"COD",term:"COD",credit:0,balance:0,seller:"Equipo Lewar",factor:1.035},
-  admin:{name:"Administración Lewar",level:"ADMIN",term:"Interno",credit:0,balance:0,seller:"—",factor:1}
+ la15:{user:"muebleriala15",name:"Mueblería La 15",level:"A",term:"NET 30",credit:15000,balance:6580,seller:"Luis Donate",factor:.985},
+ ahorro:{user:"ahorromuebles",name:"Ahorro Muebles",level:"A+",term:"NET 30",credit:25000,balance:4100,seller:"Carlos Negrón",factor:.97},
+ casa:{user:"casamuebles",name:"Casa Muebles",level:"B",term:"NET 30",credit:12000,balance:3250,seller:"Luis Donate",factor:1},
+ cod:{user:"clientecod",name:"Cliente COD",level:"COD",term:"COD",credit:0,balance:0,seller:"Equipo Lewar",factor:1.035},
+ admin:{user:"admin",name:"Administración Lewar",level:"ADMIN",term:"Interno",credit:0,balance:0,seller:"—",factor:1}
 };
-let currentKey="la15", cart={}, orders=[];
-function money(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(v||0)}
-function icon(cat){cat=(cat||"").toUpperCase();if(cat.includes("WASH"))return"🧺";if(cat.includes("DRY"))return"♨️";if(cat.includes("REFRIG"))return"🧊";if(cat.includes("RANGE")||cat.includes("OVEN"))return"🍳";if(cat.includes("MWO"))return"📻";if(cat.includes("COOK"))return"🔥";if(cat.includes("HOOD"))return"💨";return"🔌"}
-function basePrice(p){return p.volume||p.convention||p.map||0}
-function clientPrice(p){const c=CLIENTS[currentKey];let b=basePrice(p);if(!b)return 0;if(currentKey==="admin")return b;return Math.max(1,Math.round(b*c.factor))}
-function login(){if(document.getElementById("demoCode").value.trim().toUpperCase()!=="LEWAR2026"){alert("Código demo incorrecto.");return}currentKey=document.getElementById("demoClient").value;sessionStorage.setItem("lewarDemoClient",currentKey);document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
-function logout(){sessionStorage.removeItem("lewarDemoClient");document.getElementById("app").classList.add("hidden");document.getElementById("loginScreen").classList.remove("hidden")}
-function init(){const c=CLIENTS[currentKey];document.getElementById("acctName").textContent=c.name;document.getElementById("acctTerm").textContent=c.term+" · Perfil "+c.level;document.getElementById("welcome").textContent=currentKey==="admin"?"Panel Lewar":"Hola, "+c.name+" 👋";document.getElementById("welcomeSub").textContent=currentKey==="admin"?"Administra el catálogo y revisa la experiencia de cada cliente.":"Estos son sus precios exclusivos de Lewar LogDistributors (demostración).";document.getElementById("credit").textContent=money(c.credit);document.getElementById("balance").textContent=money(c.balance);document.getElementById("available").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("available2").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("term").textContent=c.term;document.getElementById("term2").textContent=c.term;document.getElementById("seller").textContent=c.seller;document.getElementById("adminNav").classList.toggle("hidden",currentKey!=="admin");buildFilters();renderFeatured();renderCatalog();renderCart();renderOrders();renderAdmin()}
-function card(p){const pr=clientPrice(p), old=p.map||p.convention||pr;const note=p.flag?'<span class="tag warn">'+esc(p.flag)+'</span>':'<span class="tag">Precio personalizado</span>';return '<div class="card"><div class="pic">'+icon(p.category)+'</div><div class="body"><div class="brandname">'+esc(p.brand)+'</div><div class="sku">'+esc(p.sku)+'</div><div class="cap">'+esc(p.capacity||p.category)+'</div>'+note+'<div class="priceRow">'+(old&&old!==pr?'<div class="old">Referencia demo '+money(old)+'</div>':'')+'<div class="price">'+(pr?money(pr):"Consultar")+'</div><div class="actions"><input class="qty" id="q-'+cssid(p.sku)+'" type="number" min="1" value="1"><button class="add" onclick="addCart(\''+jsq(p.sku)+'\')">Agregar</button></div></div></div></div>'}
-function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
-function jsq(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}
-function cssid(s){return String(s).replace(/[^a-zA-Z0-9_-]/g,"_")}
-function renderFeatured(){document.getElementById("featured").innerHTML=PRODUCTS.filter(p=>clientPrice(p)>0).slice(0,8).map(card).join("")}
-function buildFilters(){const brands=[...new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))].sort();const cats=[...new Set(PRODUCTS.map(p=>p.category).filter(Boolean))].sort();document.getElementById("brandFilter").innerHTML='<option value="">Todas las marcas</option>'+brands.map(x=>'<option>'+esc(x)+'</option>').join("");document.getElementById("catFilter").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option>'+esc(x)+'</option>').join("")}
-function renderCatalog(){const q=(document.getElementById("catalogSearch")?.value||"").toLowerCase(),b=document.getElementById("brandFilter")?.value||"",c=document.getElementById("catFilter")?.value||"",s=document.getElementById("sortFilter")?.value||"sku";let arr=PRODUCTS.filter(p=>(!b||p.brand===b)&&(!c||p.category===c)&&(!q||[p.sku,p.brand,p.category,p.capacity,p.flag].join(" ").toLowerCase().includes(q)));arr.sort((a,z)=>s==="priceAsc"?clientPrice(a)-clientPrice(z):s==="priceDesc"?clientPrice(z)-clientPrice(a):a.sku.localeCompare(z.sku));document.getElementById("productCount").textContent=arr.length;document.getElementById("catalogGrid").innerHTML=arr.length?arr.map(card).join(""):'<div class="empty">No se encontraron productos.</div>'}
-function setSearch(v){showView("catalog");document.getElementById("catalogSearch").value=v;renderCatalog()}
-function addCart(sku){const p=PRODUCTS.find(x=>x.sku===sku);if(!p)return;const el=document.getElementById("q-"+cssid(sku));const n=Math.max(1,Number(el?.value)||1);cart[sku]=(cart[sku]||0)+n;renderCart()}
-function renderCart(){const rows=Object.entries(cart);document.getElementById("cartCount").textContent=rows.length?"("+rows.reduce((a,[,q])=>a+q,0)+")":"";if(!rows.length){document.getElementById("cartRows").innerHTML='<div class="empty">Tu carrito está vacío.</div>';document.getElementById("cartTotal").textContent="";return}let total=0;document.getElementById("cartRows").innerHTML=rows.map(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku),pr=clientPrice(p),t=pr*q;total+=t;return '<div class="cartRow"><div><b>'+esc(sku)+'</b><div class="muted">'+esc(p.brand+" · "+(p.capacity||p.category))+'</div></div><div>'+money(pr)+'</div><div>x '+q+'</div><div><b>'+money(t)+'</b></div><button class="btn secondary" onclick="delete cart[\''+jsq(sku)+'\'];renderCart()">Quitar</button></div>'}).join("");document.getElementById("cartTotal").textContent="Total demo: "+money(total)}
-function placeOrder(){const items=Object.entries(cart);if(!items.length){alert("El carrito está vacío.");return}let total=0;items.forEach(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku);total+=clientPrice(p)*q});const id="LW-DEMO-"+String(Date.now()).slice(-6);orders.unshift({id,date:new Date().toLocaleDateString("es-PR"),status:"Recibida (demo)",total});cart={};renderCart();renderOrders();showView("orders");alert("Orden demo creada: "+id+"\nNo se envió a SAP ni por email.") }
-function renderOrders(){const el=document.getElementById("ordersPanel");if(!orders.length){el.innerHTML='<div class="empty">Aún no hay órdenes en esta sesión demo.</div>';return}el.innerHTML=orders.map(o=>'<div class="orderRow"><b>'+esc(o.id)+'</b><span>'+esc(o.date)+'</span><span class="pill">'+esc(o.status)+'</span><b>'+money(o.total)+'</b><button class="btn secondary">Ver</button></div>').join("")}
-function renderAdmin(){document.getElementById("adminProducts").textContent=PRODUCTS.length;document.getElementById("adminClients").innerHTML=Object.entries(CLIENTS).filter(([k])=>k!=="admin").map(([k,c])=>'<tr><td>'+esc(c.name)+'</td><td>'+esc(c.level)+'</td><td>'+esc(c.term)+'</td></tr>').join("")}
-function showView(v,btn){document.querySelectorAll('main>section').forEach(s=>s.classList.add("hidden"));document.getElementById("view-"+v).classList.remove("hidden");document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));const b=btn||document.querySelector('.navbtn[data-view="'+v+'"]');if(b)b.classList.add("active");if(v==="cart")renderCart();if(v==="orders")renderOrders()}
-const saved=sessionStorage.getItem("lewarDemoClient");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
+const USERMAP=Object.fromEntries(Object.entries(CLIENTS).map(([k,v])=>[v.user,k]));
+let currentKey="la15";
+let cart=JSON.parse(localStorage.getItem("lewarCart")||"{}");
+let orders=JSON.parse(localStorage.getItem("lewarOrders")||"null")||[
+ {id:"LW-2026-0156",date:"09/28/2026",status:"Procesada",total:2056},
+ {id:"LW-2026-0148",date:"09/15/2026",status:"En tránsito",total:1299},
+ {id:"LW-2026-0132",date:"09/02/2026",status:"Entregada",total:3450},
+ {id:"LW-2026-0120",date:"08/18/2026",status:"Cancelada",total:899}
+];
+let favorites=JSON.parse(localStorage.getItem("lewarFav")||"[]");
+let overrides=JSON.parse(localStorage.getItem("lewarOverrides")||"{}");
+let selectedSku=PRODUCTS[0]?.sku||"";
+
+function money(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(Number(v)||0)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function cid(s){return String(s).replace(/[^a-zA-Z0-9_-]/g,"_")}
+function basePrice(p){return Number(p.volume||p.convention||p.map||0)}
+function clientPrice(p,key=currentKey){
+  if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
+  const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
+}
+function availableUnits(p){let n=0;for(const c of p.sku)n+=c.charCodeAt(0);return 6+(n%31)}
+function desc(p){return p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
+
+function kind(p){const c=(p.category+" "+p.capacity).toUpperCase();if(c.includes("WASH"))return"washer";if(c.includes("DRY"))return"dryer";if(c.includes("REFRIG")||c.includes("WINE"))return"fridge";if(c.includes("RANGE")||c.includes("OVEN"))return"range";if(c.includes("MWO")||c.includes("MICRO"))return"micro";if(c.includes("COOKTOP"))return"cooktop";if(c.includes("HOOD"))return"hood";return"appliance"}
+function svg(p,size="card"){
+  const k=kind(p), w=size==="detail"?260:115, h=size==="detail"?360:130;
+  const common='class="appliance" width="'+w+'" height="'+h+'" viewBox="0 0 140 180" xmlns="http://www.w3.org/2000/svg"';
+  if(k==="washer")return '<svg '+common+'><defs><linearGradient id="g'+cid(p.sku)+'" x1="0" x2="1"><stop stop-color="#f9fafb"/><stop offset="1" stop-color="#d9dde2"/></linearGradient></defs><rect x="25" y="25" width="90" height="140" rx="4" fill="url(#g'+cid(p.sku)+')" stroke="#9aa3ad"/><path d="M25 52h90" stroke="#9aa3ad"/><rect x="34" y="31" width="72" height="16" rx="3" fill="#e7ebef"/><circle cx="45" cy="39" r="4" fill="#8b959f"/><circle cx="96" cy="39" r="4" fill="#8b959f"/><ellipse cx="70" cy="60" rx="27" ry="8" fill="#bac1c8" stroke="#8f99a3"/></svg>';
+  if(k==="dryer")return '<svg '+common+'><rect x="25" y="20" width="90" height="145" rx="4" fill="#eef1f3" stroke="#929ca6"/><rect x="34" y="29" width="72" height="18" rx="3" fill="#d8dde2"/><circle cx="45" cy="38" r="4" fill="#7b8794"/><circle cx="70" cy="104" r="38" fill="#222a31" stroke="#727d86" stroke-width="3"/><circle cx="70" cy="104" r="30" fill="#bbc2c8"/></svg>';
+  if(k==="fridge")return '<svg '+common+'><defs><linearGradient id="s'+cid(p.sku)+'" x1="0" x2="1"><stop stop-color="#f3f5f6"/><stop offset=".5" stop-color="#c7ccd0"/><stop offset="1" stop-color="#edf0f2"/></linearGradient></defs><rect x="34" y="12" width="72" height="158" rx="4" fill="url(#s'+cid(p.sku)+')" stroke="#8f989f"/><path d="M34 78h72M70 12v158" stroke="#9ea6ac"/><rect x="76" y="52" width="20" height="31" rx="2" fill="#5f6a72"/><rect x="81" y="58" width="10" height="13" rx="1" fill="#232a30"/></svg>';
+  if(k==="range")return '<svg '+common+'><rect x="27" y="48" width="86" height="116" rx="4" fill="#e9ecef" stroke="#8d969e"/><rect x="27" y="34" width="86" height="25" rx="3" fill="#c7cdd2" stroke="#8d969e"/><circle cx="42" cy="46" r="4" fill="#59636c"/><circle cx="58" cy="46" r="4" fill="#59636c"/><circle cx="82" cy="46" r="4" fill="#59636c"/><circle cx="98" cy="46" r="4" fill="#59636c"/><rect x="37" y="80" width="66" height="62" rx="4" fill="#23292e"/><rect x="42" y="85" width="56" height="50" fill="#50585f"/></svg>';
+  if(k==="micro")return '<svg '+common+'><rect x="15" y="55" width="110" height="72" rx="5" fill="#d9dee2" stroke="#818b94"/><rect x="24" y="64" width="70" height="54" rx="3" fill="#1f252a"/><rect x="99" y="64" width="17" height="54" rx="2" fill="#343c43"/><circle cx="107.5" cy="75" r="3" fill="#9ba5ad"/><circle cx="107.5" cy="87" r="3" fill="#9ba5ad"/></svg>';
+  if(k==="cooktop")return '<svg '+common+'><g transform="rotate(-8 70 90)"><rect x="18" y="68" width="104" height="55" rx="3" fill="#1f2428" stroke="#69737b"/><circle cx="45" cy="88" r="13" fill="none" stroke="#aab2b8" stroke-width="3"/><circle cx="93" cy="88" r="13" fill="none" stroke="#aab2b8" stroke-width="3"/><circle cx="70" cy="108" r="9" fill="none" stroke="#aab2b8" stroke-width="3"/></g></svg>';
+  if(k==="hood")return '<svg '+common+'><path d="M30 58h80l-11 35H41z" fill="#d5dadd" stroke="#879199"/><rect x="59" y="25" width="22" height="35" fill="#c4cacf" stroke="#879199"/><path d="M40 98h60" stroke="#65717b" stroke-width="4"/></svg>';
+  return '<svg '+common+'><rect x="40" y="35" width="60" height="120" rx="8" fill="#e0e4e8" stroke="#8d98a2"/><circle cx="70" cy="67" r="13" fill="#8b969f"/><rect x="50" y="100" width="40" height="30" rx="3" fill="#c3c9ce"/></svg>'
+}
+
+function login(){
+ const user=document.getElementById("loginUser").value.trim().toLowerCase();
+ const pass=document.getElementById("loginPass").value;
+ if(pass!=="LEWAR2026"||!USERMAP[user]){alert("Usuario o contraseña demo incorrectos.");return}
+ currentKey=USERMAP[user];sessionStorage.setItem("lewarUser",currentKey);
+ document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()
+}
+function logout(){sessionStorage.removeItem("lewarUser");document.getElementById("app").classList.add("hidden");document.getElementById("loginScreen").classList.remove("hidden")}
+function forgot(){alert("En producción, aquí se conectará el restablecimiento seguro de contraseña.");return false}
+
+function init(){
+ const c=CLIENTS[currentKey];
+ document.getElementById("topName").textContent=c.name;document.getElementById("topRole").textContent=currentKey==="admin"?"Administrador":"Cliente";
+ document.getElementById("welcome").textContent=currentKey==="admin"?"Hola, Administración Lewar 👋":"Hola, "+c.name+" 👋";
+ document.getElementById("credit").textContent=money(c.credit);document.getElementById("available").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("term").textContent=c.term;document.getElementById("seller").textContent=c.seller;
+ document.getElementById("accountBalance").textContent=money(c.balance);document.getElementById("accountAvail").textContent=money(Math.max(c.credit-c.balance,0));document.getElementById("accountTerm").textContent=c.term;
+ document.getElementById("adminNav").classList.toggle("hidden",currentKey!=="admin");
+ buildFilters();renderDashboard();renderCatalog();renderCart();renderOrders();renderFavorites();renderProfile();renderAdmin();updateCartBubble();
+ document.getElementById("bannerArt").innerHTML=PRODUCTS.slice(0,5).map(p=>'<div style="height:150px;width:90px">'+svg(p)+'</div>').join("");
+ if(currentKey==="admin")showView("admin");
+}
+function buildFilters(){
+ const cats=[...new Set(PRODUCTS.map(p=>p.category).filter(Boolean))].sort(),brands=[...new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))].sort();
+ document.getElementById("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+cats.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+ document.getElementById("brandFilter").innerHTML='<option value="">Todas las marcas</option>'+brands.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");
+ document.getElementById("adminClientSelect").innerHTML=Object.entries(CLIENTS).filter(([k])=>k!=="admin").map(([k,c])=>'<option value="'+k+'">'+esc(c.name)+'</option>').join("");
+}
+
+function productCard(p){
+ const price=clientPrice(p), regular=Number(p.map||p.convention||price), fav=favorites.includes(p.sku);
+ return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail">Disponible: '+availableUnits(p)+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+svg(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="priceOld">'+(regular?money(regular):"")+'</div><div class="priceNow">'+(price?money(price):"Consultar")+'</div><div class="cardActions"><select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button></div></article>';
+}
+function renderDashboard(){
+ const priced=PRODUCTS.filter(p=>clientPrice(p)>0);
+ document.getElementById("buyAgain").innerHTML=priced.slice(0,4).map(productCard).join("");
+ document.getElementById("featured").innerHTML=priced.slice(4,12).map(productCard).join("");
+}
+function renderCatalog(){
+ const q=(document.getElementById("catalogSearch").value||"").toLowerCase(),cat=document.getElementById("categoryFilter").value,brand=document.getElementById("brandFilter").value,sort=document.getElementById("sortFilter").value;
+ let arr=PRODUCTS.filter(p=>(!q||[p.sku,p.brand,p.category,p.capacity].join(" ").toLowerCase().includes(q))&&(!cat||p.category===cat)&&(!brand||p.brand===brand));
+ if(sort==="low")arr.sort((a,b)=>clientPrice(a)-clientPrice(b));else if(sort==="high")arr.sort((a,b)=>clientPrice(b)-clientPrice(a));
+ document.getElementById("catalogGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">No se encontraron productos.</div>';
+}
+function globalSearch(v){showView("catalog");document.getElementById("catalogSearch").value=v;renderCatalog()}
+function openProduct(sku){selectedSku=sku;renderDetail();showView("detail")}
+function renderDetail(){
+ const p=PRODUCTS.find(x=>x.sku===selectedSku);if(!p)return;const price=clientPrice(p),regular=Number(p.map||p.convention||price);
+ document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="thumbCol">'+[1,2,3,4,5].map(()=>'<div class="thumb">'+svg(p)+'</div>').join("")+'</div><div class="detailMainImage">'+svg(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock">● Disponible: '+availableUnits(p)+' unidades</div><h3>Descripción</h3><ul><li>'+esc(desc(p))+'</li><li>Producto distribuido por Lewar LogDistributors</li><li>Acceso a precio personalizado por cuenta</li><li>Disponibilidad sujeta a confirmación</li><li>Garantía según marca y modelo</li></ul><div class="detailPriceBlock"><div class="reg">Precio regular distribuidor: <s>'+money(regular)+'</s></div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" onclick="addDetailToCart()">Agregar al carrito</button></div><div class="volumeBox"><h4>Descuentos por cantidad · ejemplo</h4><div class="volumeRow"><span>1 – 4 unidades</span><b>'+money(price)+' c/u</b></div><div class="volumeRow"><span>5 – 9 unidades</span><b>'+money(Math.max(1,price-10))+' c/u</b></div><div class="volumeRow"><span>10+ unidades</span><b>'+money(Math.max(1,price-20))+' c/u</b></div></div></div></div></div>';
+}
+function detailQty(d){const el=document.getElementById("detailQty");el.textContent=Math.max(1,Number(el.textContent)+d)}
+function addDetailToCart(){const q=Number(document.getElementById("detailQty").textContent)||1;cart[selectedSku]=(cart[selectedSku]||0)+q;saveCart();renderCart();updateCartBubble();showView("cart")}
+function addToCart(sku){const q=Number(document.getElementById("qty-"+cid(sku))?.value)||1;cart[sku]=(cart[sku]||0)+q;saveCart();updateCartBubble()}
+function saveCart(){localStorage.setItem("lewarCart",JSON.stringify(cart))}
+function updateCartBubble(){document.getElementById("cartBubble").textContent=Object.values(cart).reduce((a,b)=>a+b,0)}
+function changeCart(sku,d){cart[sku]=Math.max(1,(cart[sku]||1)+d);saveCart();renderCart();updateCartBubble()}
+function removeCart(sku){delete cart[sku];saveCart();renderCart();updateCartBubble()}
+function renderCart(){
+ const entries=Object.entries(cart),wrap=document.getElementById("cartWrap");let subtotal=0;
+ if(!entries.length){wrap.innerHTML='<div class="empty">Tu carrito está vacío.</div>';document.getElementById("cartTotals").innerHTML='';return}
+ wrap.innerHTML='<table class="cartTable"><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>'+entries.map(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku),price=clientPrice(p),total=price*q;subtotal+=total;return '<tr><td><div class="cartProduct"><div class="miniArt">'+svg(p)+'</div><div><b>'+esc(p.brand+" "+p.sku)+'</b><div class="muted">'+esc(desc(p))+'</div></div></div></td><td>'+money(price)+'</td><td><div class="stepper"><button onclick="changeCart(\''+esc(sku)+'\',-1)">−</button><span>'+q+'</span><button onclick="changeCart(\''+esc(sku)+'\',1)">+</button></div></td><td><b>'+money(total)+'</b></td><td><button class="remove" onclick="removeCart(\''+esc(sku)+'\')">⌫</button></td></tr>'}).join("")+'</tbody></table>';
+ const totalQty=Object.values(cart).reduce((a,b)=>a+b,0),discount=totalQty>=10?50:0,total=subtotal-discount;
+ document.getElementById("cartTotals").innerHTML='<div class="sumrow"><span>Subtotal</span><b>'+money(subtotal)+'</b></div><div class="sumrow discount"><span>Descuento por volumen</span><b>'+(discount?'-'+money(discount):money(0))+'</b></div><div class="sumrow total"><span>Total</span><span>'+money(total)+'</span></div>';
+}
+function placeOrder(){
+ const entries=Object.entries(cart);if(!entries.length){alert("El carrito está vacío.");return}
+ let total=0;entries.forEach(([sku,q])=>{const p=PRODUCTS.find(x=>x.sku===sku);total+=clientPrice(p)*q});
+ const id="LW-"+new Date().getFullYear()+"-"+String(Math.floor(1000+Math.random()*8999));
+ orders.unshift({id,date:new Date().toLocaleDateString("en-US"),status:"Procesando",total});
+ localStorage.setItem("lewarOrders",JSON.stringify(orders));cart={};saveCart();updateCartBubble();renderCart();renderOrders();showView("orders");alert("Orden demo registrada como "+id+". No fue enviada a SAP ni a facturación.");
+}
+function statusClass(s){if(s==="Cancelada")return"cancelled";if(s==="En tránsito"||s==="Procesando")return"transit";return"ok"}
+function renderOrders(){
+ document.getElementById("ordersWrap").innerHTML='<table class="orderTable"><thead><tr><th># Orden</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead><tbody>'+orders.map(o=>'<tr><td><b>'+esc(o.id)+'</b></td><td>'+esc(o.date)+'</td><td><span class="status '+statusClass(o.status)+'">'+esc(o.status)+'</span></td><td><b>'+money(o.total)+'</b></td><td><button class="pdfBtn" onclick="alert(\'PDF disponible al integrar el generador de órdenes.\')">Ver PDF</button></td></tr>').join("")+'</tbody></table>';
+}
+function toggleFav(sku){favorites=favorites.includes(sku)?favorites.filter(x=>x!==sku):[...favorites,sku];localStorage.setItem("lewarFav",JSON.stringify(favorites));renderDashboard();renderCatalog();renderFavorites()}
+function renderFavorites(){const arr=PRODUCTS.filter(p=>favorites.includes(p.sku));document.getElementById("favoritesGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">Aún no has añadido productos a favoritos.</div>'}
+function renderProfile(){const c=CLIENTS[currentKey];document.getElementById("profilePanel").innerHTML='<h3>'+esc(c.name)+'</h3><p><b>Nivel de precio:</b> '+esc(c.level)+'</p><p><b>Término:</b> '+esc(c.term)+'</p><p><b>Vendedor:</b> '+esc(c.seller)+'</p><p class="lead">Los datos de dirección, contacto y documentos de registro se conectarían al expediente real del cliente.</p>'}
+function renderAdmin(){
+ if(!document.getElementById("adminClientSelect").options.length)return;
+ const key=document.getElementById("adminClientSelect").value||"la15",c=CLIENTS[key];document.getElementById("adminClientName").textContent=c.name;
+ document.getElementById("adminPriceRows").innerHTML=PRODUCTS.slice(0,16).map(p=>'<tr><td><b>'+esc(p.brand+" "+p.sku)+'</b></td><td>'+money(basePrice(p))+'</td><td><input class="priceInput" id="ap-'+cid(p.sku)+'" type="number" step="0.01" value="'+clientPrice(p,key)+'"></td><td><button class="saveSmall" onclick="saveOverride(\''+key+'\',\''+esc(p.sku)+'\')">Guardar</button></td></tr>').join("");
+}
+function saveOverride(key,sku){const v=document.getElementById("ap-"+cid(sku)).value;if(!overrides[key])overrides[key]={};overrides[key][sku]=v;localStorage.setItem("lewarOverrides",JSON.stringify(overrides));alert("Precio demo actualizado para "+CLIENTS[key].name+" · "+sku)}
+function showView(v,btn){
+ document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
+ document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
+ if(v==="catalog")renderCatalog();if(v==="cart")renderCart();if(v==="orders")renderOrders();if(v==="favorites")renderFavorites();if(v==="admin")renderAdmin();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
-</body></html>
+</body>
+</html>
