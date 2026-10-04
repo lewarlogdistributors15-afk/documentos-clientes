@@ -46,7 +46,7 @@ async function initPriceGate(){
 }
 
 function manualLine(entry){
- const unit=Math.round(Number(entry.price)*100)/100;
+ const unit=roundExpoPrice(entry.price);
  return {
   product:{modelo:entry.modelo,marca:'MANUAL',categoria:'MANUAL',descripcion:entry.note||'Artículo añadido manualmente',nota:entry.note||'',manualEntry:true},
   quantity:Number(entry.quantity),unit,volume:false,manual:false,manualEntry:true,automaticUnit:null,total:Number(entry.quantity)*Math.round(unit*100)
@@ -68,8 +68,8 @@ function addManualEntry(){
  const model=$('manual-modelo').value.trim().toUpperCase(),quantity=Number($('manual-cantidad').value),price=Number($('manual-precio').value),note=$('manual-nota').value.trim();
  if(!model){$('manual-modelo').focus();$('estado').textContent='Escribe el modelo del artículo manual.';return}
  if(!Number.isInteger(quantity)||quantity<1||quantity>999){$('manual-cantidad').focus();$('estado').textContent='La cantidad manual debe ser entre 1 y 999.';return}
- if(!Number.isFinite(price)||price<0||price>999999.99){$('manual-precio').focus();$('estado').textContent='Escribe un precio unitario manual válido.';return}
- manualEntries.push({id:newUuid(),modelo:model,quantity,price:Math.round(price*100)/100,note});
+ if(!Number.isFinite(price)||price<0||price>999999){$('manual-precio').focus();$('estado').textContent='Escribe un precio unitario manual válido.';return}
+ manualEntries.push({id:newUuid(),modelo:model,quantity,price:roundExpoPrice(price),note});
  $('manual-modelo').value='';$('manual-cantidad').value='1';$('manual-precio').value='';$('manual-nota').value='';
  renderManualEntries();calculate();$('manual-modelo').focus();
 }
@@ -100,10 +100,10 @@ function calculate(){
  $('unidades').textContent=order.units;
  $('subtotal').textContent=usd(order.total/100);
  $('enviar').disabled=sending||submitted||invalid||!order.units;
- if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (máximo 2 decimales, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'
+ if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (dólares completos, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'
 }
 async function load(){try{
- const response=await fetch('./catalogo.json?v=20261003-artx2419sw',{cache:'no-store'});if(!response.ok)throw Error();
+ const response=await fetch('./catalogo.json?v=20261004-rounded-wrtx3021tw',{cache:'no-store'});if(!response.ok)throw Error();
  const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();
  const groups=new Map();
  for(const p of products){
@@ -137,7 +137,7 @@ async function load(){try{
    const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value='0';input.id='qty-'+p.modelo;input.disabled=!Number.isFinite(p.precio);input.setAttribute('aria-label','Cantidad de '+p.modelo);input.addEventListener('input',calculate);
    const price=document.createElement('div');price.className='money';price.style.whiteSpace='pre-line';price.id='price-'+p.modelo;
    const manualBox=document.createElement('div');manualBox.className='manual-price';const label=document.createElement('label');label.htmlFor='manual-'+p.modelo;label.textContent='Precio unitario manual ($)';label.style.fontSize='14px';
-   const manualInput=document.createElement('input');manualInput.type='number';manualInput.min='0';manualInput.max='999999.99';manualInput.step='0.01';manualInput.placeholder='Vacío = automático';manualInput.id='manual-'+p.modelo;manualInput.setAttribute('aria-label','Precio unitario manual de '+p.modelo);manualInput.addEventListener('input',calculate);manualBox.append(label,manualInput);
+   const manualInput=document.createElement('input');manualInput.type='number';manualInput.min='0';manualInput.max='999999';manualInput.step='1';manualInput.placeholder='Vacío = automático';manualInput.id='manual-'+p.modelo;manualInput.setAttribute('aria-label','Precio unitario manual de '+p.modelo);manualInput.addEventListener('input',calculate);manualBox.append(label,manualInput);
    const quantityBox=document.createElement('div');quantityBox.className='quantity-box';const quantityLabel=document.createElement('label');quantityLabel.htmlFor=input.id;quantityLabel.textContent='Cantidad';quantityBox.append(quantityLabel,input);
    row.append(photo,info,quantityBox,price,manualBox);body.append(row);
   }
