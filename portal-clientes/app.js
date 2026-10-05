@@ -7,12 +7,52 @@ const usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maxi
 
 let catalog=[],customer=null,currentOrder=null,sessionToken='',saving=false;
 const quantities={};
+const memoryStore={};
 
+function safeGet(key){
+  try{const v=localStorage.getItem(key);if(v!==null)return v}catch{}
+  try{const v=sessionStorage.getItem(key);if(v!==null)return v}catch{}
+  return Object.prototype.hasOwnProperty.call(memoryStore,key)?memoryStore[key]:null;
+}
+function safeSet(key,value,persistent=false){
+  memoryStore[key]=String(value);
+  try{(persistent?localStorage:sessionStorage).setItem(key,String(value));return}catch{}
+  try{document.cookie=encodeURIComponent(key)+'='+encodeURIComponent(String(value))+'; Path=/; SameSite=Lax; Secure'+(persistent?'; Max-Age=31536000':'')}catch{}
+}
+function safeRemove(key){
+  delete memoryStore[key];
+  try{localStorage.removeItem(key)}catch{}
+  try{sessionStorage.removeItem(key)}catch{}
+  try{document.cookie=encodeURIComponent(key)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure'}catch{}
+}
+function cookieGet(key){
+  try{
+    const wanted=encodeURIComponent(key)+'=';
+    for(const part of document.cookie.split(';')){
+      const p=part.trim();
+      if(p.startsWith(wanted))return decodeURIComponent(p.slice(wanted.length));
+    }
+  }catch{}
+  return null;
+}
+function deviceFingerprint(){
+  const s=window.screen||{};
+  const parts=[
+    navigator.userAgent||'ua',
+    navigator.platform||'platform',
+    navigator.language||'lang',
+    String(s.width||0)+'x'+String(s.height||0),
+    String(navigator.hardwareConcurrency||0),
+    String(navigator.deviceMemory||0),
+    Intl.DateTimeFormat().resolvedOptions().timeZone||'tz'
+  ];
+  return 'fp-'+parts.join('|').replace(/[^a-zA-Z0-9|._:-]/g,'').slice(0,500);
+}
 function deviceId(){
-  let id=localStorage.getItem(DEVICE_KEY);
+  let id=safeGet(DEVICE_KEY)||cookieGet(DEVICE_KEY);
   if(!id){
-    id=(crypto.randomUUID?.()||('d-'+Date.now()+'-'+Math.random().toString(36).slice(2)))+'-'+Math.random().toString(36).slice(2);
-    localStorage.setItem(DEVICE_KEY,id);
+    id=deviceFingerprint();
+    safeSet(DEVICE_KEY,id,true);
   }
   return id;
 }
@@ -37,8 +77,8 @@ async function rpc(name,payload){
 }
 function storeSession(token){
   sessionToken=token||'';
-  if(token)sessionStorage.setItem(SESSION_KEY,token);
-  else sessionStorage.removeItem(SESSION_KEY);
+  if(token)safeSet(SESSION_KEY,token,false);
+  else safeRemove(SESSION_KEY);
 }
 function showGate(){
   $('gate').hidden=false;$('portal').hidden=true;$('footer').hidden=true;
@@ -291,5 +331,6 @@ $('logout').addEventListener('click',logout);
 $('categoria').addEventListener('change',filterCatalog);
 $('buscar').addEventListener('input',filterCatalog);
 
-sessionToken=sessionStorage.getItem(SESSION_KEY)||'';
+sessionToken=safeGet(SESSION_KEY)||cookieGet(SESSION_KEY)||'';
+gateStatus('Sistema listo · acceso seguro activo.');
 if(sessionToken)bootstrap();else showGate();
