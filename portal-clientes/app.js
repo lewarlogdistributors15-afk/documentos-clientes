@@ -56,6 +56,26 @@ function deviceId(){
   }
   return id;
 }
+function deviceInfo(){
+  const s=window.screen||{};
+  const ua=navigator.userAgent||'';
+  let browser='Navegador';
+  if(/Edg\//.test(ua))browser='Microsoft Edge';
+  else if(/OPR\//.test(ua))browser='Opera';
+  else if(/Chrome\//.test(ua))browser='Chrome';
+  else if(/Firefox\//.test(ua))browser='Firefox';
+  else if(/Safari\//.test(ua))browser='Safari';
+  const mobile=!!(navigator.userAgentData?.mobile||/Mobi|Android|iPhone|iPad/i.test(ua));
+  return {
+    browser,
+    platform:navigator.userAgentData?.platform||navigator.platform||'',
+    mobile,
+    language:navigator.language||'',
+    screen:String(s.width||0)+'x'+String(s.height||0),
+    timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'',
+    userAgent:ua.slice(0,500)
+  };
+}
 function setStatus(message,error=false){
   $('estado').textContent=message;
   $('estado').className='status'+(error?' error':'');
@@ -92,7 +112,7 @@ async function login(){
   if(!/^\d{6}$/.test(pin)){gateStatus('Ingresa el PIN de 6 dígitos asignado a tu comercio.',true);$('pin').focus();return}
   $('login').disabled=true;gateStatus('Verificando acceso…');
   try{
-    const data=await rpc('portal_client_login',{p_pin:pin,p_device_id:deviceId()});
+    const data=await rpc('portal_client_login_v2',{p_pin:pin,p_device_id:deviceId(),p_device_info:deviceInfo()});
     if(!data.ok)throw new Error(data.error||'PIN incorrecto.');
     storeSession(data.sessionToken);
     $('pin').value='';
