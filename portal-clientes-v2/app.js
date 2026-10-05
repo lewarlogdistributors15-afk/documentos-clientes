@@ -171,7 +171,7 @@ function renderCatalog(){
       row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria,label].join(' ').toLowerCase();
 
       const photo=document.createElement('div');photo.className='product-photo';
-      const src=typeof productPhotos!=='undefined'?productPhotos[p.modelo]:'';
+      const src=typeof productPhotos!=='undefined'?(productPhotos[p.modelo]||(p.modelo==='LWMC30309LB'?productPhotos['WMC30309LB']:'')):'';
       if(src){const img=document.createElement('img');img.src=src;img.alt=p.marca+' '+p.modelo;img.loading='lazy';img.decoding='async';photo.append(img)}
       else{const no=document.createElement('span');no.className='no-photo';no.textContent='Sin foto';photo.append(no)}
 
@@ -179,6 +179,7 @@ function renderCatalog(){
       const strong=document.createElement('strong');strong.textContent=p.modelo;
       const desc=document.createElement('small');desc.textContent=p.marca+' · '+p.descripcion;
       const chips=document.createElement('div');chips.className='catalog-prices';
+      if(p.agotado){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';chips.append(sold)}
       const regular=document.createElement('span');regular.className='price-chip';regular.textContent='Precio 1 unidad '+usd(p.precio);chips.append(regular);
       if(Number.isFinite(Number(p.precio_volumen))){
         const special=document.createElement('span');special.className='price-chip special';
@@ -192,10 +193,9 @@ function renderCatalog(){
       const qlabel=document.createElement('span');qlabel.className='qty-label';qlabel.textContent='Cantidad';
       const step=document.createElement('div');step.className='stepper';
       const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','Restar '+p.modelo);
-      const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);
+      const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);if(p.agotado){input.value='0';quantities[p.modelo]=0;input.disabled=true;}
       const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','Añadir '+p.modelo);
-      minus.onclick=()=>{input.value=String(Math.max(0,(Number(input.value)||0)-1));quantityChanged(p.modelo,input)};
-      plus.onclick=()=>{input.value=String(Math.min(999,(Number(input.value)||0)+1));quantityChanged(p.modelo,input)};
+      if(p.agotado){minus.disabled=true;plus.disabled=true}else{minus.onclick=()=>{input.value=String(Math.max(0,(Number(input.value)||0)-1));quantityChanged(p.modelo,input)};plus.onclick=()=>{input.value=String(Math.min(999,(Number(input.value)||0)+1));quantityChanged(p.modelo,input)}}
       input.oninput=()=>quantityChanged(p.modelo,input);
       step.append(minus,input,plus);qbox.append(qlabel,step);
 
@@ -215,7 +215,7 @@ function localPricing(){
   const combinable=catalog.filter(p=>p.regla==='combinable').reduce((n,p)=>n+(quantities[p.modelo]||0),0);
   const lines=[];
   for(const p of catalog){
-    const q=quantities[p.modelo]||0;
+    const q=p.agotado?0:(quantities[p.modelo]||0);
     const regular=Math.ceil(Number(p.precio)||0);
     const volumePrice=p.precio_volumen===null?null:Math.ceil(Number(p.precio_volumen));
     const volume=volumePrice!==null&&(p.regla==='mismo_modelo'?q>=3:combinable>=3);
