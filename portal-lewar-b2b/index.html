@@ -161,6 +161,24 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 @media(max-width:980px){.adminPriceTools{grid-template-columns:1fr 1fr}.adminBulkBar{grid-template-columns:1fr 1fr}.adminBulkBar div{grid-column:1/-1}}
 @media(max-width:620px){.adminPriceTools{grid-template-columns:1fr}.adminBulkBar{grid-template-columns:1fr}.adminPriceSummary{flex-wrap:wrap}.adminPriceSummary .primary{margin-left:0}}
 
+
+/* Permanent exact photos for Small Appliances — extracted from Lewar source catalog */
+.smallSpritePhoto{
+  display:block!important;
+  background-repeat:no-repeat!important;
+  background-size:500% 1000%!important;
+  background-color:#fff!important;
+  background-origin:border-box!important;
+}
+.productImage .smallSpritePhoto{
+  width:128px!important;height:128px!important;
+  max-width:128px!important;max-height:128px!important;
+}
+.detailMainImage .smallSpritePhoto{
+  width:330px!important;height:330px!important;
+  max-width:330px!important;max-height:330px!important;
+}
+
 </style>
 </head>
 <body>
@@ -445,8 +463,32 @@ function svg(p,size="card"){
 function divisionProducts(){return ALL_PRODUCTS.filter(p=>p.division===currentDivision)}
 function divisionLabel(d){return d==="small"?"Small Appliances":d==="coriat"?"Coriat Commercial":"Large Appliances"}
 function availabilityText(p){return p.availabilityLabel||("Disponible: "+availableUnits(p)+" unidades")}
+const SMALL_SPRITE_URL="./assets/small-appliances-2026.webp?v=20261005-1";
+const SMALL_SPRITE_COLS=5;
+const SMALL_SPRITE_ROWS=10;
+const SMALL_SPRITE_SKUS=[
+  "HB2400B","HB2800B","MX1500W","MX1515-1BDLA","MX400B-LA",
+  "BL0877-1BDLA","BL0876-2SDPR","BL0877-0BDLA","BL0876-3WDPR","FP4200B-LA",
+  "CM0701W","CM618","CM0915BK-LA","CM0916B","CM1105B",
+  "CM1331S-LA","CM0122-1BPLA","CM0755S-MX","EM0312-0SDLA","SS0441-0BPLA",
+  "RC503","RC5200M","RC514B","PR100SD","PC500",
+  "PC700","DB1002B","SB1001B","SM602F-1BDLA","TR0012SS-LA",
+  "TR7827-1WDLA","TR1278W","WM120B","CJ4000S","JE2500B-LA",
+  "CJ625-LA","JMBD3181","HC150W","SK1212B","HC300B",
+  "TO1705SG-LA","TO1950SBD","TO4125-0SDLA","IRBD350","AC8820-110F",
+  "D2400 (BV) F","D5952","R1001","F1001A","HC4060(110)F"
+];
+const SMALL_SPRITE_POS=Object.fromEntries(SMALL_SPRITE_SKUS.map((sku,i)=>[sku,[i%SMALL_SPRITE_COLS,Math.floor(i/SMALL_SPRITE_COLS)]]));
+
 function productVisual(p,size="card"){
   const cls=size==="detail"?"realProductPhoto detailPhoto":"realProductPhoto";
+  const spritePos=SMALL_SPRITE_POS[p.sku];
+  if(spritePos){
+    const x=(spritePos[0]*100)/(SMALL_SPRITE_COLS-1);
+    const y=(spritePos[1]*100)/(SMALL_SPRITE_ROWS-1);
+    const alt=esc(((p.brand||"")+" "+p.sku).trim());
+    return '<span class="'+cls+' smallSpritePhoto" role="img" aria-label="'+alt+'" title="'+alt+'" style="background-image:url(\''+SMALL_SPRITE_URL+'\');background-position:'+x+'% '+y+'%"></span>';
+  }
   if(p.image){
     return '<img class="'+cls+'" src="'+esc(p.image)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><span style="display:none">'+svg(p,size)+'</span>';
   }
