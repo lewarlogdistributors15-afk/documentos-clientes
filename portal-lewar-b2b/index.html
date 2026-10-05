@@ -478,7 +478,7 @@ function productImageError(img,sku){
 function productVisual(p,size="card"){
   const cls=size==="detail"?"realProductPhoto detailPhoto":"realProductPhoto";
   if(p.image){
-    return '<img class="'+cls+'" src="'+esc(p.image)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><span style="display:none">'+svg(p,size)+'</span>';
+    return '<img class="'+cls+'" src="'+esc(p.image)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" referrerpolicy="no-referrer" onerror="productImageError(this,\'"+esc(p.sku||"")+"\')"><span style="display:none">'+svg(p,size)+'</span>';
   }
   if(typeof productPhotos!=="undefined" && productPhotos && productPhotos[p.sku]){
     return '<img class="'+cls+'" src="'+productPhotos[p.sku]+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy">';
