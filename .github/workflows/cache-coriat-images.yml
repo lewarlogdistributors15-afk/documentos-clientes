@@ -1,0 +1,98 @@
+name: Cache Coriat images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cache-coriat-images.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  cache-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download and normalize Coriat images
+        run: |
+          pip install requests pillow
+          python - <<'PY'
+          import io, os, requests
+          from PIL import Image
+
+          images = {
+            "ACV-2": "https://www.coriat.com.mx/product/image/mediumlarge/10010211_ACV-2%20PERSPECTIVA.png",
+            "ACV-3": "https://www.coriat.com.mx/product/image/mediumlarge/10010311_ACV-3%20MASTER%20V.%20PERSPECTIVA.png",
+            "CV-2": "https://www.coriat.com.mx/product/image/mediumlarge/26010211_CV-2%20MASTER%20PERSPECTIVA.png",
+            "CV-3": "https://www.coriat.com.mx/product/image/mediumlarge/26010311_CV-3%20MASTER%20V.%20PERSPECTIVA.png",
+            "CV-4": "https://www.coriat.com.mx/product/image/mediumlarge/26010411_CV-4%20MASTER%20PERSPECTIVA.png",
+            "TURBO-20-3Q": "https://rbanda.com.mx/cdn/shop/files/TURBO-20-3QMASTER_1000x_7cddd2ee-7c90-4687-a54c-9857b7f68377.webp?v=1722452257&width=1600",
+            "TURBO-25.5-4Q": "https://coriat.us/cdn/shop/files/1.TURBO-25.5-4QHDPERSPECTIVA_SF_2.png?v=1769527592&width=1946",
+            "TURBO-30-5Q": "https://www.coriat.com.mx/product/image/mediumlarge/20011311_5.%20FRYER%2030-5Q%20PERSPECTIVA_SF.png",
+            "SP-1T": "https://www.gastrox.com/cdn/shop/files/00_EC-1TMASTERComp.png?v=1736866477&width=1946",
+            "SP-2T": "https://www.coriat.com.mx/product/image/mediumlarge/19011511_19010211_00_ec-2%20master%20comp.png",
+            "SP-3T": "https://equilinea.com/cdn/shop/files/000663_1.jpg?v=1774999517",
+            "PCV-2": "https://www.cdo.com.mx/coriat/images/coriat/estufones/parrilla-coriat-PCV-2.jpg",
+            "PCV-4": "https://www.coriat.com.mx/product/image/mediumlarge/25010211_PCV-4%20MASTER%20PERSPECTIVA.png",
+            "PCV-6": "https://coriat.us/cdn/shop/files/PCV-6_MASTER_-_FRENTE.png?v=1737133239&width=1946",
+            "MULTIPLE-PISO-TURBO-MASTER": "https://coriat.us/cdn/shop/files/MULTIPLEMASTERV.FRONTAL_4.png?v=1769531872&width=1946",
+            "EC-4-HM": "https://www.coriat.com.mx/product/image/mediumlarge/17010111_00_ec-4-hm%20piso%20master%20comp.png",
+            "EC-6-HG": "https://coriat.com.mx/product/image/mediumlarge/16010111_1.%20EC-6%20HG%20MASTER%20V.FRONTAL%281%29.png",
+            "MULTIPLE-MESA-MASTER": "https://www.cristalerialaunica.com.mx/cdn/shop/files/0561200S-1.jpg?v=1748117943",
+            "MULTICHEF-MESA-MASTER": "https://www.coriat.com.mx/product/image/mediumlarge/18010311_00_multichef%20mesa%20m%C3%A1ster%20comp.png",
+            "MINICHEF-MESA-MASTER": "https://www.coriat.com.mx/product/image/mediumlarge/18010211_00_minichef%20mesa%20m%C3%A1ster%20comp.png",
+            "EC-4-GA": "https://laindustrial.mx/assets/images/products/coriat/661300.jpg",
+            "FC-10": "https://homeappliancepr.com/cdn/shop/files/freidora-1-quemador-coriat-fc-10-petit-premium-20010211-1647482077.jpg?crop=center&height=1200&v=1768415213&width=1200",
+            "EQUIP-STAND-12": "https://coriat.us/cdn/shop/files/BASEM.jpg?v=1723837084&width=1200",
+            "EQUIP-STAND-24": "https://coriat.us/cdn/shop/files/Banco59cm01.png?v=1718631878&width=1200",
+            "EQUIP-STAND-48": "https://coriat.us/cdn/shop/files/Mesadetrabajo1-100_1.jpg?v=1723212859&width=1200",
+            "SP-2T-90CM": "https://coriat.us/cdn/shop/files/SP-2T.png?v=1769529586&width=1946",
+          }
+
+          os.makedirs("portal-lewar-b2b/assets/coriat", exist_ok=True)
+          headers = {
+            "User-Agent": "Mozilla/5.0 (compatible; LewarCatalog/1.0)",
+            "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+          }
+          ok, failed = [], []
+          for sku, url in images.items():
+            try:
+              h = dict(headers)
+              if "coriat.com.mx" in url:
+                h["Referer"] = "https://www.coriat.com.mx/"
+              elif "coriat.us" in url:
+                h["Referer"] = "https://coriat.us/"
+              r = requests.get(url, headers=h, timeout=30, allow_redirects=True)
+              r.raise_for_status()
+              im = Image.open(io.BytesIO(r.content))
+              if im.mode not in ("RGB", "RGBA"):
+                im = im.convert("RGBA" if "A" in im.mode else "RGB")
+              safe = sku.replace(" ", "-").replace("/", "-")
+              out = f"portal-lewar-b2b/assets/coriat/{safe}.webp"
+              im.save(out, "WEBP", quality=92, method=6)
+              ok.append(sku)
+              print("OK", sku, im.size, r.url)
+            except Exception as e:
+              failed.append(sku)
+              print("FAIL", sku, repr(e))
+          print("SUCCESS", len(ok), ok)
+          print("FAILED", len(failed), failed)
+          if failed:
+            with open("portal-lewar-b2b/assets/coriat/FAILED.txt","w") as f:
+              f.write("\n".join(failed))
+          elif os.path.exists("portal-lewar-b2b/assets/coriat/FAILED.txt"):
+            os.remove("portal-lewar-b2b/assets/coriat/FAILED.txt")
+          PY
+      - name: Commit cached images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add portal-lewar-b2b/assets/coriat
+          if ! git diff --cached --quiet; then
+            git commit -m "Cache Coriat product images locally"
+            git push
+          fi
