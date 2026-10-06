@@ -20,7 +20,7 @@
 <section id="gate" class="price-gate">
   <div class="eyebrow">Acceso privado por cliente</div>
   <h1>Portal de pedidos</h1>
-  <p>Ingresa el PIN exclusivo asignado a tu comercio. El acceso se vincula al primer dispositivo autorizado.</p>
+  <p>Ingresa el PIN exclusivo asignado a tu comercio o a tu cuenta interna de Lewar.</p>
   <div class="security-alert">
     <strong>⚠️ Aviso de seguridad y confidencialidad</strong>
     El acceso y uso de este portal están sujetos a monitoreo y registro por motivos de seguridad. Toda la información disponible es confidencial y de uso exclusivo del cliente autorizado. <b>Se prohíbe compartir, reenviar, reproducir o divulgar a terceros el contenido, credenciales, precios o capturas de pantalla de este portal.</b>
@@ -34,7 +34,7 @@
 
 <main id="portal" hidden>
   <div class="portal-nav">
-    <div><span class="eyebrow">Cliente autorizado</span><div id="customer-name" class="customer-pill"></div></div>
+    <div><span class="eyebrow">Acceso autorizado</span><div id="customer-name" class="customer-pill"></div></div>
     <button id="logout" class="secondary" type="button">Cerrar sesión</button>
   </div>
   <div class="eyebrow">Pedidos especiales · Lewar LogDistributors</div>
@@ -43,14 +43,14 @@
   <p class="intro"><span class="locked">🔒 Precios protegidos</span> No se permiten artículos manuales ni cambios de precio.</p>
   <div class="security-alert compact">
     <strong>🔒 Acceso monitoreado y confidencial</strong>
-    Este acceso está sujeto a monitoreo y registro. La información de este portal es exclusiva del cliente autorizado. <b>Queda prohibido compartirla con terceros, incluyendo credenciales, precios, documentos o capturas de pantalla.</b>
+    Este acceso está sujeto a monitoreo y registro. La información de este portal es exclusiva del usuario autorizado. <b>Queda prohibido compartirla con terceros, incluyendo credenciales, precios, documentos o capturas de pantalla.</b>
   </div>
 
   <div class="layout"><div>
     <section class="panel">
       <div class="panel-head"><h2><span class="step">01</span>Cliente y contacto</h2></div>
       <div class="grid">
-        <div class="field"><label for="cliente">Nombre comercial</label><input id="cliente" readonly></div>
+        <div class="field"><label for="cliente">Nombre comercial</label><input id="cliente" readonly><select id="cliente-select" hidden aria-label="Seleccionar cliente"><option value="">Selecciona un cliente</option></select></div>
         <div class="field"><label for="contacto">Persona de contacto *</label><input id="contacto" required autocomplete="name"></div>
         <div class="field"><label for="telefono">Teléfono *</label><input id="telefono" required type="tel" autocomplete="tel"></div>
         <div class="field"><label for="correo">Correo electrónico *</label><input id="correo" required type="email" autocomplete="email"></div>
@@ -86,6 +86,6 @@
 <script src="../expo-muebles/vendor/pdf-lib.min.js"></script>
 <script src="../expo-muebles/order-pdf.js"></script>
 <script src="../expo-muebles/fotos-catalogo.js?v=20261004-wrtx3021tz"></script>
-<script src="./app.js?v=20261006-delivery-guard-2"></script>
+<script src="./app.js?v=20261006-staff-roles-1"></script>
 </body>
 </html>
