@@ -48,6 +48,12 @@ async function rpc(name,payload){
 }
 const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format((Number(cents)||0)/100);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function b64Blob(b64,type='application/pdf'){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type})}
+async function openPdf(orderId){
+  const data=await rpc('portal_admin_order_pdf',{p_session_token:sessionToken,p_device_id:deviceId(),p_order_id:orderId});
+  if(!data.ok)throw new Error(data.error||'PDF no disponible.');
+  const url=URL.createObjectURL(b64Blob(data.pdfBase64));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
 
 function render(orders){
   const rows=$('rows');rows.replaceChildren();
@@ -67,14 +73,20 @@ function render(orders){
       '<td><span class="pill">'+esc(o.status||'—')+'</span></td>'+
       '<td><span class="pill">'+esc(o.emailState||'—')+'</span></td>';
     const action=document.createElement('td');
-    const btn=document.createElement('button');btn.className='detail-btn';btn.type='button';btn.textContent='Detalle';
+    const btn=document.createElement('button');btn.className='detail-btn';btn.type='button';btn.textContent='Ver orden';
     const detail=document.createElement('div');detail.className='details';detail.hidden=true;
     const lines=(o.lines||[]).map(l=>'<li>'+esc(l.quantity)+' × '+esc(l.product?.modelo||'')+' · '+money(l.total)+'</li>').join('');
     detail.innerHTML='<strong>Contacto:</strong> '+esc(o.contacto||'—')+' · '+esc(o.telefono||'—')+' · '+esc(o.correo||'—')+
       (o.nota?'<br><strong>Notas:</strong> '+esc(o.nota):'')+
       '<br><strong>Artículos:</strong><ul>'+lines+'</ul>';
-    btn.onclick=()=>{detail.hidden=!detail.hidden;btn.textContent=detail.hidden?'Detalle':'Ocultar'};
-    action.append(btn,detail);tr.append(action);rows.append(tr);
+    btn.onclick=()=>{detail.hidden=!detail.hidden;btn.textContent=detail.hidden?'Ver orden':'Ocultar orden'};
+    const pdf=document.createElement('button');pdf.className='detail-btn';pdf.type='button';pdf.textContent='Ver PDF';pdf.style.marginLeft='6px';
+    pdf.onclick=async()=>{pdf.disabled=true;try{await openPdf(o.id)}catch(e){alert(e.message)}finally{pdf.disabled=false}};
+    const sendWrap=document.createElement('div');sendWrap.className='pdf-send';
+    const email=document.createElement('input');email.type='email';email.placeholder='Enviar PDF a: email@ejemplo.com';email.setAttribute('aria-label','Email para enviar PDF');
+    const send=document.createElement('button');send.type='button';send.className='detail-btn';send.textContent='Enviar PDF';
+    send.onclick=()=>{const v=email.value.trim();if(!v||!email.checkValidity()){alert('Escribe un email válido.');return}alert('El envío directo quedará habilitado cuando el servicio de correo de Portal Clientes esté verificado. El PDF sí puede abrirse desde “Ver PDF”.')};
+    sendWrap.append(email,send);action.append(btn,pdf,sendWrap,detail);tr.append(action);rows.append(tr);
   }
 }
 async function load(){
