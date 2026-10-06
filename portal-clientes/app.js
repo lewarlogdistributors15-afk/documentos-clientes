@@ -288,6 +288,33 @@ function pdfLink(order,bytes){
   $('descargar').href=url;$('descargar').download=order.id+'-v'+order.version+'.pdf';
   $('descargar').dataset.url=url;$('descargar').style.display='block';
 }
+function bytesToBase64(bytes){
+  let binary='';
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+  }
+  return btoa(binary);
+}
+async function deliveryUpdate(order,bytes,state,error=''){
+  try{
+    const data=await rpc('portal_client_delivery_update',{
+      p_session_token:sessionToken,
+      p_device_id:deviceId(),
+      p_order_id:order.id,
+      p_pdf_base64:bytes?bytesToBase64(bytes):null,
+      p_pdf_filename:bytes?(order.id+'-v'+order.version+'.pdf'):null,
+      p_email_state:state,
+      p_error:error||null
+    });
+    if(!data.ok)throw new Error(data.error||'No se pudo registrar la entrega.');
+    return data;
+  }catch(e){
+    console.error('Delivery tracking error',e);
+    return {ok:false,error:e.message};
+  }
+}
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function sendEmail(order,bytes){
   if(!bytes)return {skipped:true};
   const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
@@ -314,6 +341,23 @@ async function sendEmail(order,bytes){
   if(!res.ok||result.success===false)throw new Error(result.message||'El correo no confirmó el envío.');
   return result;
 }
+async function sendEmailWithRetry(order,bytes){
+  let lastError=null;
+  for(let attempt=1;attempt<=3;attempt++){
+    await deliveryUpdate(order,null,'sending',lastError?.message||'');
+    try{
+      const result=await sendEmail(order,bytes);
+      await deliveryUpdate(order,null,'sent','');
+      return result;
+    }catch(e){
+      lastError=e;
+      const finalAttempt=attempt===3;
+      await deliveryUpdate(order,null,finalAttempt?'failed':'retrying',e.message||'Error de envío');
+      if(!finalAttempt)await wait(1200*attempt);
+    }
+  }
+  throw lastError||new Error('No se pudo confirmar el envío del correo.');
+}
 async function saveOrder(){
   if(saving)return;
   const ids=['contacto','telefono','correo','vendedor'];
@@ -329,11 +373,14 @@ async function saveOrder(){
     if(!data.ok)throw new Error(data.error||'No se pudo guardar la orden.');
     currentOrder=data.order;
     const bytes=await createPdf(currentOrder);pdfLink(currentOrder,bytes);
+    if(!bytes)throw new Error('La orden quedó guardada, pero no se pudo generar el PDF automático.');
+    const backup=await deliveryUpdate(currentOrder,bytes,'pdf_saved','');
+    if(!backup.ok)throw new Error('La orden quedó guardada, pero no se pudo respaldar el PDF automático. '+(backup.error||''));
     $('page-title').textContent='Modificar '+currentOrder.id;
     $('summary-title').textContent='Orden activa';$('guardar').textContent='Guardar cambios';
-    setStatus('Orden '+currentOrder.id+' guardada. Enviando confirmación…');
-    try{await sendEmail(currentOrder,bytes);setStatus('Orden '+currentOrder.id+' guardada y confirmación enviada.')}
-    catch(emailError){setStatus('La orden quedó guardada correctamente. El correo no confirmó el envío: '+emailError.message,true)}
+    setStatus('Orden '+currentOrder.id+' guardada. PDF respaldado. Enviando confirmación…');
+    try{await sendEmailWithRetry(currentOrder,bytes);setStatus('Orden '+currentOrder.id+' guardada, PDF respaldado y confirmación enviada.')}
+    catch(emailError){setStatus('La orden y el PDF quedaron guardados. El correo falló después de 3 intentos: '+emailError.message+'. Comunícate con Lewar para reenviarlo.',true)}
   }catch(e){
     if(/sesión/i.test(e.message)){storeSession('');gateStatus(e.message,true);showGate()}
     else setStatus(e.message,true);
