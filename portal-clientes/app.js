@@ -149,6 +149,7 @@ function hydrate(){
   const isStaff=actor?.type==='staff';
   const roleLabel=actor?.role==='admin'?'Administrador':actor?.role==='seller'?'Vendedor':'Cliente';
   $('customer-name').textContent=isStaff?(actor.name+' · '+roleLabel):(customer?.name||'Cliente');
+  $('orders-tab').hidden=!(isStaff&&actor?.role==='admin');
   $('cliente').hidden=isStaff;
   $('cliente-select').hidden=!isStaff;
   $('vendedor').readOnly=!!(isStaff&&actor?.role==='seller');
