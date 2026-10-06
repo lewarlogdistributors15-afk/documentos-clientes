@@ -5,7 +5,7 @@ const DEVICE_KEY='lewar-client-device-v1';
 const $=id=>document.getElementById(id);
 const usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(n)||0);
 
-let catalog=[],customer=null,currentOrder=null,sessionToken='',saving=false;
+let catalog=[],customer=null,customers=[],actor=null,currentOrder=null,sessionToken='',saving=false;
 const quantities={};
 const memoryStore={};
 
@@ -109,34 +109,68 @@ function showPortal(){
 }
 async function login(){
   const pin=$('pin').value.trim();
-  if(!/^\d{6}$/.test(pin)){gateStatus('Ingresa el PIN de 6 dígitos asignado a tu comercio.',true);$('pin').focus();return}
+  if(!/^\d{6}$/.test(pin)){gateStatus('Ingresa tu PIN de 6 dígitos.',true);$('pin').focus();return}
   $('login').disabled=true;gateStatus('Verificando acceso…');
   try{
-    const data=await rpc('portal_client_login_v2',{p_pin:pin,p_device_id:deviceId(),p_device_info:deviceInfo()});
+    const data=await rpc('portal_access_login',{p_pin:pin,p_device_id:deviceId(),p_device_info:deviceInfo()});
     if(!data.ok)throw new Error(data.error||'PIN incorrecto.');
+    actor=data.actor||null;
     storeSession(data.sessionToken);
     $('pin').value='';
     await bootstrap();
   }catch(e){
     storeSession('');
+    actor=null;
     gateStatus(e.message,true);
     showGate();
   }finally{$('login').disabled=false}
 }
-async function bootstrap(){
+async function bootstrap(selectedCustomerId=null){
   if(!sessionToken){showGate();return}
   try{
-    const data=await rpc('portal_client_bootstrap',{p_session_token:sessionToken,p_device_id:deviceId()});
+    const data=await rpc('portal_access_bootstrap',{
+      p_session_token:sessionToken,
+      p_device_id:deviceId(),
+      p_customer_id:selectedCustomerId||null
+    });
     if(!data.ok)throw new Error(data.error||'Sesión inválida.');
-    customer=data.customer;catalog=data.catalog.productos||[];currentOrder=data.order||null;
+    actor=data.actor||actor;
+    customers=data.customers||[];
+    customer=data.customer||null;
+    catalog=data.catalog?.productos||[];
+    currentOrder=data.order||null;
     showPortal();hydrate();
   }catch(e){
-    storeSession('');gateStatus(e.message,true);showGate();
+    storeSession('');actor=null;customers=[];customer=null;
+    gateStatus(e.message,true);showGate();
   }
 }
 function hydrate(){
-  $('customer-name').textContent=customer.name;
-  $('cliente').value=customer.name;
+  const isStaff=actor?.type==='staff';
+  const roleLabel=actor?.role==='admin'?'Administrador':actor?.role==='seller'?'Vendedor':'Cliente';
+  $('customer-name').textContent=isStaff?(actor.name+' · '+roleLabel):(customer?.name||'Cliente');
+  $('cliente').hidden=isStaff;
+  $('cliente-select').hidden=!isStaff;
+  $('vendedor').readOnly=!!(isStaff&&actor?.role==='seller');
+
+  if(isStaff){
+    const select=$('cliente-select');
+    const selected=customer?.id||'';
+    select.replaceChildren();
+    const placeholder=document.createElement('option');
+    placeholder.value='';placeholder.textContent='Selecciona un cliente';select.append(placeholder);
+    for(const item of customers){
+      const opt=document.createElement('option');
+      opt.value=item.id;
+      opt.textContent=item.name+(item.clientCode?' · '+item.clientCode:'');
+      select.append(opt);
+    }
+    select.value=selected;
+    $('cliente').value=customer?.name||'';
+  }else{
+    $('cliente').value=customer?.name||'';
+  }
+
   $('vigencia').textContent=(catalog.length||0)+' modelos';
   for(const key of Object.keys(quantities))delete quantities[key];
   for(const p of catalog)quantities[p.modelo]=0;
@@ -148,18 +182,19 @@ function hydrate(){
     $('contacto').value=currentOrder.contacto||'';
     $('telefono').value=currentOrder.telefono||'';
     $('correo').value=currentOrder.correo||'';
-    $('vendedor').value=currentOrder.vendedor||'';
+    $('vendedor').value=(isStaff&&actor?.role==='seller')?actor.name:(currentOrder.vendedor||actor?.name||'');
     $('nota').value=currentOrder.nota||'';
     for(const line of currentOrder.lines||[]){
       if(Object.prototype.hasOwnProperty.call(quantities,line.product?.modelo))quantities[line.product.modelo]=Number(line.quantity)||0;
     }
-    setStatus('Puedes añadir, reducir o eliminar productos de tu orden activa.');
+    setStatus('Puedes añadir, reducir o eliminar productos de la orden activa.');
   }else{
-    $('page-title').textContent='Preparar pedido';
+    $('page-title').textContent=isStaff?'Preparar pedido para cliente':'Preparar pedido';
     $('summary-title').textContent='Resumen del pedido';
     $('guardar').textContent='Enviar pedido';
-    for(const id of ['contacto','telefono','correo','vendedor','nota'])$(id).value='';
-    setStatus('Selecciona los equipos y cantidades.');
+    for(const id of ['contacto','telefono','correo','nota'])$(id).value='';
+    $('vendedor').value=isStaff?(actor?.name||''):'';
+    setStatus(isStaff&&!customer?'Selecciona primero el cliente para esta orden.':'Selecciona los equipos y cantidades.');
   }
   renderCatalog();calculate();
 }
@@ -258,8 +293,12 @@ function calculate(){
   }
   $('modelos').textContent=String(models);$('unidades').textContent=String(order.units);
   $('subtotal').textContent=order.units?usd(order.total/100):'—';
-  $('guardar').disabled=saving||!order.units;
-  if(!saving)setStatus(order.units?(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.'):'Selecciona los equipos y cantidades.');
+  const needsCustomer=actor?.type==='staff'&&!customer;
+  $('guardar').disabled=saving||!order.units||needsCustomer;
+  if(!saving){
+    if(needsCustomer)setStatus('Selecciona primero el cliente para esta orden.');
+    else setStatus(order.units?(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.'):'Selecciona los equipos y cantidades.');
+  }
 }
 function filterCatalog(){
   const cat=$('categoria').value.toLowerCase(),term=$('buscar').value.trim().toLowerCase();
@@ -298,7 +337,7 @@ function bytesToBase64(bytes){
 }
 async function deliveryUpdate(order,bytes,state,error=''){
   try{
-    const data=await rpc('portal_client_delivery_update',{
+    const data=await rpc('portal_access_delivery_update',{
       p_session_token:sessionToken,
       p_device_id:deviceId(),
       p_order_id:order.id,
@@ -360,13 +399,15 @@ async function sendEmailWithRetry(order,bytes){
 }
 async function saveOrder(){
   if(saving)return;
+  if(actor?.type==='staff'&&!customer){$('cliente-select').focus();setStatus('Selecciona el cliente antes de guardar.',true);return}
   const ids=['contacto','telefono','correo','vendedor'];
   for(const id of ids){if(!$(id).value.trim()||!$(id).reportValidity()){$(id).focus();setStatus('Completa los datos de contacto antes de guardar.',true);return}}
   if(!selectedItems().length)return;
   saving=true;$('guardar').disabled=true;setStatus('Calculando precios oficiales y guardando la orden…');
   try{
-    const data=await rpc('portal_client_save',{
+    const data=await rpc('portal_access_save',{
       p_session_token:sessionToken,p_device_id:deviceId(),
+      p_customer_id:customer?.id||null,
       p_contacto:$('contacto').value,p_telefono:$('telefono').value,p_correo:$('correo').value,
       p_vendedor:$('vendedor').value,p_nota:$('nota').value,p_items:selectedItems()
     });
@@ -382,19 +423,20 @@ async function saveOrder(){
     try{await sendEmailWithRetry(currentOrder,bytes);setStatus('Orden '+currentOrder.id+' guardada, PDF respaldado y confirmación enviada.')}
     catch(emailError){setStatus('La orden y el PDF quedaron guardados. El correo falló después de 3 intentos: '+emailError.message+'. Comunícate con Lewar para reenviarlo.',true)}
   }catch(e){
-    if(/sesión/i.test(e.message)){storeSession('');gateStatus(e.message,true);showGate()}
+    if(/sesión/i.test(e.message)){storeSession('');actor=null;gateStatus(e.message,true);showGate()}
     else setStatus(e.message,true);
   }finally{saving=false;calculate()}
 }
 async function logout(){
-  try{if(sessionToken)await rpc('portal_client_logout',{p_session_token:sessionToken,p_device_id:deviceId()})}catch{}
-  storeSession('');customer=null;currentOrder=null;catalog=[];showGate();gateStatus('Sesión cerrada.');
+  try{if(sessionToken)await rpc('portal_access_logout',{p_session_token:sessionToken,p_device_id:deviceId()})}catch{}
+  storeSession('');actor=null;customers=[];customer=null;currentOrder=null;catalog=[];showGate();gateStatus('Sesión cerrada.');
 }
 
 $('login').addEventListener('click',login);
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();login()}});
 $('guardar').addEventListener('click',saveOrder);
 $('logout').addEventListener('click',logout);
+$('cliente-select').addEventListener('change',()=>bootstrap($('cliente-select').value||null));
 $('categoria').addEventListener('change',filterCatalog);
 $('buscar').addEventListener('input',filterCatalog);
 
