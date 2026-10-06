@@ -35,7 +35,10 @@
 <main id="portal" hidden>
   <div class="portal-nav">
     <div><span class="eyebrow">Acceso autorizado</span><div id="customer-name" class="customer-pill"></div></div>
-    <button id="logout" class="secondary" type="button">Cerrar sesión</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a id="orders-tab" href="./ordenes.html" class="secondary" style="text-decoration:none" hidden>Registro de órdenes</a>
+      <button id="logout" class="secondary" type="button">Cerrar sesión</button>
+    </div>
   </div>
   <div class="eyebrow">Pedidos especiales · Lewar LogDistributors</div>
   <h1 id="page-title">Preparar pedido</h1>
@@ -86,6 +89,6 @@
 <script src="../expo-muebles/vendor/pdf-lib.min.js"></script>
 <script src="../expo-muebles/order-pdf.js"></script>
 <script src="../expo-muebles/fotos-catalogo.js?v=20261004-wrtx3021tz"></script>
-<script src="./app.js?v=20261006-staff-roles-1"></script>
+<script src="./app.js?v=20261006-admin-orders-1"></script>
 </body>
 </html>
