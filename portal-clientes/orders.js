@@ -85,7 +85,7 @@ function render(orders){
     const sendWrap=document.createElement('div');sendWrap.className='pdf-send';
     const email=document.createElement('input');email.type='email';email.placeholder='Enviar PDF a: email@ejemplo.com';email.setAttribute('aria-label','Email para enviar PDF');
     const send=document.createElement('button');send.type='button';send.className='detail-btn';send.textContent='Enviar PDF';
-    send.onclick=()=>{const v=email.value.trim();if(!v||!email.checkValidity()){alert('Escribe un email válido.');return}alert('El envío directo quedará habilitado cuando el servicio de correo de Portal Clientes esté verificado. El PDF sí puede abrirse desde “Ver PDF”.')};
+    send.onclick=async()=>{const v=email.value.trim();if(!v||!email.checkValidity()){alert('Escribe un email válido.');return}send.disabled=true;const original=send.textContent;send.textContent='Enviando…';try{const res=await fetch(SUPABASE_URL+'/functions/v1/portal-admin-send-order-pdf',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({session_token:sessionToken,device_id:deviceId(),order_id:o.id,recipient_email:v})});let data={};try{data=await res.json()}catch{}if(!res.ok||!data.ok)throw new Error(data.error||'No se pudo enviar el PDF.');alert('PDF enviado correctamente a '+v+'.')}catch(e){alert(e.message)}finally{send.disabled=false;send.textContent=original}};
     sendWrap.append(email,send);action.append(btn,pdf,sendWrap,detail);tr.append(action);rows.append(tr);
   }
 }
