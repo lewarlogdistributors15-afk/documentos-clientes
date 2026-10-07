@@ -90,5 +90,16 @@
 <script src="../expo-muebles/order-pdf.js"></script>
 <script src="../expo-muebles/fotos-catalogo.js?v=20261004-wrtx3021tz"></script>
 <script src="./app.js?v=20261006-admin-orders-1"></script>
+<script id="billing-redirect-v1">
+try{
+  const originalHydrate=hydrate;
+  hydrate=function(){
+    originalHydrate();
+    if(actor?.type==='staff'&&actor?.role==='billing'){
+      location.replace('./ordenes.html');
+    }
+  };
+}catch(e){}
+</script>
 </body>
 </html>
