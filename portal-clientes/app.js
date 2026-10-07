@@ -95,9 +95,9 @@ async function rpc(name,payload){
   if(!res.ok)throw new Error(data.message||data.error||'No se pudo conectar con el portal.');
   return data;
 }
-function storeSession(token){
+function storeSession(token,persistent=false){
   sessionToken=token||'';
-  if(token)safeSet(SESSION_KEY,token,false);
+  if(token)safeSet(SESSION_KEY,token,persistent);
   else safeRemove(SESSION_KEY);
 }
 function showGate(){
@@ -115,7 +115,7 @@ async function login(){
     const data=await rpc('portal_access_login',{p_pin:pin,p_device_id:deviceId(),p_device_info:deviceInfo()});
     if(!data.ok)throw new Error(data.error||'PIN incorrecto.');
     actor=data.actor||null;
-    storeSession(data.sessionToken);
+    storeSession(data.sessionToken,actor?.type==='staff');
     $('pin').value='';
     await bootstrap();
   }catch(e){
@@ -135,6 +135,7 @@ async function bootstrap(selectedCustomerId=null){
     });
     if(!data.ok)throw new Error(data.error||'Sesión inválida.');
     actor=data.actor||actor;
+    if(actor?.type==='staff'&&sessionToken)safeSet(SESSION_KEY,sessionToken,true);
     customers=data.customers||[];
     customer=data.customer||null;
     catalog=data.catalog?.productos||[];
@@ -147,9 +148,9 @@ async function bootstrap(selectedCustomerId=null){
 }
 function hydrate(){
   const isStaff=actor?.type==='staff';
-  const roleLabel=actor?.role==='admin'?'Administrador':actor?.role==='seller'?'Vendedor':'Cliente';
+  const roleLabel=actor?.role==='admin'?'Administrador':actor?.role==='seller'?'Vendedor':actor?.role==='billing'?'Facturación':'Cliente';
   $('customer-name').textContent=isStaff?(actor.name+' · '+roleLabel):(customer?.name||'Cliente');
-  $('orders-tab').hidden=!(isStaff&&actor?.role==='admin');
+  $('orders-tab').hidden=!(isStaff&&['admin','billing'].includes(actor?.role));
   $('cliente').hidden=isStaff;
   $('cliente-select').hidden=!isStaff;
   $('vendedor').readOnly=!!(isStaff&&actor?.role==='seller');
