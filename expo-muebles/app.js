@@ -66,6 +66,7 @@ function renderManualEntries(){
 }
 function addManualEntry(){
  const model=$('manual-modelo').value.trim().toUpperCase(),quantity=Number($('manual-cantidad').value),price=Number($('manual-precio').value),note=$('manual-nota').value.trim();
+ if(products.some(p=>p.modelo===model&&p.agotado)){$('estado').textContent=model+' está AGOTADO.';return}
  if(!model){$('manual-modelo').focus();$('estado').textContent='Escribe el modelo del artículo manual.';return}
  if(!Number.isInteger(quantity)||quantity<1||quantity>999){$('manual-cantidad').focus();$('estado').textContent='La cantidad manual debe ser entre 1 y 999.';return}
  if(!Number.isFinite(price)||price<0||price>999999){$('manual-precio').focus();$('estado').textContent='Escribe un precio unitario manual válido.';return}
@@ -77,12 +78,13 @@ function calculate(){
  const quantities={},overrides={};invalid=false;
  for(const p of products){
   const el=$('qty-'+p.modelo),manual=$('manual-'+p.modelo);
+  if(p.agotado){el.value='0';el.disabled=true;manual.disabled=true;quantities[p.modelo]=0;continue}
   if(manual.value!==''||manual.validity.badInput){if(!manual.checkValidity())invalid=true;else overrides[p.modelo]=Number(manual.value)}
   el.disabled=!Number.isFinite(p.precio)&&!Number.isFinite(overrides[p.modelo]);
   if(!el.disabled&&!el.checkValidity())invalid=true;
   quantities[p.modelo]=Number(el.value)
  }
- const automatic=priceOrder(products,quantities,overrides),manualLines=manualEntries.map(manualLine);
+ const automatic=priceOrder(products,quantities,overrides),manualLines=manualEntries.filter(entry=>!products.some(p=>p.modelo===entry.modelo&&p.agotado)).map(manualLine);
  order={...automatic,lines:[...automatic.lines,...manualLines],units:automatic.units+manualLines.reduce((n,l)=>n+l.quantity,0),total:automatic.total+manualLines.reduce((n,l)=>n+l.total,0)};
  $('detalle').replaceChildren();
  for(const line of order.lines){
@@ -126,6 +128,7 @@ async function load(){try{
    const row=document.createElement('div');row.className='item';row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria,group.label].join(' ').toLowerCase();
    const info=document.createElement('div'),strong=document.createElement('strong'),desc=document.createElement('small'),rule=document.createElement('p'),priceList=document.createElement('div');
    strong.textContent=p.modelo;desc.textContent=p.marca+' · '+p.descripcion;priceList.className='catalog-prices';
+   if(p.agotado){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';priceList.append(sold)}
    const regular=document.createElement('span');regular.className='price-chip';regular.textContent=Number.isFinite(p.precio)?'Precio 1 unidad '+usd(p.precio):'Precio por confirmar';priceList.append(regular);
    if(Number.isFinite(p.precio_volumen)){const special=document.createElement('span');special.className='price-chip special';special.textContent='Precio 3+ '+usd(p.precio_volumen);priceList.append(special)}
    rule.className='hint';rule.textContent=(Number.isFinite(p.precio_volumen)?`Precio de volumen desde 3 ${p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas'}`:'Sin precio especial por volumen')+(p.nota?' · '+p.nota:'');
