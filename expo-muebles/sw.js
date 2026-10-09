@@ -1,4 +1,4 @@
-const CACHE = "lewar-expo-20261004-artx2419sw-540";
+const CACHE = "lewar-expo-20261009-wfg320m0mw-agotado";
 const CORE = [
   "./",
   "./index.html",
