@@ -267,10 +267,11 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "Liquidación",
+      "nota": "Liquidación · AGOTADO",
       "precio": 515,
       "precio_volumen": 505,
-      "regla": "combinable"
+      "regla": "combinable",
+      "agotado": true
     },
     {
       "modelo": "WFG505M0MW",
