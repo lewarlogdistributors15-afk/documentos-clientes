@@ -101,6 +101,7 @@ function storeSession(token,persistent=false){
   else safeRemove(SESSION_KEY);
 }
 function showGate(){
+  clearCatalogInventory();
   $('gate').hidden=false;$('portal').hidden=true;$('footer').hidden=true;
   $('pin').focus();
 }
@@ -201,6 +202,39 @@ function hydrate(){
   }
   renderCatalog();calculate();
 }
+
+let catalogInventoryGeneration=0;
+function clearCatalogInventory(){
+  catalogInventoryGeneration++;
+  document.querySelectorAll('.internal-stock,#inventory-catalog-date').forEach(el=>el.remove());
+}
+async function refreshCatalogInventory(){
+  clearCatalogInventory();
+  if(actor?.type!=='staff'||!sessionToken||$('portal').hidden)return;
+  const token=sessionToken,staffId=actor.id,generation=catalogInventoryGeneration;
+  if(token!==(safeGet(SESSION_KEY)||cookieGet(SESSION_KEY)||''))return;
+  try{
+    const data=await rpc('portal_staff_inventory',{p_session_token:token,p_device_id:deviceId(),p_include_items:true});
+    if(!data.ok||generation!==catalogInventoryGeneration||sessionToken!==token||actor?.id!==staffId||$('portal').hidden)return;
+    if(token!==(safeGet(SESSION_KEY)||cookieGet(SESSION_KEY)||''))return;
+    const inventory=new Map((data.items||[]).map(item=>[String(item.model).trim().toUpperCase(),item.available]));
+    const date=data.date?new Date(data.date+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'}):'sin fecha';
+    const note=document.createElement('p');note.id='inventory-catalog-date';note.className='hint';
+    note.textContent='Inventario interno al '+date+' · Visible solo para personal autorizado.';
+    $('catalogo').before(note);
+    for(const row of $('catalogo').querySelectorAll('.item')){
+      const model=row.dataset.model,stock=document.createElement('p');stock.className='internal-stock';
+      stock.textContent=inventory.has(model)?'Inventario interno: '+inventory.get(model)+' disponibles':'Inventario interno: sin dato en el reporte';
+      if(inventory.has(model)&&inventory.get(model)<=0)stock.classList.add('no-stock');
+      row.querySelector('.product-info').append(stock);
+    }
+  }catch{}
+}
+window.addEventListener('pagehide',clearCatalogInventory);
+window.addEventListener('pageshow',()=>{if(typeof actor!=='undefined')refreshCatalogInventory()});
+window.addEventListener('storage',event=>{if(event.key===SESSION_KEY||event.key===null)clearCatalogInventory()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')clearCatalogInventory();else refreshCatalogInventory()});
+
 function categoryLabel(raw){
   return String(raw||'OTROS').replace(/^T-\d+\s*/,'').trim()||'OTROS';
 }
@@ -227,6 +261,7 @@ function renderCatalog(){
     for(const p of groups.get(label)){
       const row=document.createElement('div');row.className='item';
       row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria,label].join(' ').toLowerCase();
+      row.dataset.model=String(p.modelo).trim().toUpperCase();
 
       const photo=document.createElement('div');photo.className='product-photo';
       const src=typeof productPhotos!=='undefined'?(productPhotos[p.modelo]||(p.modelo==='LWMC30309LB'?productPhotos['WMC30309LB']:'')):'';
@@ -263,6 +298,7 @@ function renderCatalog(){
     section.append(body);root.append(section);
   }
   filterCatalog();
+  refreshCatalogInventory();
 }
 function quantityChanged(model,input){
   let q=Math.trunc(Number(input.value)||0);
