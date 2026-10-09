@@ -152,10 +152,11 @@
       "marca": "MAYTAG",
       "categoria": "T-01 WASHERS",
       "descripcion": "3.5 CF TOP L. 5 YEAR WA.",
-      "nota": "",
+      "nota": "AGOTADO",
       "precio": 699,
       "precio_volumen": 689,
-      "regla": "combinable"
+      "regla": "combinable",
+      "agotado": true
     },
     {
       "modelo": "MEDP586KW",
@@ -194,10 +195,11 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "20\" 4 BURNERS",
-      "nota": "",
+      "nota": "AGOTADO",
       "precio": 188,
       "precio_volumen": 182,
-      "regla": "combinable"
+      "regla": "combinable",
+      "agotado": true
     },
     {
       "modelo": "LAGR2110B",
@@ -589,10 +591,11 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "FRENCH DOOR 30\" 20 CF",
-      "nota": "",
+      "nota": "AGOTADO",
       "precio": 1065,
       "precio_volumen": 1050,
-      "regla": "combinable"
+      "regla": "combinable",
+      "agotado": true
     },
     {
       "modelo": "WRS325SDHZ",
