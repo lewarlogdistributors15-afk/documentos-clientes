@@ -147,6 +147,7 @@ async function bootstrap(selectedCustomerId=null){
   }
 }
 function hydrate(){
+  window.LewarInventory?.refreshLink();
   const isStaff=actor?.type==='staff';
   const roleLabel=actor?.role==='admin'?'Administrador':actor?.role==='seller'?'Vendedor':actor?.role==='billing'?'Facturación':'Cliente';
   $('customer-name').textContent=isStaff?(actor.name+' · '+roleLabel):(customer?.name||'Cliente');
