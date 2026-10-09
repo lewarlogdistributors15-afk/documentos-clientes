@@ -217,15 +217,16 @@ async function refreshCatalogInventory(){
     const data=await rpc('portal_staff_inventory',{p_session_token:token,p_device_id:deviceId(),p_include_items:true});
     if(!data.ok||generation!==catalogInventoryGeneration||sessionToken!==token||actor?.id!==staffId||$('portal').hidden)return;
     if(token!==(safeGet(SESSION_KEY)||cookieGet(SESSION_KEY)||''))return;
-    const inventory=new Map((data.items||[]).map(item=>[String(item.model).trim().toUpperCase(),item.available]));
+    const inventory=new Map((data.items||[]).map(item=>[String(item.model).trim().toUpperCase(),item]));
     const date=data.date?new Date(data.date+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'}):'sin fecha';
     const note=document.createElement('p');note.id='inventory-catalog-date';note.className='hint';
     note.textContent='Inventario interno al '+date+' · Visible solo para personal autorizado.';
     $('catalogo').before(note);
     for(const row of $('catalogo').querySelectorAll('.item')){
       const model=row.dataset.model,stock=document.createElement('p');stock.className='internal-stock';
-      stock.textContent=inventory.has(model)?'Inventario interno: '+inventory.get(model)+' disponibles':'Inventario interno: sin dato en el reporte';
-      if(inventory.has(model)&&inventory.get(model)<=0)stock.classList.add('no-stock');
+      const item=inventory.get(model);
+      stock.textContent=!item?'Inventario interno: pendiente de verificación':item.verification_source&&item.available<=0?'Inventario interno: AGOTADO · '+(item.committed>0?'sin unidades libres; '+item.in_stock+' en existencia y '+item.committed+' comprometidas':'sin existencias')+' · Verificado en SAP el 9 de octubre de 2026':'Inventario interno: '+item.available+' disponibles';
+      if(item&&item.available<=0)stock.classList.add('no-stock');
       row.querySelector('.product-info').append(stock);
     }
   }catch{}
