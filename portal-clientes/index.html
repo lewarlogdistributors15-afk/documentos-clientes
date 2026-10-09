@@ -22,6 +22,7 @@
 .special-countdown.expired .countdown-heading,.special-countdown.expired .countdown-value{color:#9d332b}
 @media(max-width:650px){.special-countdown{align-items:flex-start;flex-direction:column;gap:8px}.special-countdown .countdown-value{white-space:normal;font-size:23px}}
 
+.internal-stock{margin:12px 0 0;padding:8px 10px;border-radius:7px;background:#edf5ee;color:#315b39;font-size:13px;font-weight:700}.internal-stock.no-stock{background:#fff4e5;color:#875817}#inventory-catalog-date{margin:0 0 16px}
 </style>
 </head>
 <body>
@@ -111,7 +112,7 @@
 <script src="../expo-muebles/order-pdf.js"></script>
 <script src="../expo-muebles/fotos-catalogo.js?v=20261004-wrtx3021tz"></script>
 <script src="./inventory-access.js?v=20261009-1"></script>
-<script src="./app.js?v=20261009-inventory-1"></script>
+<script src="./app.js?v=20261009-catalog-inventory-1"></script>
 <script id="client-price-countdown-v1">
 (function(){
   const expiresAt=Date.parse('2026-10-23T23:59:59-04:00');
@@ -148,7 +149,7 @@ try{
   const originalHydrate=hydrate;
   hydrate=function(){
     originalHydrate();
-    if(actor?.type==='staff'&&actor?.role==='billing'){
+    if(actor?.type==='staff'&&actor?.role==='billing'&&new URLSearchParams(location.search).get('catalogo')!=='1'){
       location.replace('./ordenes.html');
     }
   };
