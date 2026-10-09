@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Inventario disponible | Lewar LogDistributors</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#202a35;background:#f6f7f8}*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0}header{background:#080808;color:white}.top{max-width:1200px;margin:auto;padding:16px 24px;display:flex;align-items:center;gap:20px}.top img{width:72px;height:72px;object-fit:contain}.top strong{font-size:20px}
+main{max-width:1200px;margin:auto;padding:28px 24px 60px}.nav{display:flex;gap:12px;flex-wrap:wrap}
+a,button{font:inherit;border:1px solid #aeb7be;background:#fff;border-radius:7px;padding:11px 15px;color:#26313d;text-decoration:none;cursor:pointer}
+h1{font-size:clamp(28px,4vw,38px);letter-spacing:-.04em;margin:26px 0 8px}.muted{color:#65717b;line-height:1.5}
+.panel{background:white;border:1px solid #e1e5e8;border-radius:12px;padding:22px;margin-top:20px}
+label{display:block;font-weight:700;margin-bottom:8px}input{font:inherit;width:100%;border:1px solid #cbd2d8;border-radius:7px;padding:12px}
+.toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap}.field{flex:1;min-width:220px}button{min-height:44px}
+.summary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:18px 0;color:#65717b;font-size:14px}
+.scroll{overflow:auto;max-height:65vh;border:1px solid #e1e5e8;border-radius:8px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:13px 15px;border-bottom:1px solid #e5e9ec;text-align:left;vertical-align:top}
+th{background:#f4f6f7;position:sticky;top:0}td:first-child{font-weight:700;white-space:nowrap}.number{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.negative{color:#a33c32;font-weight:700}.error{color:#a33c32}
+@media(max-width:650px){main{padding:22px 14px}.panel{padding:16px}.top{padding:12px 16px}.top strong{font-size:17px}th,td{padding:11px 9px}table{min-width:550px}}
+</style>
+</head>
+<body>
+<header><div class="top"><img src="../expo-muebles/lewar-logo.png" alt="Lewar LogDistributors"><strong>Lewar LogDistributors</strong></div></header>
+<main>
+<nav class="nav"><a href="./">Portal de clientes</a><a id="orders-link" href="./ordenes.html" hidden>Registro de órdenes</a></nav>
+<h1>Inventario disponible</h1>
+<p id="access-status" class="muted" role="status">Verificando acceso…</p>
+<section id="inventory-panel" class="panel" hidden aria-label="Inventario interno">
+<div class="toolbar"><div class="field"><label for="inventory-search">Buscar modelo o descripción</label><input id="inventory-search" type="search" placeholder="Ej. WTW4105SW" autocomplete="off"></div><button id="inventory-refresh" type="button">Actualizar</button></div>
+<div class="summary"><span id="inventory-date"></span><span id="inventory-count" aria-live="polite"></span></div>
+<div class="scroll"><table><thead><tr><th scope="col">Modelo</th><th scope="col">Descripción</th><th scope="col" class="number">Disponible</th></tr></thead><tbody id="inventory-rows"></tbody></table></div>
+<p id="inventory-empty" class="muted" hidden>No se encontraron artículos.</p>
+<p class="muted">Cantidades del reporte indicado. Los valores negativos se muestran tal como aparecen en el inventario.</p>
+</section>
+</main>
+<script src="./inventory-access.js?v=20261009-1"></script>
+<script src="./inventory.js?v=20261009-1"></script>
+</body></html>
