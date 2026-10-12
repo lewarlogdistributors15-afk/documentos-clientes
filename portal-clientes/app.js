@@ -273,23 +273,25 @@ function renderCatalog(){
       const strong=document.createElement('strong');strong.textContent=p.modelo;
       const desc=document.createElement('small');desc.textContent=p.marca+' · '+p.descripcion;
       const chips=document.createElement('div');chips.className='catalog-prices';
-      if(p.agotado){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';chips.append(sold)}
+      if(p.agotado&&!p.mantener_activo){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';chips.append(sold)}
+      if(p.mantener_activo){const future=document.createElement('span');future.className='price-chip special';future.textContent=p.agotado?'UNIDADES EN CAMINO · PEDIDO EN REPOSICIÓN':'MODELO ACTIVO · REPOSICIÓN CONTINUA';chips.append(future)}
       const regular=document.createElement('span');regular.className='price-chip';regular.textContent='Precio 1 unidad '+usd(p.precio);chips.append(regular);
       if(Number.isFinite(Number(p.precio_volumen))){
         const special=document.createElement('span');special.className='price-chip special';
         special.textContent='Precio 3+ '+usd(p.precio_volumen);chips.append(special);
       }
       const rule=document.createElement('p');rule.className='hint';
-      rule.textContent=(p.precio_volumen!==null?('Precio de volumen desde 3 '+(p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas')):'Sin precio especial por volumen')+(p.nota?' · '+p.nota:'');
+      const displayNote=p.mantener_activo&&p.agotado?'Unidades en camino · Entrega pendiente de confirmación':p.nota;
+      rule.textContent=(p.precio_volumen!==null?('Precio de volumen desde 3 '+(p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas')):'Sin precio especial por volumen')+(displayNote?' · '+displayNote:'');
       info.append(strong,desc,chips,rule);
 
       const qbox=document.createElement('div');qbox.className='quantity-box';
       const qlabel=document.createElement('span');qlabel.className='qty-label';qlabel.textContent='Cantidad';
       const step=document.createElement('div');step.className='stepper';
       const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','Restar '+p.modelo);
-      const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);if(p.agotado){input.value='0';quantities[p.modelo]=0;input.disabled=true;}
+      const input=document.createElement('input');input.type='number';input.min='0';input.max=String(p.maximo_por_pedido||999);input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);if(p.agotado&&!p.mantener_activo){input.value='0';quantities[p.modelo]=0;input.disabled=true;}
       const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','Añadir '+p.modelo);
-      if(p.agotado){minus.disabled=true;plus.disabled=true}else{minus.onclick=()=>{input.value=String(Math.max(0,(Number(input.value)||0)-1));quantityChanged(p.modelo,input)};plus.onclick=()=>{input.value=String(Math.min(999,(Number(input.value)||0)+1));quantityChanged(p.modelo,input)}}
+      if(p.agotado&&!p.mantener_activo){minus.disabled=true;plus.disabled=true}else{minus.onclick=()=>{input.value=String(Math.max(0,(Number(input.value)||0)-1));quantityChanged(p.modelo,input)};plus.onclick=()=>{input.value=String(Math.min(p.maximo_por_pedido||999,(Number(input.value)||0)+1));quantityChanged(p.modelo,input)}}
       input.oninput=()=>quantityChanged(p.modelo,input);
       step.append(minus,input,plus);qbox.append(qlabel,step);
 
@@ -303,14 +305,14 @@ function renderCatalog(){
 }
 function quantityChanged(model,input){
   let q=Math.trunc(Number(input.value)||0);
-  if(q<0)q=0;if(q>999)q=999;
+  if(q<0)q=0;const max=catalog.find(p=>p.modelo===model)?.maximo_por_pedido||999;if(q>max)q=max;
   quantities[model]=q;input.value=String(q);calculate();
 }
 function localPricing(){
   const combinable=catalog.filter(p=>p.regla==='combinable').reduce((n,p)=>n+(quantities[p.modelo]||0),0);
   const lines=[];
   for(const p of catalog){
-    const q=p.agotado?0:(quantities[p.modelo]||0);
+    const q=p.agotado&&!p.mantener_activo?0:(quantities[p.modelo]||0);
     const regular=Math.ceil(Number(p.precio)||0);
     const volumePrice=p.precio_volumen===null?null:Math.ceil(Number(p.precio_volumen));
     const volume=volumePrice!==null&&(p.regla==='mismo_modelo'?q>=3:combinable>=3);
@@ -328,7 +330,7 @@ function calculate(){
     if(l.quantity){
       models++;
       const p=document.createElement('p');p.style.margin='9px 0';
-      p.textContent=l.quantity+' × '+l.product.modelo+' · '+usd(l.total/100);detail.append(p);
+      p.textContent=l.quantity+' × '+l.product.modelo+' · '+usd(l.total/100)+(l.product.mantener_activo&&l.product.agotado?' · En camino (entrega pendiente)':'');detail.append(p);
     }
   }
   $('modelos').textContent=String(models);$('unidades').textContent=String(order.units);
@@ -337,7 +339,7 @@ function calculate(){
   $('guardar').disabled=saving||!order.units||needsCustomer;
   if(!saving){
     if(needsCustomer)setStatus('Selecciona primero el cliente para esta orden.');
-    else setStatus(order.units?(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.'):'Selecciona los equipos y cantidades.');
+    else setStatus(order.units?(catalog.some(p=>p.mantener_activo&&p.agotado&&(quantities[p.modelo]||0)>0)?'Incluye unidades en camino. Pedido sujeto a confirmación de entrega.':(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.')):'Selecciona los equipos y cantidades.');
   }
 }
 function filterCatalog(){
@@ -410,7 +412,7 @@ async function sendEmail(order,bytes){
     'Vendedor':order.vendedor,
     'Artículos':(order.lines||[]).map(l=>l.quantity+' x '+l.product.modelo+' | '+money(l.unit)+' c/u | '+money(l.total/100)).join('\n'),
     'Subtotal':money(order.total/100),'Notas':order.nota||'Ninguna',
-    'Condiciones':'Sujeto a disponibilidad y confirmación de Lewar. Precios calculados por el portal protegido.',
+    'Condiciones':(order.lines||[]).some(l=>/Unidades en camino/i.test(l.product?.nota||''))?'Incluye unidades en camino. Fecha de entrega pendiente de confirmación por Lewar. Precios calculados por el portal protegido.':'Sujeto a disponibilidad y confirmación de Lewar. Precios calculados por el portal protegido.',
     honeypot:'website',website:''
   };
   for(const [k,v] of Object.entries(fields))form.append(k,String(v??''));
