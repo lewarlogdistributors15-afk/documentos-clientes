@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-04",
+  "version": "2026-10-12",
   "vigencia": "95 modelos · precios de convención redondeados al dólar",
   "productos": [
     {
@@ -10,7 +10,9 @@
       "nota": "",
       "precio": 370,
       "precio_volumen": 365,
-      "regla": "mismo_modelo"
+      "regla": "mismo_modelo",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "NED4655EW",
@@ -20,29 +22,35 @@
       "nota": "",
       "precio": 370,
       "precio_volumen": 365,
-      "regla": "mismo_modelo"
+      "regla": "mismo_modelo",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "NGD4655EW",
       "marca": "AMANA",
       "categoria": "T-07 DRYERS",
       "descripcion": "6.5 CF GAS DRYER",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 375,
       "precio_volumen": 365,
       "regla": "mismo_modelo",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WTW4955HW",
       "marca": "WHIRLPOOL",
       "categoria": "T-01 WASHERS",
       "descripcion": "3.8 CF TOP LOAD",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 389,
       "precio_volumen": 379,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WGD4815EW",
@@ -62,40 +70,48 @@
       "nota": "",
       "precio": 399,
       "precio_volumen": 389,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WTW4107SW",
       "marca": "WHIRLPOOL",
       "categoria": "T-01 WASHERS",
       "descripcion": "4.2 - 4.3 CF TOP LOAD",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 450,
       "precio_volumen": 440,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WED4105SW",
       "marca": "WHIRLPOOL",
       "categoria": "T-07 DRYERS",
       "descripcion": "7.0 CF ELECTRIC / ADAPTIVE DRY",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 440,
       "precio_volumen": 425,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WGD4105SW",
       "marca": "WHIRLPOOL",
       "categoria": "T-07 DRYERS",
       "descripcion": "7.0 CF GAS / ADAPTIVE DRY",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 440,
       "precio_volumen": 425,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "MVW4005SW",
@@ -105,7 +121,9 @@
       "nota": "",
       "precio": 445,
       "precio_volumen": 435,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "MED4005SW",
@@ -115,7 +133,9 @@
       "nota": "",
       "precio": 420,
       "precio_volumen": 410,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "MGD4005SW",
@@ -125,7 +145,9 @@
       "nota": "",
       "precio": 420,
       "precio_volumen": 410,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WED5010LW",
@@ -152,11 +174,13 @@
       "marca": "MAYTAG",
       "categoria": "T-01 WASHERS",
       "descripcion": "3.5 CF TOP L. 5 YEAR WA.",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 699,
       "precio_volumen": 689,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "MEDP586KW",
@@ -188,40 +212,48 @@
       "nota": "",
       "precio": 188,
       "precio_volumen": 182,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWW1002Q",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "20\" 4 BURNERS",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 188,
       "precio_volumen": 182,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LAGR2110B",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 6 BURNERS PORCELAIN COOKTOP",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 291,
       "precio_volumen": 280,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LAGR4130G",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 6 BURNERS 5.1 CF OVEN",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 320,
       "precio_volumen": 315,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWFR3100Q",
@@ -231,7 +263,9 @@
       "nota": "Exceso",
       "precio": 365,
       "precio_volumen": 360,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWFR3100B",
@@ -241,7 +275,9 @@
       "nota": "",
       "precio": 385,
       "precio_volumen": 375,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWFR7000S",
@@ -258,22 +294,26 @@
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "30-inch Gas Range with Bake Assist Temps",
-      "nota": "Pedido especial no hay en PR · AGOTADO",
+      "nota": "Pedido especial · Unidades en camino · Entrega pendiente de confirmación",
       "precio": 485,
       "precio_volumen": 475,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "AGR6303MMS",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "30-inch Gas Range with Bake Assist Temps",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 535,
       "precio_volumen": 525,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFG320M0MW",
@@ -291,66 +331,78 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "Liquidación · AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 535,
       "precio_volumen": 525,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFG505M0MS",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "Liquidación · AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 545,
       "precio_volumen": 535,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFGS3030RS",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 560,
       "precio_volumen": 545,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFGS3330RS",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 609,
       "precio_volumen": 590,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "AEP222VAW",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "20\" 2.6 CF ELECTRIC 4 BURNER",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 437,
       "precio_volumen": 427,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "AER6303MFW",
       "marca": "AMANA",
       "categoria": "T-02 RANGES",
       "descripcion": "T-02 RANGES",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 550,
       "precio_volumen": 540,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "AER6303MMS",
@@ -360,51 +412,61 @@
       "nota": "",
       "precio": 580,
       "precio_volumen": 570,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFES3030RW",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 565,
       "precio_volumen": 555,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFES3030RB",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 565,
       "precio_volumen": 555,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WFES3030RS",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" 5.3 CF ELECT ENERGY STAR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 595,
       "precio_volumen": 585,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWFRE1330D",
       "marca": "WHIRLPOOL",
       "categoria": "T-02 RANGES",
       "descripcion": "30\" SLIDE-IN Tecnologia Ever Clean",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 580,
       "precio_volumen": 570,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "LWFRE2450D",
@@ -421,44 +483,53 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "9 CF XPERT INVERTER",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación · Referencia: hasta 106 unidades",
       "precio": 320,
       "precio_volumen": 310,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true,
+      "maximo_por_pedido": 106
     },
     {
       "modelo": "WT1130M",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "11.3 CF XPERT ENERGY",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 470,
       "precio_volumen": 460,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WT1133M",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "11.3 CF XPERT ENERGY DISP.",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 475,
       "precio_volumen": 465,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRT112CZJW",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "24\" 11.6 CF COUNTER DEPTH",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 485,
       "precio_volumen": 475,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRT112CZJZ",
@@ -468,29 +539,35 @@
       "nota": "",
       "precio": 515,
       "precio_volumen": 499,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "ARTX2419SW",
       "marca": "AMANA",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 540,
       "precio_volumen": 535,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "ARTX2419SZ",
       "marca": "AMANA",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "19 CF ENERGY STAR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 571,
       "precio_volumen": 558,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRT108FFDM",
@@ -520,7 +597,9 @@
       "nota": "",
       "precio": 615,
       "precio_volumen": 595,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRTX3019SZ",
@@ -570,11 +649,13 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "SXS 33\" 22 CF",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 785,
       "precio_volumen": 775,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "ASI2575GRS",
@@ -591,33 +672,39 @@
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "FRENCH DOOR 30\" 20 CF",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1065,
       "precio_volumen": 1050,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRS325SDHZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "SXS 36\" 25 CF",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1125,
       "precio_volumen": 1110,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRQA59CNKZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "36\" 19.4 CF COUNTER DEPTH 4 DOOR",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1160,
       "precio_volumen": 1145,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRSF5536RZ",
@@ -627,18 +714,22 @@
       "nota": "",
       "precio": 1399,
       "precio_volumen": 1379,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRSC5536RZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "T-03 REFRIGERATION",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1299,
       "precio_volumen": 1279,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRFF3136SZ",
@@ -648,29 +739,35 @@
       "nota": "",
       "precio": 1359,
       "precio_volumen": 1339,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRFF3436RZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "25 cf Max. Ice Capacity 3.7lb",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1599,
       "precio_volumen": 1579,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WRFF3536SZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-03 REFRIGERATION",
       "descripcion": "30 cf Indoor Ice",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 1340,
       "precio_volumen": 1320,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WM1807B",
@@ -680,7 +777,9 @@
       "nota": "",
       "precio": 56,
       "precio_volumen": 54,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WM1811D",
@@ -690,7 +789,9 @@
       "nota": "",
       "precio": 83,
       "precio_volumen": 80,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WM1811B",
@@ -700,18 +801,22 @@
       "nota": "",
       "precio": 83,
       "precio_volumen": 80,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WM1807W",
       "marca": "WHIRLPOOL",
       "categoria": "T-04 MWO",
       "descripcion": "1.1 CF WHITE",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 56,
       "precio_volumen": 54,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WMC30309LB",
@@ -721,7 +826,10 @@
       "nota": "",
       "precio": 67,
       "precio_volumen": 63,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true,
+      "codigo_inventario": "LWMC30309LB"
     },
     {
       "modelo": "WM3911D",
@@ -731,40 +839,48 @@
       "nota": "",
       "precio": 133,
       "precio_volumen": 129,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WMMS3130RS",
       "marca": "WHIRLPOOL",
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 243,
       "precio_volumen": 237,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WMMS3130RW",
       "marca": "WHIRLPOOL",
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 236,
       "precio_volumen": 230,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WMMS3130RZ",
       "marca": "WHIRLPOOL",
       "categoria": "T-04 MWO",
       "descripcion": "30-inch Microhood - 1.7 cu. ft.",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 252,
       "precio_volumen": 246,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WCE55US0HB",
@@ -774,7 +890,9 @@
       "nota": "",
       "precio": 400,
       "precio_volumen": 391,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WCE55US0HS",
@@ -784,29 +902,35 @@
       "nota": "",
       "precio": 418,
       "precio_volumen": 408,
-      "regla": "combinable"
+      "regla": "combinable",
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WCGK5030PS",
       "marca": "WHIRLPOOL",
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 388,
       "precio_volumen": 379,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WCGK5030PB",
       "marca": "WHIRLPOOL",
       "categoria": "COOKTOPS",
       "descripcion": "30-inch Electric Ceramic",
-      "nota": "AGOTADO",
+      "nota": "Unidades en camino · Entrega pendiente de confirmación",
       "precio": 357,
       "precio_volumen": 348,
       "regla": "combinable",
-      "agotado": true
+      "agotado": true,
+      "mantener_activo": true,
+      "permitir_pedido_en_reposicion": true
     },
     {
       "modelo": "WH7610D",
