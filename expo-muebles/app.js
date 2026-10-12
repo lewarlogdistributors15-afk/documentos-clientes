@@ -66,8 +66,9 @@ function renderManualEntries(){
 }
 function addManualEntry(){
  const model=$('manual-modelo').value.trim().toUpperCase(),quantity=Number($('manual-cantidad').value),price=Number($('manual-precio').value),note=$('manual-nota').value.trim();
- if(products.some(p=>p.modelo===model&&p.agotado)){$('estado').textContent=model+' está AGOTADO.';return}
- if(!model){$('manual-modelo').focus();$('estado').textContent='Escribe el modelo del artículo manual.';return}
+ if(products.some(p=>p.modelo===model&&p.agotado&&!p.mantener_activo)){$('estado').textContent=model+' está AGOTADO.';return}
+ if(products.some(p=>p.modelo===model&&p.maximo_por_pedido)){$('estado').textContent='Este modelo tiene un límite por pedido. Ajusta su cantidad directamente en el catálogo.';return}
+  if(!model){$('manual-modelo').focus();$('estado').textContent='Escribe el modelo del artículo manual.';return}
  if(!Number.isInteger(quantity)||quantity<1||quantity>999){$('manual-cantidad').focus();$('estado').textContent='La cantidad manual debe ser entre 1 y 999.';return}
  if(!Number.isFinite(price)||price<0||price>999999){$('manual-precio').focus();$('estado').textContent='Escribe un precio unitario manual válido.';return}
  manualEntries.push({id:newUuid(),modelo:model,quantity,price:roundExpoPrice(price),note});
@@ -78,13 +79,13 @@ function calculate(){
  const quantities={},overrides={};invalid=false;
  for(const p of products){
   const el=$('qty-'+p.modelo),manual=$('manual-'+p.modelo);
-  if(p.agotado){el.value='0';el.disabled=true;manual.disabled=true;quantities[p.modelo]=0;continue}
+  if(p.agotado&&!p.mantener_activo){el.value='0';el.disabled=true;manual.disabled=true;quantities[p.modelo]=0;continue}
   if(manual.value!==''||manual.validity.badInput){if(!manual.checkValidity())invalid=true;else overrides[p.modelo]=Number(manual.value)}
   el.disabled=!Number.isFinite(p.precio)&&!Number.isFinite(overrides[p.modelo]);
   if(!el.disabled&&!el.checkValidity())invalid=true;
   quantities[p.modelo]=Number(el.value)
  }
- const automatic=priceOrder(products,quantities,overrides),manualLines=manualEntries.filter(entry=>!products.some(p=>p.modelo===entry.modelo&&p.agotado)).map(manualLine);
+ const automatic=priceOrder(products,quantities,overrides),manualLines=manualEntries.filter(entry=>!products.some(p=>p.modelo===entry.modelo&&p.agotado&&!p.mantener_activo)).map(manualLine);
  order={...automatic,lines:[...automatic.lines,...manualLines],units:automatic.units+manualLines.reduce((n,l)=>n+l.quantity,0),total:automatic.total+manualLines.reduce((n,l)=>n+l.total,0)};
  $('detalle').replaceChildren();
  for(const line of order.lines){
@@ -94,7 +95,7 @@ function calculate(){
   }
   if(q){
    const row=document.createElement('p');
-   row.textContent=`${q} × ${p.modelo} · ${usd(total/100)}${manualEntry?' · Entrada manual':''}`;
+   row.textContent=`${q} × ${p.modelo} · ${usd(total/100)}${manualEntry?' · Entrada manual':''}${p.mantener_activo&&p.agotado?' · Unidades en camino (entrega pendiente)':''}`;
    $('detalle').append(row)
   }
  }
@@ -102,10 +103,10 @@ function calculate(){
  $('unidades').textContent=order.units;
  $('subtotal').textContent=usd(order.total/100);
  $('enviar').disabled=sending||submitted||invalid||!order.units;
- if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades (0 a 999) y los precios manuales (dólares completos, sin negativos).':order.units?'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.':'Agrega artículos para preparar el pedido.'
+ if(!sending&&!submitted)$('estado').textContent=invalid?'Revisa las cantidades permitidas por modelo y los precios manuales (dólares completos, sin negativos).':order.units?(order.lines.some(l=>l.quantity&&l.product.mantener_activo&&l.product.agotado)?'El pedido incluye unidades en camino. La entrega requiere confirmación y se registrará la orden con su PDF.':'Al procesar, la orden se guardará primero y el correo con PDF se enviará sin hacerte esperar.'):'Agrega artículos para preparar el pedido.'
 }
 async function load(){try{
- const response=await fetch('./catalogo.json?v=20261004-rounded-wrtx3021tw',{cache:'no-store'});if(!response.ok)throw Error();
+ const response=await fetch('./catalogo.json?v=20261012-incoming-units',{cache:'no-store'});if(!response.ok)throw Error();
  const data=await response.json();products=data.productos;$('catalogo').className='';$('catalogo').replaceChildren();
  const groups=new Map();
  for(const p of products){
@@ -128,7 +129,8 @@ async function load(){try{
    const row=document.createElement('div');row.className='item';row.dataset.search=[p.modelo,p.marca,p.descripcion,p.categoria,group.label].join(' ').toLowerCase();
    const info=document.createElement('div'),strong=document.createElement('strong'),desc=document.createElement('small'),rule=document.createElement('p'),priceList=document.createElement('div');
    strong.textContent=p.modelo;desc.textContent=p.marca+' · '+p.descripcion;priceList.className='catalog-prices';
-   if(p.agotado){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';priceList.append(sold)}
+   if(p.agotado&&!p.mantener_activo){const sold=document.createElement('span');sold.className='price-chip special';sold.textContent='AGOTADO';priceList.append(sold)}
+    if(p.mantener_activo){const active=document.createElement('span');active.className='price-chip special';active.textContent=p.agotado?'UNIDADES EN CAMINO · PEDIDO EN REPOSICIÓN':'MODELO ACTIVO · DISPONIBILIDAD SUJETA A CONFIRMACIÓN';priceList.append(active)}
    const regular=document.createElement('span');regular.className='price-chip';regular.textContent=Number.isFinite(p.precio)?'Precio 1 unidad '+usd(p.precio):'Precio por confirmar';priceList.append(regular);
    if(Number.isFinite(p.precio_volumen)){const special=document.createElement('span');special.className='price-chip special';special.textContent='Precio 3+ '+usd(p.precio_volumen);priceList.append(special)}
    rule.className='hint';rule.textContent=(Number.isFinite(p.precio_volumen)?`Precio de volumen desde 3 ${p.regla==='mismo_modelo'?'del mismo modelo':'unidades combinadas'}`:'Sin precio especial por volumen')+(p.nota?' · '+p.nota:'');
@@ -137,7 +139,7 @@ async function load(){try{
    const src=typeof productPhotos!=='undefined'?productPhotos[p.modelo]:'';
    if(src){const img=document.createElement('img');img.src=src;img.alt=p.marca+' '+p.modelo;img.loading='lazy';img.decoding='async';img.width=120;img.height=140;photo.append(img)}
    else{const noPhoto=document.createElement('span');noPhoto.className='no-photo';noPhoto.textContent='Sin foto';photo.append(noPhoto)}
-   const input=document.createElement('input');input.type='number';input.min='0';input.max='999';input.step='1';input.value='0';input.id='qty-'+p.modelo;input.disabled=!Number.isFinite(p.precio);input.setAttribute('aria-label','Cantidad de '+p.modelo);input.addEventListener('input',calculate);
+   const input=document.createElement('input');input.type='number';input.min='0';input.max=String(p.maximo_por_pedido||999);input.step='1';input.value='0';input.id='qty-'+p.modelo;input.disabled=!Number.isFinite(p.precio);input.setAttribute('aria-label','Cantidad de '+p.modelo);input.addEventListener('input',calculate);
    const price=document.createElement('div');price.className='money';price.style.whiteSpace='pre-line';price.id='price-'+p.modelo;
    const manualBox=document.createElement('div');manualBox.className='manual-price';const label=document.createElement('label');label.htmlFor='manual-'+p.modelo;label.textContent='Precio unitario manual ($)';label.style.fontSize='14px';
    const manualInput=document.createElement('input');manualInput.type='number';manualInput.min='0';manualInput.max='999999';manualInput.step='1';manualInput.placeholder='Vacío = automático';manualInput.id='manual-'+p.modelo;manualInput.setAttribute('aria-label','Precio unitario manual de '+p.modelo);manualInput.addEventListener('input',calculate);manualBox.append(label,manualInput);
