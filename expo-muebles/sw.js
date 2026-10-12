@@ -1,4 +1,4 @@
-const CACHE = "lewar-expo-20261009-sap-inventory-verified-2";
+const CACHE = "lewar-expo-20261012-incoming-stock-61";
 const CORE = [
   "./",
   "./index.html",
