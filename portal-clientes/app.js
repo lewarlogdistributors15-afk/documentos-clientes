@@ -3,7 +3,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const SESSION_KEY='lewar-client-session-v1';
 const DEVICE_KEY='lewar-client-device-v1';
 const $=id=>document.getElementById(id);
-const usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(n)||0);
+const usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0,maximumFractionDigits:0}).format(Number(n)||0);
 
 let catalog=[],customer=null,customers=[],actor=null,currentOrder=null,sessionToken='',saving=false;
 const quantities={};
