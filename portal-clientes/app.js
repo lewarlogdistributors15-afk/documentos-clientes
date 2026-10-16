@@ -139,7 +139,7 @@ async function bootstrap(selectedCustomerId=null){
     if(actor?.type==='staff'&&sessionToken)safeSet(SESSION_KEY,sessionToken,true);
     customers=data.customers||[];
     customer=data.customer||null;
-    catalog=data.catalog?.productos||[];
+    catalog=(data.catalog?.productos||[]).filter(p=>String(p.modelo||'').trim().toUpperCase()!=='LWFR7000S');
     currentOrder=data.order||null;
     showPortal();hydrate();
   }catch(e){
