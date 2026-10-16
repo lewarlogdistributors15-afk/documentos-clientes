@@ -337,6 +337,8 @@ function calculate(){
   $('subtotal').textContent=order.units?usd(order.total/100):'—';
   const needsCustomer=actor?.type==='staff'&&!customer;
   $('guardar').disabled=saving||!order.units||needsCustomer;
+  if($('nuevo-pedido'))$('nuevo-pedido').disabled=saving||!customer;
+  $('cliente-select').disabled=saving;
   if(!saving){
     if(needsCustomer)setStatus('Selecciona primero el cliente para esta orden.');
     else setStatus(order.units?(catalog.some(p=>p.mantener_activo&&p.agotado&&(quantities[p.modelo]||0)>0)?'Incluye unidades en camino. Pedido sujeto a confirmación de entrega.':(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.')):'Selecciona los equipos y cantidades.');
@@ -469,6 +471,41 @@ async function saveOrder(){
     else setStatus(e.message,true);
   }finally{saving=false;calculate()}
 }
+
+async function startNewOrder(){
+  if(saving)return;
+  if(!customer){setStatus('Selecciona primero el cliente.',true);return}
+  const previous=currentOrder;
+  const hasItems=selectedItems().length>0;
+  const message=previous
+    ? '¿Comenzar un nuevo pedido? La orden '+previous.id+' quedará guardada en el historial. Los cambios que no hayas guardado se descartarán.'
+    : '¿Limpiar los artículos seleccionados para comenzar un nuevo pedido?';
+  if((previous||hasItems)&&!window.confirm(message))return;
+  saving=true;calculate();
+  let notice='',failed=false;
+  try{
+    if(previous){
+      const result=await rpc('portal_access_new_order',{
+        p_session_token:sessionToken,p_device_id:deviceId(),
+        p_customer_id:customer.id,p_order_id:previous.id,p_version:previous.version
+      });
+      if(!result.ok)throw new Error(result.error||'No se pudo iniciar un nuevo pedido.');
+    }
+    const contact={};
+    for(const id of ['contacto','telefono','correo','vendedor'])contact[id]=$(id).value;
+    currentOrder=null;
+    $('buscar').value='';
+    hydrate();
+    for(const id of Object.keys(contact))$(id).value=contact[id];
+    const download=$('descargar');
+    if(download.dataset.url)URL.revokeObjectURL(download.dataset.url);
+    download.removeAttribute('href');delete download.dataset.url;download.style.display='none';
+    notice=previous?'Nuevo pedido listo. La orden anterior quedó conservada en el historial.':'Nuevo pedido listo. Selecciona los equipos y cantidades.';
+    $('page-title').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){notice=e.message;failed=true}
+  finally{saving=false;calculate();setStatus(notice,failed)}
+}
+
 async function logout(){
   try{if(sessionToken)await rpc('portal_access_logout',{p_session_token:sessionToken,p_device_id:deviceId()})}catch{}
   storeSession('');actor=null;customers=[];customer=null;currentOrder=null;catalog=[];showGate();gateStatus('Sesión cerrada.');
@@ -477,6 +514,7 @@ async function logout(){
 $('login').addEventListener('click',login);
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();login()}});
 $('guardar').addEventListener('click',saveOrder);
+$('nuevo-pedido')?.addEventListener('click',startNewOrder);
 $('logout').addEventListener('click',logout);
 $('cliente-select').addEventListener('change',()=>bootstrap($('cliente-select').value||null));
 $('categoria').addEventListener('change',filterCatalog);
