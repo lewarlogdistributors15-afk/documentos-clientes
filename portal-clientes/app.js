@@ -147,6 +147,24 @@ async function bootstrap(selectedCustomerId=null){
     gateStatus(e.message,true);showGate();
   }
 }
+function isClientOrderLocked(){
+  return actor?.type==='client'&&!!currentOrder;
+}
+function updateOrderLockUI(){
+  const locked=isClientOrderLocked();
+  const notice=$('order-locked-banner');
+  if(notice)notice.hidden=!locked;
+  for(const id of ['contacto','telefono','correo','vendedor','nota']){
+    $(id).readOnly=locked||(id==='vendedor'&&actor?.type==='staff'&&actor?.role==='seller');
+  }
+  if(locked){
+    $('page-title').textContent='Orden sometida '+currentOrder.id;
+    $('summary-title').textContent='Orden sometida';
+    $('guardar').textContent='🔒 Orden sometida · no editable';
+    document.querySelectorAll('#catalogo .stepper button,#catalogo .stepper input')
+      .forEach(control=>{control.disabled=true});
+  }
+}
 function hydrate(){
   window.LewarInventory?.refreshLink();
   const isStaff=actor?.type==='staff';
@@ -200,7 +218,7 @@ function hydrate(){
     $('vendedor').value=isStaff?(actor?.name||''):'';
     setStatus(isStaff&&!customer?'Selecciona primero el cliente para esta orden.':'Selecciona los equipos y cantidades.');
   }
-  renderCatalog();calculate();
+  renderCatalog();updateOrderLockUI();calculate();
 }
 
 let catalogInventoryGeneration=0;
@@ -289,7 +307,7 @@ function renderCatalog(){
       const qlabel=document.createElement('span');qlabel.className='qty-label';qlabel.textContent='Cantidad';
       const step=document.createElement('div');step.className='stepper';
       const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','Restar '+p.modelo);
-      const input=document.createElement('input');input.type='number';input.min='0';input.max=String(p.maximo_por_pedido||999);input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);if(p.agotado&&!p.mantener_activo){input.value='0';quantities[p.modelo]=0;input.disabled=true;}
+      const input=document.createElement('input');input.type='number';input.min='0';input.max=String(p.maximo_por_pedido||999);input.step='1';input.value=String(quantities[p.modelo]||0);input.id='qty-'+p.modelo;input.setAttribute('aria-label','Cantidad de '+p.modelo);if(p.agotado&&!p.mantener_activo){if(!isClientOrderLocked()){input.value='0';quantities[p.modelo]=0;}input.disabled=true;}
       const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','Añadir '+p.modelo);
       if(p.agotado&&!p.mantener_activo){minus.disabled=true;plus.disabled=true}else{minus.onclick=()=>{input.value=String(Math.max(0,(Number(input.value)||0)-1));quantityChanged(p.modelo,input)};plus.onclick=()=>{input.value=String(Math.min(p.maximo_por_pedido||999,(Number(input.value)||0)+1));quantityChanged(p.modelo,input)}}
       input.oninput=()=>quantityChanged(p.modelo,input);
@@ -304,6 +322,7 @@ function renderCatalog(){
   refreshCatalogInventory();
 }
 function quantityChanged(model,input){
+  if(isClientOrderLocked()){input.value=String(quantities[model]||0);return}
   let q=Math.trunc(Number(input.value)||0);
   if(q<0)q=0;const max=catalog.find(p=>p.modelo===model)?.maximo_por_pedido||999;if(q>max)q=max;
   quantities[model]=q;input.value=String(q);calculate();
@@ -322,7 +341,13 @@ function localPricing(){
   return {lines,units:lines.reduce((n,l)=>n+l.quantity,0),total:lines.reduce((n,l)=>n+l.total,0)};
 }
 function calculate(){
-  const order=localPricing(),detail=$('detalle');detail.replaceChildren();
+  const locked=isClientOrderLocked();
+  const order=locked?{
+    lines:currentOrder.lines||[],
+    units:Number(currentOrder.units)||0,
+    total:Number(currentOrder.total)||0
+  }:localPricing();
+  const detail=$('detalle');detail.replaceChildren();
   let models=0;
   for(const l of order.lines){
     const el=$('price-'+l.product.modelo);
@@ -336,11 +361,12 @@ function calculate(){
   $('modelos').textContent=String(models);$('unidades').textContent=String(order.units);
   $('subtotal').textContent=order.units?usd(order.total/100):'—';
   const needsCustomer=actor?.type==='staff'&&!customer;
-  $('guardar').disabled=saving||!order.units||needsCustomer;
+  $('guardar').disabled=saving||locked||!order.units||needsCustomer;
   if($('nuevo-pedido'))$('nuevo-pedido').disabled=saving||!customer;
   $('cliente-select').disabled=saving;
   if(!saving){
-    if(needsCustomer)setStatus('Selecciona primero el cliente para esta orden.');
+    if(locked)setStatus('Orden ya sometida. No se puede modificar; utiliza "Nuevo pedido" para solicitar otra orden.');
+    else if(needsCustomer)setStatus('Selecciona primero el cliente para esta orden.');
     else setStatus(order.units?(catalog.some(p=>p.mantener_activo&&p.agotado&&(quantities[p.modelo]||0)>0)?'Incluye unidades en camino. Pedido sujeto a confirmación de entrega.':(currentOrder?'Guarda los cambios cuando termines.':'Pedido listo para enviar.')):'Selecciona los equipos y cantidades.');
   }
 }
@@ -441,12 +467,30 @@ async function sendEmailWithRetry(order,bytes){
   }
   throw lastError||new Error('No se pudo confirmar el envío del correo.');
 }
+function confirmCustomerSubmission(){
+  const dialog=$('confirm-order-dialog');
+  const question='¿Está seguro de que desea someter su orden? Una vez sometida, no podrá modificarse.';
+  if(!dialog||typeof dialog.showModal!=='function')return Promise.resolve(window.confirm(question));
+  if(dialog.open)return Promise.resolve(false);
+  return new Promise(resolve=>{
+    dialog.returnValue='cancel';
+    dialog.addEventListener('close',()=>resolve(dialog.returnValue==='confirm'),{once:true});
+    dialog.showModal();
+  });
+}
 async function saveOrder(){
   if(saving)return;
+  if(isClientOrderLocked()){
+    setStatus('Esta orden ya fue sometida y no puede modificarse. Utiliza "Nuevo pedido".',true);
+    return;
+  }
   if(actor?.type==='staff'&&!customer){$('cliente-select').focus();setStatus('Selecciona el cliente antes de guardar.',true);return}
   const ids=['contacto','telefono','correo','vendedor'];
   for(const id of ids){if(!$(id).value.trim()||!$(id).reportValidity()){$(id).focus();setStatus('Completa los datos de contacto antes de guardar.',true);return}}
   if(!selectedItems().length)return;
+  if(actor?.type==='client'&&!(await confirmCustomerSubmission()))return;
+  if(saving||isClientOrderLocked())return;
+  let finalMessage='',finalError=false;
   saving=true;$('guardar').disabled=true;setStatus('Calculando precios oficiales y guardando la orden…');
   try{
     const data=await rpc('portal_access_save',{
@@ -457,19 +501,30 @@ async function saveOrder(){
     });
     if(!data.ok)throw new Error(data.error||'No se pudo guardar la orden.');
     currentOrder=data.order;
+    updateOrderLockUI();
     const bytes=await createPdf(currentOrder);pdfLink(currentOrder,bytes);
     if(!bytes)throw new Error('La orden quedó guardada, pero no se pudo generar el PDF automático.');
     const backup=await deliveryUpdate(currentOrder,bytes,'pdf_saved','');
     if(!backup.ok)throw new Error('La orden quedó guardada, pero no se pudo respaldar el PDF automático. '+(backup.error||''));
-    $('page-title').textContent='Modificar '+currentOrder.id;
-    $('summary-title').textContent='Orden activa';$('guardar').textContent='Guardar cambios';
+    if(actor?.type==='staff'){
+      $('page-title').textContent='Modificar '+currentOrder.id;
+      $('summary-title').textContent='Orden activa';$('guardar').textContent='Guardar cambios';
+    }
     setStatus('Orden '+currentOrder.id+' guardada. PDF respaldado. Enviando confirmación…');
-    try{await sendEmailWithRetry(currentOrder,bytes);setStatus('Orden '+currentOrder.id+' guardada, PDF respaldado y confirmación enviada.')}
-    catch(emailError){setStatus('La orden y el PDF quedaron guardados. El correo falló después de 3 intentos: '+emailError.message+'. Comunícate con Lewar para reenviarlo.',true)}
+    try{
+      await sendEmailWithRetry(currentOrder,bytes);
+      finalMessage='Orden '+currentOrder.id+' sometida, PDF respaldado y confirmación enviada.';
+    }catch(emailError){
+      finalMessage='La orden y el PDF quedaron guardados. El correo falló después de 3 intentos: '+emailError.message+'. Comunícate con Lewar para reenviarlo.';
+      finalError=true;
+    }
   }catch(e){
     if(/sesión/i.test(e.message)){storeSession('');actor=null;gateStatus(e.message,true);showGate()}
-    else setStatus(e.message,true);
-  }finally{saving=false;calculate()}
+    else{finalMessage=e.message;finalError=true;}
+  }finally{
+    saving=false;calculate();
+    if(finalMessage)setStatus(finalMessage,finalError);
+  }
 }
 
 async function startNewOrder(){
@@ -478,7 +533,9 @@ async function startNewOrder(){
   const previous=currentOrder;
   const hasItems=selectedItems().length>0;
   const message=previous
-    ? '¿Comenzar un nuevo pedido? La orden '+previous.id+' quedará guardada en el historial. Los cambios que no hayas guardado se descartarán.'
+    ? (isClientOrderLocked()
+      ? '¿Comenzar un nuevo pedido? La orden '+previous.id+' ya fue sometida y quedará conservada sin modificaciones.'
+      : '¿Comenzar un nuevo pedido? La orden '+previous.id+' quedará guardada en el historial. Los cambios que no hayas guardado se descartarán.')
     : '¿Limpiar los artículos seleccionados para comenzar un nuevo pedido?';
   if((previous||hasItems)&&!window.confirm(message))return;
   saving=true;calculate();
