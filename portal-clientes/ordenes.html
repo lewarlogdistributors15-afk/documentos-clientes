@@ -18,7 +18,7 @@
     <a id="inventory-tab" class="button" href="./inventario.html" hidden>Inventario</a>
     <button id="logout" type="button">Cerrar sesión</button>
   </div>
-  <div style="margin-top:22px"><span class="eyebrow">Administración y Facturación</span><h1>Registro de órdenes</h1><p class="intro">Consulta las órdenes generadas desde el portal de clientes y las creadas por personal de Lewar.</p></div>
+  <div style="margin-top:22px"><span class="eyebrow">Administración y Facturación</span><h1>Registro de órdenes</h1><p class="intro">Consulta todas las órdenes de Expo Muebles y del portal de clientes, incluidas las creadas por personal de Lewar.</p></div>
   <section id="access-panel" class="panel"><p id="access-status" class="status">Verificando acceso autorizado…</p></section>
   <section id="registry" class="panel" hidden>
     <div class="toolbar">
@@ -35,6 +35,8 @@
   </section>
 </main>
 <script src="./inventory-access.js?v=20261009-1"></script>
-<script src="./orders.js?v=20261007-smtp2go-1"></script>
+<script src="../expo-muebles/vendor/pdf-lib.min.js"></script>
+<script src="../expo-muebles/order-pdf.js"></script>
+<script src="./orders.js?v=20261021-registro-completo"></script>
 </body>
 </html>

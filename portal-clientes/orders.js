@@ -49,7 +49,16 @@ async function rpc(name,payload){
 const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format((Number(cents)||0)/100);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function b64Blob(b64,type='application/pdf'){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type})}
-async function openPdf(orderId){
+async function openPdf(order){
+  if(order.source==='expo'){
+    const logo=await fetch('../expo-muebles/lewar-logo.png');
+    if(!logo.ok)throw new Error('No se pudo preparar el PDF de la orden.');
+    const bytes=await createOrderPdf(order,await logo.arrayBuffer());
+    const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+    window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);
+    return;
+  }
+  const orderId=order.id;
   const data=await rpc('portal_admin_order_pdf',{p_session_token:sessionToken,p_device_id:deviceId(),p_order_id:orderId});
   if(!data.ok)throw new Error(data.error||'PDF no disponible.');
   const url=URL.createObjectURL(b64Blob(data.pdfBase64));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);
@@ -63,7 +72,7 @@ function render(orders){
   for(const o of orders){
     const tr=document.createElement('tr');
     const created=o.date||new Date(o.createdAt).toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'});
-    const createdBy=o.submittedBy||'Cliente';
+    const createdBy=o.submittedBy||(o.source==='expo'?'Expo Muebles':'Cliente');
     tr.innerHTML='<td><strong>'+esc(o.id)+'</strong><br><span class="status">v'+esc(o.version)+' · '+esc(created)+'</span></td>'+
       '<td>'+esc(o.cliente)+'</td>'+
       '<td>'+esc(o.vendedor||'—')+'</td>'+
@@ -81,12 +90,14 @@ function render(orders){
       '<br><strong>Artículos:</strong><ul>'+lines+'</ul>';
     btn.onclick=()=>{detail.hidden=!detail.hidden;btn.textContent=detail.hidden?'Ver orden':'Ocultar orden'};
     const pdf=document.createElement('button');pdf.className='detail-btn';pdf.type='button';pdf.textContent='Ver PDF';pdf.style.marginLeft='6px';
-    pdf.onclick=async()=>{pdf.disabled=true;try{await openPdf(o.id)}catch(e){alert(e.message)}finally{pdf.disabled=false}};
+    pdf.onclick=async()=>{pdf.disabled=true;try{await openPdf(o)}catch(e){alert(e.message)}finally{pdf.disabled=false}};
     const sendWrap=document.createElement('div');sendWrap.className='pdf-send';
     const email=document.createElement('input');email.type='email';email.placeholder='Enviar PDF a: email@ejemplo.com';email.setAttribute('aria-label','Email para enviar PDF');
     const send=document.createElement('button');send.type='button';send.className='detail-btn';send.textContent='Enviar PDF';
     send.onclick=async()=>{const v=email.value.trim();if(!v||!email.checkValidity()){alert('Escribe un email válido.');return}send.disabled=true;const original=send.textContent;send.textContent='Enviando…';try{const res=await fetch(SUPABASE_URL+'/functions/v1/portal-admin-send-order-pdf',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({session_token:sessionToken,device_id:deviceId(),order_id:o.id,recipient_email:v})});let data={};try{data=await res.json()}catch{}if(!res.ok||!data.ok)throw new Error(data.error||'No se pudo enviar el PDF.');alert('PDF enviado correctamente a '+v+'.')}catch(e){alert(e.message)}finally{send.disabled=false;send.textContent=original}};
-    sendWrap.append(email,send);action.append(btn,pdf,sendWrap,detail);tr.append(action);rows.append(tr);
+    sendWrap.append(email,send);action.append(btn,pdf);
+    if(o.source!=='expo')action.append(sendWrap);
+    action.append(detail);tr.append(action);rows.append(tr);
   }
 }
 async function load(){
