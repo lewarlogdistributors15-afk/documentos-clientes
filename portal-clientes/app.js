@@ -92,6 +92,12 @@ async function rpc(name,payload){
     cache:'no-store'
   });
   let data={};try{data=await res.json()}catch{}
+  if(data.code==='PORTAL_PAUSED'){
+    pauseClientAccess(data.error||'Ups, lo sentimos. Estos precios ya no están disponibles.');
+    const error=new Error(data.error||'Estos precios ya no están disponibles.');
+    error.code='PORTAL_PAUSED';
+    throw error;
+  }
   if(!res.ok)throw new Error(data.message||data.error||'No se pudo conectar con el portal.');
   return data;
 }
@@ -108,6 +114,39 @@ function showGate(){
 function showPortal(){
   $('gate').hidden=true;$('portal').hidden=false;$('footer').hidden=false;
 }
+function pauseClientAccess(message){
+  storeSession('');
+  actor=null;customers=[];customer=null;currentOrder=null;catalog=[];
+  for(const key of Object.keys(quantities))delete quantities[key];
+  $('catalogo').replaceChildren();
+  $('detalle').replaceChildren();
+  const download=$('descargar');
+  if(download.dataset.url)URL.revokeObjectURL(download.dataset.url);
+  download.removeAttribute('href');delete download.dataset.url;download.style.display='none';
+  const dialog=$('confirm-order-dialog');
+  if(dialog?.open)dialog.close('cancel');
+  $('pin').value='';
+  showGate();gateStatus(message,true);
+}
+let checkingClientAccess=false;
+async function checkClientAccess(){
+  if(checkingClientAccess||actor?.type!=='client'||!sessionToken||document.visibilityState==='hidden')return;
+  checkingClientAccess=true;
+  const token=sessionToken;
+  try{
+    const data=await rpc('portal_access_bootstrap',{p_session_token:token,p_device_id:deviceId(),p_customer_id:null});
+    if(token===sessionToken&&!data.ok){
+      pauseClientAccess(data.error||'Sesión inválida o vencida. Ingresa nuevamente con tu PIN.');
+    }
+  }catch(e){
+    if(token===sessionToken&&e.code==='PORTAL_PAUSED')pauseClientAccess(e.message);
+  }finally{checkingClientAccess=false}
+}
+window.addEventListener('pageshow',checkClientAccess);
+window.addEventListener('focus',checkClientAccess);
+document.addEventListener('visibilitychange',checkClientAccess);
+setInterval(checkClientAccess,30000);
+
 async function login(){
   const pin=$('pin').value.trim();
   if(!/^\d{6}$/.test(pin)){gateStatus('Ingresa tu PIN de 6 dígitos.',true);$('pin').focus();return}
