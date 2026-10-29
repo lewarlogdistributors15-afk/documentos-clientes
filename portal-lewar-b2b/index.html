@@ -290,6 +290,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             <div class="notes"><label>Notas para Lewar (opcional)</label><textarea id="orderNotes" placeholder="Agregar instrucciones especiales..."></textarea></div>
             <div id="cartTotals" class="totals"></div>
           </div>
+          <p class="lead" style="margin-top:12px">El IVU de 11.5 % se calcula sobre el subtotal después del descuento por volumen.</p>
           <div class="cartBtns"><button class="secondary" onclick="showView('catalog')">Seguir comprando</button><button class="primary" onclick="placeOrder()">Enviar orden a Lewar</button></div>
         </div>
       </section>
@@ -379,7 +380,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   </div>
 </div>
 
-<script src="../expo-muebles/fotos-catalogo.js"></script>
+<script src="./photos-large.js?v=20261029"></script>
+<script src="./photos-small.js?v=20261029"></script>
+<script src="./photos-coriat.js?v=20261029"></script>
 <script src="./catalog-small-1.js?v=20261005-coriat6"></script>
 <script src="./catalog-small-2.js?v=20261005-coriat6"></script>
 <script src="./catalog-small-3.js?v=20261005-coriat6"></script>
@@ -469,25 +472,26 @@ const CORIAT_IMAGE_FALLBACKS={
   "EQUIP-STAND-48":["https://kitchenmax.mx/cdn/shop/files/BASECORIATBASE118CMMASTER30011117BaseSoporteAceroInoxidableRestauranteHotelCafeteria.jpg?v=1779299245"],
   "SP-2T-90CM":["https://coriat.us/cdn/shop/files/SP-2T.png?v=1769529586&width=1946"]
 };
+function productImageSources(p){
+  return [...new Set([
+    window.LEWAR_PRODUCT_PHOTOS?.[p.sku],
+    p.image,
+    ...(CORIAT_IMAGE_FALLBACKS[p.sku]||[])
+  ].filter(Boolean))];
+}
 function productImageError(img,sku){
-  const list=CORIAT_IMAGE_FALLBACKS[sku]||[];
-  const idx=parseInt(img.dataset.fallbackIndex||"0",10);
-  if(idx<list.length){
-    img.dataset.fallbackIndex=String(idx+1);
-    img.src=list[idx];
-    return;
-  }
+  const p=ALL_PRODUCTS.find(p=>p.sku===sku);
+  const list=p?productImageSources(p):[];
+  const idx=Number(img.dataset.sourceIndex||0)+1;
+  if(idx<list.length){img.dataset.sourceIndex=String(idx);img.src=list[idx];return}
   img.style.display='none';
   if(img.nextElementSibling)img.nextElementSibling.style.display='block';
 }
-
 function productVisual(p,size="card"){
   const cls=size==="detail"?"realProductPhoto detailPhoto":"realProductPhoto";
-  if(p.image){
-    return '<img class="'+cls+'" src="'+esc(p.image)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" onerror="productImageError(this,\'"+esc(p.sku||"")+"\')"><span style="display:none">'+svg(p,size)+'</span>';
-  }
-  if(typeof productPhotos!=="undefined" && productPhotos && productPhotos[p.sku]){
-    return '<img class="'+cls+'" src="'+productPhotos[p.sku]+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy">';
+  const source=productImageSources(p)[0];
+  if(source){
+    return '<img class="'+cls+'" src="'+esc(source)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="lazy" decoding="async" onerror="productImageError(this,\''+esc(p.sku||"")+'\')"><span style="display:none">'+svg(p,size)+'</span>';
   }
   return svg(p,size);
 }
@@ -573,18 +577,36 @@ function saveCart(){localStorage.setItem("lewarCart",JSON.stringify(cart))}
 function updateCartBubble(){document.getElementById("cartBubble").textContent=Object.values(cart).reduce((a,b)=>a+b,0)}
 function changeCart(sku,d){cart[sku]=Math.max(1,(cart[sku]||1)+d);saveCart();renderCart();updateCartBubble()}
 function removeCart(sku){delete cart[sku];saveCart();renderCart();updateCartBubble()}
+const IVU_RATE=0.115;
+function calculateOrderTotals(){
+ const items=Object.entries(cart).map(([sku,q])=>{
+   const p=ALL_PRODUCTS.find(x=>x.sku===sku);
+   if(!p||!Number.isSafeInteger(q)||q<1)throw new Error("Revisa los productos y las cantidades del carrito.");
+   const unitPrice=clientPrice(p);
+   if(!Number.isFinite(unitPrice)||unitPrice<=0)throw new Error("El producto "+sku+" requiere un precio válido antes de ordenar.");
+   const unitCents=Math.round(unitPrice*100);
+   return {sku,quantity:q,unitPrice:unitCents/100,lineTotal:unitCents*q/100};
+ });
+ const subtotalCents=items.reduce((sum,item)=>sum+Math.round(item.lineTotal*100),0);
+ const totalQty=items.reduce((sum,item)=>sum+item.quantity,0);
+ const discountCents=totalQty>=10?Math.min(5000,subtotalCents):0;
+ const taxableCents=subtotalCents-discountCents;
+ const ivuCents=Math.round(taxableCents*115/1000);
+ return {items,subtotal:subtotalCents/100,discount:discountCents/100,taxable:taxableCents/100,ivuRate:IVU_RATE,ivu:ivuCents/100,total:(taxableCents+ivuCents)/100};
+}
 function renderCart(){
  const entries=Object.entries(cart),wrap=document.getElementById("cartWrap");let subtotal=0;
  if(!entries.length){wrap.innerHTML='<div class="empty">Tu carrito está vacío.</div>';document.getElementById("cartTotals").innerHTML='';return}
- wrap.innerHTML='<table class="cartTable"><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>'+entries.map(([sku,q])=>{const p=ALL_PRODUCTS.find(x=>x.sku===sku),price=clientPrice(p),total=price*q;subtotal+=total;return '<tr><td><div class="cartProduct"><div class="miniArt">'+svg(p)+'</div><div><b>'+esc(p.brand+" "+p.sku)+'</b><div class="muted">'+esc(desc(p))+'</div></div></div></td><td>'+money(price)+'</td><td><div class="stepper"><button onclick="changeCart(\''+esc(sku)+'\',-1)">−</button><span>'+q+'</span><button onclick="changeCart(\''+esc(sku)+'\',1)">+</button></div></td><td><b>'+money(total)+'</b></td><td><button class="remove" onclick="removeCart(\''+esc(sku)+'\')">⌫</button></td></tr>'}).join("")+'</tbody></table>';
- const totalQty=Object.values(cart).reduce((a,b)=>a+b,0),discount=totalQty>=10?50:0,total=subtotal-discount;
- document.getElementById("cartTotals").innerHTML='<div class="sumrow"><span>Subtotal</span><b>'+money(subtotal)+'</b></div><div class="sumrow discount"><span>Descuento por volumen</span><b>'+(discount?'-'+money(discount):money(0))+'</b></div><div class="sumrow total"><span>Total</span><span>'+money(total)+'</span></div>';
+ wrap.innerHTML='<table class="cartTable"><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>'+entries.map(([sku,q])=>{const p=ALL_PRODUCTS.find(x=>x.sku===sku),price=clientPrice(p),total=price*q;subtotal+=total;return '<tr><td><div class="cartProduct"><div class="miniArt">'+productVisual(p)+'</div><div><b>'+esc(p.brand+" "+p.sku)+'</b><div class="muted">'+esc(desc(p))+'</div></div></div></td><td>'+money(price)+'</td><td><div class="stepper"><button onclick="changeCart(\''+esc(sku)+'\',-1)">−</button><span>'+q+'</span><button onclick="changeCart(\''+esc(sku)+'\',1)">+</button></div></td><td><b>'+money(total)+'</b></td><td><button class="remove" onclick="removeCart(\''+esc(sku)+'\')">⌫</button></td></tr>'}).join("")+'</tbody></table>';
+ const totals=calculateOrderTotals();
+ document.getElementById("cartTotals").innerHTML='<div class="sumrow"><span>Subtotal</span><b>'+money(totals.subtotal)+'</b></div><div class="sumrow discount"><span>Descuento por volumen</span><b>'+(totals.discount?'-'+money(totals.discount):money(0))+'</b></div><div class="sumrow"><span>IVU (11.5 %)</span><b>'+money(totals.ivu)+'</b></div><div class="sumrow total"><span>Total con IVU</span><span>'+money(totals.total)+'</span></div>';
 }
 function placeOrder(){
  const entries=Object.entries(cart);if(!entries.length){alert("El carrito está vacío.");return}
- let total=0;entries.forEach(([sku,q])=>{const p=ALL_PRODUCTS.find(x=>x.sku===sku);total+=clientPrice(p)*q});
+ let totals;try{totals=calculateOrderTotals()}catch(e){alert(e.message);return}
+ if(!confirm("Confirmar orden\n\nSubtotal: "+money(totals.subtotal)+"\nDescuento por volumen: -"+money(totals.discount)+"\nIVU (11.5 %): "+money(totals.ivu)+"\nTotal con IVU: "+money(totals.total)))return;
  const id="LW-"+new Date().getFullYear()+"-"+String(Math.floor(1000+Math.random()*8999));
- orders.unshift({id,date:new Date().toLocaleDateString("en-US"),status:"Procesando",total});
+ orders.unshift({id,date:new Date().toLocaleDateString("en-US"),status:"Procesando",...totals});
  localStorage.setItem("lewarOrders",JSON.stringify(orders));cart={};saveCart();updateCartBubble();renderCart();renderOrders();showView("orders");alert("Orden demo registrada como "+id+". No fue enviada a SAP ni a facturación.");
 }
 function statusClass(s){if(s==="Cancelada")return"cancelled";if(s==="En tránsito"||s==="Procesando")return"transit";return"ok"}
