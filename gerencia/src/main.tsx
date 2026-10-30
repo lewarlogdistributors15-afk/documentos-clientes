@@ -1,17 +1,22 @@
-import {useEffect,useState} from 'react';
+import {useEffect} from 'react';
 import {createRoot} from 'react-dom/client';
 import ManagementView from './management-view';
 import type {ManagementAging} from './lib/management-aging';
 const API='https://wbahyotiggsjtqvqpjio.supabase.co/functions/v1/aging-management';
-const SESSION='lewar-gerencia-private-session';
-const TOKEN=/^[A-Za-z0-9_-]{43}$/;
+
+async function fetchAging(signal?:AbortSignal){
+ const response=await fetch(API,{cache:'no-store',signal});
+ let data:any;try{data=await response.json()}catch{throw Error('No se pudo conectar con el aging. Intenta nuevamente.');}
+ if(!response.ok)throw Error(data.error||'No se pudo cargar el aging.');
+ if(!Array.isArray(data.invoices))throw Error('Respuesta no válida.');
+ return data as ManagementAging;
+}
 function App(){
- const [token,setToken]=useState(''),[entry,setEntry]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[name,setName]=useState(''),[expires,setExpires]=useState(0);
- function leave(message=''){try{sessionStorage.removeItem(SESSION)}catch{}setToken('');setEntry('');setName('');setExpires(0);setError(message);}
- async function fetchAging(key:string,signal?:AbortSignal){const r=await fetch(API,{headers:{Authorization:'Bearer '+key},cache:'no-store',signal});let body:any;try{body=await r.json()}catch{throw Error('No se pudo conectar con el aging. Intenta nuevamente.');}if(r.status===401){leave(body.error||'El acceso venció. Usa tu enlace personal.');throw Error(body.error);}if(!r.ok)throw Error(body.error||'No se pudo cargar el aging.');if(!Array.isArray(body.invoices))throw Error('Respuesta no válida.');return body as ManagementAging&{viewer:{name:string;email:string};syncedAt:string};}
- async function login(raw:string,expiry=Date.now()+12*3600000){setBusy(true);setError('');try{let key=raw.trim();if(key.startsWith('https://')){const url=new URL(key);if(url.origin!==location.origin||url.pathname!==location.pathname)throw Error('Usa el acceso personal de Gerencia.');key=new URLSearchParams(url.hash.slice(1)).get('acceso')||'';}if(!TOKEN.test(key)||expiry<=Date.now())throw Error('Introduce tu acceso personal completo.');const data=await fetchAging(key);try{sessionStorage.setItem(SESSION,JSON.stringify({key,expires:expiry}))}catch{}setToken(key);setName(data.viewer.name);setExpires(expiry);setEntry('');}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- useEffect(()=>{const fragment=new URLSearchParams(location.hash.slice(1));const key=fragment.get('acceso');if(location.hash)history.replaceState(null,'',location.pathname+location.search);if(key){void login(key);return;}try{const saved=JSON.parse(sessionStorage.getItem(SESSION)||'null');if(saved&&TOKEN.test(saved.key)&&saved.expires>Date.now())void login(saved.key,saved.expires);else sessionStorage.removeItem(SESSION);}catch{}},[]);
- if(token)return <ManagementView logoSrc="../expo-muebles/lewar-logo.png" loadData={async signal=>{if(Date.now()>expires){leave('La sesión terminó. Abre nuevamente tu acceso personal.');throw Error('Sesión terminada.');}return fetchAging(token,signal);}} accessControls={<div className="reader-controls"><span>{name}</span><button className="btn secondary" onClick={()=>leave()}>Cerrar sesión</button></div>}/>;
- return <div className="access-shell"><header><img src="../expo-muebles/lewar-logo.png" alt="Lewar LogDistributors" width="112" height="112"/><div><strong>LEWAR</strong><small>LOGDISTRIBUTORS</small></div></header><main className="access-card"><span className="eyebrow">VISTA DE GERENCIA</span><h1>Cuentas por cobrar</h1><p>El aging vigente de Lewar, con acceso privado de solo lectura.</p><form onSubmit={e=>{e.preventDefault();void login(entry)}}><label htmlFor="access-key">Acceso personal</label><input id="access-key" type="password" autoComplete="off" value={entry} onChange={e=>setEntry(e.target.value)} placeholder="Pega tu enlace o clave de acceso" required spellCheck={false}/><button type="submit" className="btn" disabled={busy}>{busy?'Verificando acceso…':'Entrar al aging'}</button></form>{error&&<div className="alert danger" role="alert">{error}</div>}<p className="access-help">Abre el enlace personal que te compartió Finanzas o pégalo aquí. Ese acceso es individual; consérvalo de forma privada.</p></main><footer>Lewar LogDistributors · Finanzas y Gestión de Cobro</footer></div>;
+ useEffect(()=>{
+  // Remove credentials left by the previous private-access version.
+  try{sessionStorage.removeItem('lewar-gerencia-private-session')}catch{}
+  if(new URLSearchParams(location.hash.slice(1)).has('acceso'))history.replaceState(null,'',location.pathname+location.search);
+ },[]);
+ return <ManagementView logoSrc="../expo-muebles/lewar-logo.png" loadData={fetchAging}/>;
 }
 createRoot(document.getElementById('root')!).render(<App/>);
