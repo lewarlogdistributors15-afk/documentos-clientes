@@ -25,19 +25,12 @@ export function makeHandler(settings:{url:string;serviceKey:string;request?:type
   if(origin&&origin!==ORIGIN)return json({error:'Origen no permitido.'},403);
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(!['GET','POST'].includes(req.method))return json({error:'Método no permitido.'},405);
+  const credential=req.method==='GET'?req.headers.get('authorization')?.replace(/^Bearer /,''):req.headers.get('x-sync-key');
+  if(!credential||!(/^[a-zA-Z0-9_-]{43,100}$/).test(credential))return json({error:'Se requiere un acceso personal válido.'},401);
   try{
-   // The owner explicitly enabled public read-only access. Never select reader
-   // identities or server credentials when returning the aging projection.
-   if(req.method==='GET'){
-    const result=await rest('id=eq.lewar&select=snapshot,updated_at');if(!result.ok)throw Error('database');const current=(await result.json())[0];
-    if(!current?.snapshot)return json({error:'El aging todavía no está sincronizado.'},503);
-    return json({...current.snapshot,checkedAt:new Date().toISOString(),syncedAt:current.updated_at});
-   }
-   const credential=req.headers.get('x-sync-key');
-   if(!credential||!(/^[a-zA-Z0-9_-]{43,100}$/).test(credential))return json({error:'Acceso no autorizado.'},401);
    const digest=await hash(credential);
-   // Synchronization remains authenticated independently of public viewing.
-   const check=await rest('id=eq.lewar&select=writer_hash,revision');
+   // Financial data is fetched only after authenticating against the current hashes.
+   const check=await rest('id=eq.lewar&select=writer_hash,readers,revision');
    if(!check.ok)throw Error('database');const rows=await check.json(),record=rows[0];if(!record)throw Error('database');
    if(req.method==='POST'){
     if(!safeEqual(record.writer_hash,digest))return json({error:'Acceso no autorizado.'},401);
@@ -48,6 +41,12 @@ export function makeHandler(settings:{url:string;serviceKey:string;request?:type
     const update=await rest('id=eq.lewar&revision=lt.'+value.revision,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(value)});
     if(!update.ok)throw Error('database');return json({ok:true});
    }
+   const reader=(record.readers||[]).find((r:any)=>safeEqual(r.keyHash,digest));if(!reader)return json({error:'El acceso no es válido o fue renovado. Solicita tu enlace personal a Finanzas.'},401);
+   const result=await rest('id=eq.lewar&select=snapshot,updated_at,readers');if(!result.ok)throw Error('database');const current=(await result.json())[0];
+   // Recheck in the same row as the snapshot so revocation wins a concurrent read.
+   const active=current?.readers?.find((r:any)=>safeEqual(r.keyHash,digest));if(!active)return json({error:'Acceso renovado.'},401);
+   if(!current.snapshot)return json({error:'El aging todavía no está sincronizado.'},503);
+   return json({...current.snapshot,checkedAt:new Date().toISOString(),syncedAt:current.updated_at,viewer:{name:active.name,email:active.email}});
   }catch{return json({error:'No se pudo consultar el aging. Intenta nuevamente.'},503);}
  };
 }
