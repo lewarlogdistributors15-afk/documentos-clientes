@@ -204,6 +204,34 @@ function updateOrderLockUI(){
       .forEach(control=>{control.disabled=true});
   }
 }
+// Delivery requests travel with the existing order note, so PDFs, email and history retain them.
+const NOVEMBER_DELIVERY_NOTE='Entrega solicitada: noviembre de 2026. Fecha por coordinar con Lewar.';
+function readDeliveryNote(note){
+  const value=String(note||'');
+  if(value===NOVEMBER_DELIVERY_NOTE)return {month:'2026-11',note:''};
+  if(value.startsWith(NOVEMBER_DELIVERY_NOTE+'\n'))return {month:'2026-11',note:value.slice(NOVEMBER_DELIVERY_NOTE.length+1)};
+  return {month:'',note:value};
+}
+function orderNote(){
+  const note=$('nota').value;
+  return $('entrega').value==='2026-11'?NOVEMBER_DELIVERY_NOTE+(note?'\n'+note:''):note;
+}
+function hydrateDelivery(){
+  const saved=readDeliveryNote(currentOrder?.nota);
+  $('entrega').value=saved.month;
+  $('nota').value=saved.note;
+  updateDeliveryUI();
+}
+function updateDeliveryUI(){
+  const november=$('entrega').value==='2026-11';
+  $('entrega').disabled=saving||isClientOrderLocked();
+  $('entrega-hint').textContent=november
+    ? 'Entrega solicitada para noviembre de 2026. Lewar coordinará contigo la fecha exacta.'
+    : 'Lewar coordinará contigo la fecha de entrega.';
+  $('entrega-resumen').textContent=november?'Noviembre de 2026':'Por coordinar';
+  $('nota').maxLength=november?1500-NOVEMBER_DELIVERY_NOTE.length-1:1500;
+}
+
 function hydrate(){
   window.LewarInventory?.refreshLink();
   const isStaff=actor?.type==='staff';
@@ -257,6 +285,7 @@ function hydrate(){
     $('vendedor').value=isStaff?(actor?.name||''):'';
     setStatus(isStaff&&!customer?'Selecciona primero el cliente para esta orden.':'Selecciona los equipos y cantidades.');
   }
+  hydrateDelivery();
   renderCatalog();updateOrderLockUI();calculate();
 }
 
@@ -380,6 +409,7 @@ function localPricing(){
   return {lines,units:lines.reduce((n,l)=>n+l.quantity,0),total:lines.reduce((n,l)=>n+l.total,0)};
 }
 function calculate(){
+  updateDeliveryUI();
   const locked=isClientOrderLocked();
   const order=locked?{
     lines:currentOrder.lines||[],
@@ -508,7 +538,10 @@ async function sendEmailWithRetry(order,bytes){
 }
 function confirmCustomerSubmission(){
   const dialog=$('confirm-order-dialog');
-  const question='¿Está seguro de que desea someter su orden? Una vez sometida, no podrá modificarse.';
+  const delivery=$('entrega').value==='2026-11'?' Entrega solicitada para noviembre de 2026; fecha por coordinar con Lewar.':'';
+  const question='¿Está seguro de que desea someter su orden? Una vez sometida, no podrá modificarse.'+delivery;
+  const confirmation=$('confirm-order-message');
+  if(confirmation)confirmation.textContent='Una vez sometida, no podrá modificarse. Verifica las cantidades y la información de contacto antes de continuar.'+delivery;
   if(!dialog||typeof dialog.showModal!=='function')return Promise.resolve(window.confirm(question));
   if(dialog.open)return Promise.resolve(false);
   return new Promise(resolve=>{
@@ -526,20 +559,22 @@ async function saveOrder(){
   if(actor?.type==='staff'&&!customer){$('cliente-select').focus();setStatus('Selecciona el cliente antes de guardar.',true);return}
   const ids=['contacto','telefono','correo','vendedor'];
   for(const id of ids){if(!$(id).value.trim()||!$(id).reportValidity()){$(id).focus();setStatus('Completa los datos de contacto antes de guardar.',true);return}}
+  if(orderNote().length>1500){$('nota').focus();setStatus('Reduce las notas del pedido para guardar también la selección de entrega.',true);return}
   if(!selectedItems().length)return;
   if(actor?.type==='client'&&!(await confirmCustomerSubmission()))return;
   if(saving||isClientOrderLocked())return;
   let finalMessage='',finalError=false;
-  saving=true;$('guardar').disabled=true;setStatus('Calculando precios oficiales y guardando la orden…');
+  saving=true;updateDeliveryUI();$('guardar').disabled=true;setStatus('Calculando precios oficiales y guardando la orden…');
   try{
     const data=await rpc('portal_access_save',{
       p_session_token:sessionToken,p_device_id:deviceId(),
       p_customer_id:customer?.id||null,
       p_contacto:$('contacto').value,p_telefono:$('telefono').value,p_correo:$('correo').value,
-      p_vendedor:$('vendedor').value,p_nota:$('nota').value,p_items:selectedItems()
+      p_vendedor:$('vendedor').value,p_nota:orderNote(),p_items:selectedItems()
     });
     if(!data.ok)throw new Error(data.error||'No se pudo guardar la orden.');
     currentOrder=data.order;
+    hydrateDelivery();
     updateOrderLockUI();
     const bytes=await createPdf(currentOrder);pdfLink(currentOrder,bytes);
     if(!bytes)throw new Error('La orden quedó guardada, pero no se pudo generar el PDF automático.');
@@ -610,6 +645,7 @@ async function logout(){
 $('login').addEventListener('click',login);
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();login()}});
 $('guardar').addEventListener('click',saveOrder);
+$('entrega').addEventListener('change',updateDeliveryUI);
 $('nuevo-pedido')?.addEventListener('click',startNewOrder);
 $('logout').addEventListener('click',logout);
 $('cliente-select').addEventListener('change',()=>bootstrap($('cliente-select').value||null));

@@ -13,15 +13,6 @@
 @media(max-width:1050px){.layout{grid-template-columns:1fr}.aside{position:static}.item{grid-template-columns:100px minmax(150px,1fr) 125px 130px}}
 @media(max-width:700px){main{padding:26px 16px}.top{padding:12px;gap:8px}.brand img{width:65px!important;height:65px!important}.expo-logo{width:134px;height:46px;flex:0 1 134px;background-size:418px 241px;background-position:-147px -43px}.partner{font-size:15px}.grid,.catalog-filters{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:19px}.item{grid-template-columns:82px minmax(0,1fr);gap:13px;padding:20px 0}.product-photo{min-height:105px}.product-photo img{height:105px}.quantity-box{grid-column:1}.money{grid-column:2;text-align:right}.price-gate{margin:28px 16px 60px;padding:24px 18px}.pin-row{flex-direction:column}.pin-row button{width:100%}.portal-nav{align-items:flex-start;flex-direction:column}}
 
-/* Vigencia de precios especiales de convención: visible antes y después del acceso */
-.special-countdown{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;margin:16px 0 24px;border:1px solid #d8c292;border-radius:10px;background:#fbf7ed;color:#5d4a26;text-align:left}
-.special-countdown .countdown-heading{display:block;font:800 15px Manrope,sans-serif;color:#3d321d;margin-bottom:5px}
-.special-countdown .countdown-label{display:block;font-size:13px;line-height:1.5}
-.special-countdown .countdown-value{display:block;font:800 20px Manrope,sans-serif;white-space:nowrap;color:#76561f;letter-spacing:.02em}
-.special-countdown.expired{border-color:#dfb0aa;background:#fff4f2}
-.special-countdown.expired .countdown-heading,.special-countdown.expired .countdown-value{color:#9d332b}
-@media(max-width:650px){.special-countdown{align-items:flex-start;flex-direction:column;gap:8px}.special-countdown .countdown-value{white-space:normal;font-size:23px}}
-
 .internal-stock{margin:12px 0 0;padding:8px 10px;border-radius:7px;background:#edf5ee;color:#315b39;font-size:13px;font-weight:700}.internal-stock.no-stock{background:#fff4e5;color:#875817}#inventory-catalog-date{margin:0 0 16px}
 .order-final-notice{margin:16px 0 22px;padding:16px 18px;border:1px solid #c9d6cc;border-left:4px solid #406b49;border-radius:9px;background:#f2f8f3;color:#315b39;font-size:14px;line-height:1.55}
 .order-final-notice strong{display:block;font-size:16px;margin-bottom:5px}
@@ -42,10 +33,6 @@
   <h1>Portal de pedidos</h1>
   <p>Ingresa el PIN exclusivo asignado a tu comercio o a tu cuenta interna de Lewar.</p>
 
-  <section class="special-countdown" data-special-countdown role="timer" aria-live="off" aria-label="Cuenta regresiva de precios especiales de convención">
-    <div><strong class="countdown-heading">Vigencia de precios especiales</strong><span class="countdown-label" data-countdown-label>Disponibles hasta el 23 de octubre de 2026 a las 11:59 p. m. (Puerto Rico).</span></div>
-    <strong class="countdown-value" data-countdown-value>Calculando…</strong>
-  </section>
   <div class="security-alert">
     <strong>⚠️ Aviso de seguridad y confidencialidad</strong>
     El acceso y uso de este portal están sujetos a monitoreo y registro por motivos de seguridad. Toda la información disponible es confidencial y de uso exclusivo del cliente autorizado. <b>Se prohíbe compartir, reenviar, reproducir o divulgar a terceros el contenido, credenciales, precios o capturas de pantalla de este portal.</b>
@@ -76,10 +63,6 @@
   <p class="intro">Selecciona únicamente productos del catálogo autorizado. Los precios están bloqueados y se recalculan en el servidor al guardar.</p>
   <p class="intro"><span class="locked">🔒 Precios protegidos</span> No se permiten artículos manuales ni cambios de precio.</p>
 
-  <section class="special-countdown" data-special-countdown role="timer" aria-live="off" aria-label="Cuenta regresiva de precios especiales de convención">
-    <div><strong class="countdown-heading">Vigencia de precios especiales</strong><span class="countdown-label" data-countdown-label>Disponibles hasta el 23 de octubre de 2026 a las 11:59 p. m. (Puerto Rico).</span></div>
-    <strong class="countdown-value" data-countdown-value>Calculando…</strong>
-  </section>
   <div class="security-alert compact">
     <strong>🔒 Acceso monitoreado y confidencial</strong>
     Este acceso está sujeto a monitoreo y registro. La información de este portal es exclusiva del usuario autorizado. <b>Queda prohibido compartirla con terceros, incluyendo credenciales, precios, documentos o capturas de pantalla.</b>
@@ -94,7 +77,15 @@
         <div class="field"><label for="telefono">Teléfono *</label><input id="telefono" required type="tel" autocomplete="tel"></div>
         <div class="field"><label for="correo">Correo electrónico *</label><input id="correo" required type="email" autocomplete="email"></div>
         <div class="field"><label for="vendedor">Vendedor *</label><input id="vendedor" required placeholder="Nombre del vendedor"></div>
-        <div class="field full"><label for="nota">Notas del pedido</label><textarea id="nota" placeholder="Información necesaria para procesar la orden"></textarea></div>
+        <div class="field full">
+          <label for="entrega">Programar entrega</label>
+          <select id="entrega" aria-describedby="entrega-hint">
+            <option value="">Coordinar con Lewar</option>
+            <option value="2026-11">Programar entrega para noviembre de 2026</option>
+          </select>
+          <p id="entrega-hint" class="hint" aria-live="polite">Lewar coordinará contigo la fecha de entrega.</p>
+        </div>
+        <div class="field full"><label for="nota">Notas del pedido</label><textarea id="nota" maxlength="1500" placeholder="Información necesaria para procesar la orden"></textarea></div>
       </div>
     </section>
 
@@ -112,6 +103,7 @@
     <h2 id="summary-title">Resumen del pedido</h2>
     <div class="summary-line"><span>Modelos</span><strong id="modelos">0</strong></div>
     <div class="summary-line"><span>Unidades</span><strong id="unidades">0</strong></div>
+    <div class="summary-line"><span>Entrega solicitada</span><strong id="entrega-resumen">Por coordinar</strong></div>
     <div id="detalle" style="font-size:14px;max-height:260px;overflow:auto"></div>
     <div class="total"><span>Subtotal</span><span id="subtotal">—</span></div>
     <div class="notice">El precio definitivo se vuelve a calcular en el servidor. No se aceptan precios enviados manualmente por el navegador.</div>
@@ -138,38 +130,7 @@
 <script src="../expo-muebles/order-pdf.js"></script>
 <script src="../expo-muebles/fotos-catalogo.js?v=20261004-wrtx3021tz"></script>
 <script src="./inventory-access.js?v=20261009-1"></script>
-<script src="./app.js?v=20261026-pausa-clientes"></script>
-<script id="client-price-countdown-v1">
-(function(){
-  const expiresAt=Date.parse('2026-10-23T23:59:59-04:00');
-  const boxes=document.querySelectorAll('[data-special-countdown]');
-  if(!boxes.length)return;
-  function renderCountdown(){
-    const remaining=expiresAt-Date.now();
-    const expired=remaining<=0;
-    let display='ESPECIAL EXPIRADO';
-    if(!expired){
-      const total=Math.floor(remaining/1000);
-      const days=Math.floor(total/86400);
-      const hours=Math.floor((total%86400)/3600);
-      const minutes=Math.floor((total%3600)/60);
-      const seconds=total%60;
-      display=days+'d '+String(hours).padStart(2,'0')+'h '+String(minutes).padStart(2,'0')+'m '+String(seconds).padStart(2,'0')+'s';
-    }
-    boxes.forEach(function(box){
-      box.classList.toggle('expired',expired);
-      const value=box.querySelector('[data-countdown-value]');
-      const label=box.querySelector('[data-countdown-label]');
-      if(value)value.textContent=display;
-      if(label)label.textContent=expired
-        ? 'El período de precios especiales terminó el 23 de octubre de 2026. Consulte los precios vigentes con Lewar.'
-        : 'Disponibles hasta el 23 de octubre de 2026 a las 11:59 p. m. (Puerto Rico).';
-    });
-  }
-  renderCountdown();
-  setInterval(renderCountdown,1000);
-})();
-</script>
+<script src="./app.js?v=20261030-entregas-noviembre"></script>
 <script id="billing-redirect-v1">
 try{
   const originalHydrate=hydrate;
