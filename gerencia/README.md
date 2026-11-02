@@ -19,3 +19,7 @@ La compilación utiliza React y esbuild desde el repositorio de Control de cobro
 ## Historial de pagos
 
 La seccion de pagos muestra todos los recibos disponibles, sus facturas, saldada o abono, fechas reales o de validacion y cheques pendientes. Incluye filtros de esta semana, este mes, ultimos seis meses, YTD, todo el historial y fechas personalizadas, con busqueda, estados, CSV e impresion. Cada recibo se cuenta una sola vez. Las facturas muestran su estado actual; los registros sin fecha real o sin aplicacion documentada se identifican expresamente. El endpoint limpia el historial con una lista cerrada de campos y conserva el ultimo historial si recibe una actualizacion de un publicador antiguo.
+
+## Totales por cliente
+
+El selector de cliente se conserva entre aging y pagos. La vista Totales por cliente suma todos los resultados filtrados, con detalle por cliente, exportacion CSV e impresion. El aging respeta cliente, busqueda y antiguedad; los pagos respetan cliente y periodo. Los recibos con varias facturas se cuentan una sola vez y los devueltos/anulados se excluyen del total. No cambia datos financieros.
