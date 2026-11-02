@@ -15,3 +15,7 @@ La vista consulta el servicio cada minuto mientras está visible; calcula los d�
 `node --experimental-strip-types --test gerencia/tests/edge.test.mjs`
 
 La compilación utiliza React y esbuild desde el repositorio de Control de cobros: `node scripts/build-github-management.mjs <ruta-absoluta-a-gerencia>`.
+
+## Historial de pagos
+
+La seccion de pagos muestra todos los recibos disponibles, sus facturas, saldada o abono, fechas reales o de validacion y cheques pendientes. Incluye filtros de esta semana, este mes, ultimos seis meses, YTD, todo el historial y fechas personalizadas, con busqueda, estados, CSV e impresion. Cada recibo se cuenta una sola vez. Las facturas muestran su estado actual; los registros sin fecha real o sin aplicacion documentada se identifican expresamente. El endpoint limpia el historial con una lista cerrada de campos y conserva el ultimo historial si recibe una actualizacion de un publicador antiguo.

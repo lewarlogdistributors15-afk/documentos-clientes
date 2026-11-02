@@ -1,3 +1,4 @@
+import {cleanHistory} from './history.ts';
 const ORIGIN='https://lewarlogdistributors15-afk.github.io';
 const encode=new TextEncoder();
 export const hash=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',encode.encode(value)))).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -13,7 +14,7 @@ export function cleanPayload(b:any){
  if(aging&&(!day(aging.date)||isNaN(Date.parse(aging.uploadedAt))))throw Error('invalid');
  const invoices=b.snapshot.invoices.map((i:any)=>{if(!day(i.posting)||!day(i.due)||typeof i.needsReview!=='boolean')throw Error('invalid');return {key:short(i.key,300),clientCode:short(i.clientCode,60),clientName:short(i.clientName),number:short(i.number,80),installment:short(i.installment,30),posting:i.posting,due:i.due,term:short(i.term,60),original:amount(i.original),balance:amount(i.balance),agingBalance:amount(i.agingBalance),needsReview:i.needsReview};});
  if(new Set(invoices.map((i:any)=>i.key)).size!==invoices.length)throw Error('invalid');
- return {revision:b.revision,readers,snapshot:{aging,invoices,checkedAt:new Date().toISOString()},updated_at:new Date().toISOString()};
+ return {revision:b.revision,readers,snapshot:{aging,invoices,checkedAt:new Date().toISOString(),...(b.snapshot.history?{history:cleanHistory(b.snapshot.history)}:{})},updated_at:new Date().toISOString()};
 }
 export function makeHandler(settings:{url:string;serviceKey:string;request?:typeof fetch}){
  const request=settings.request||fetch;
@@ -44,6 +45,8 @@ export function makeHandler(settings:{url:string;serviceKey:string;request?:type
     if(Number(req.headers.get('content-length')||0)>2500000)return json({error:'Carga demasiado grande.'},413);
     const raw=await req.text();if(raw.length>2500000)return json({error:'Carga demasiado grande.'},413);
     let value;try{value=cleanPayload(JSON.parse(raw))}catch{return json({error:'Datos de sincronización no válidos.'},400);}
+    // Keep the last complete ledger when an older aging-only publisher sends an update.
+    if(!value.snapshot.history){const previous=await rest('id=eq.lewar&select=snapshot');if(!previous.ok)throw Error('database');const history=(await previous.json())[0]?.snapshot?.history;if(history)value.snapshot.history=cleanHistory(history);}
     // Optimistic monotonic update prevents a delayed request from replacing newer data.
     const update=await rest('id=eq.lewar&revision=lt.'+value.revision,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(value)});
     if(!update.ok)throw Error('database');return json({ok:true});

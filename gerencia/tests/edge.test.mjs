@@ -19,3 +19,20 @@ test('newer revisions win and updates are visible without a personal key',async(
 test('invalid payloads cannot replace the last valid aging',async()=>{
  const bad=await payload(3);bad.snapshot.invoices[0].balance=-1;assert.equal((await call('POST',writer,bad,null)).status,400);assert.equal(row.revision,2);
 });
+
+const history=()=>({version:1,generatedAt:'2026-11-02T15:00:00Z',availableFrom:'2026-10-30',privateNotes:'DO NOT PUBLISH',payments:[{id:'qa-payment',clientCode:'QA',clientName:'Synthetic client',date:'2026-10-30',dateBasis:'pago',method:'Cheque',status:'depositado',reference:'QA-CHECK',depositDate:'2026-10-31',amount:3000,unapplied:999999,notes:'PRIVATE PAYMENT NOTE',evidence:'PRIVATE FILE',applications:[{key:'QA|1',number:'1',installment:'',amount:3000,balance:7000,status:'abono',privateContact:'PRIVATE CONTACT'}]}],invoices:[{key:'QA|1',clientCode:'QA',clientName:'Synthetic client',number:'1',installment:'',original:10000,balance:7000,applied:3000,pending:0,status:'abono',date:'2026-10-30',dateBasis:'pago',lastPaymentDate:'2026-10-30',validationDate:'',notes:'PRIVATE INVOICE NOTE'}]});
+
+test('payment history is whitelisted, keeps application dates and recomputes unapplied amounts',async()=>{
+ const next=await payload(3);next.snapshot.history=history();assert.equal((await call('POST',writer,next,null)).status,200);const data=await (await call('GET')).json();assert.equal(data.history.payments.length,1);assert.equal(data.history.payments[0].unapplied,0);assert.equal(data.history.invoices[0].status,'abono');assert.equal(data.history.invoices[0].lastPaymentDate,'2026-10-30');assert.ok(!JSON.stringify(data).includes('PRIVATE'));assert.ok(!JSON.stringify(data).includes('DO NOT PUBLISH'));
+});
+
+test('invalid or duplicated history never replaces the last valid snapshot',async()=>{
+ for(const change of [h=>h.payments.push(h.payments[0]),h=>h.payments[0].applications[0].amount=4000,h=>h.invoices[0].balance=-1,h=>h.payments[0].date='2026-02-30',h=>h.invoices[0].status='invented']){
+  const bad=await payload(4);bad.snapshot.history=history();change(bad.snapshot.history);assert.equal((await call('POST',writer,bad,null)).status,400);assert.equal(row.revision,3);
+ }
+});
+
+test('an aging-only publisher retains the last full history and old revisions cannot overwrite it',async()=>{
+ assert.equal((await call('POST',writer,await payload(4),null)).status,200);assert.equal(row.revision,4);assert.equal(row.snapshot.history.payments.length,1);
+ const old=await payload(3);old.snapshot.history=history();old.snapshot.history.payments=[];assert.equal((await call('POST',writer,old,null)).status,200);assert.equal(row.revision,4);assert.equal(row.snapshot.history.payments.length,1);
+});
