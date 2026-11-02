@@ -228,7 +228,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <div class="helpBox"><b>¿Necesita ayuda?</b>Nuestro equipo está listo para apoyarle.</div>
     </aside>
 
-    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios, inventario y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros.</div><button class="primary mobileAccountLink" onclick="showView('account')">Mi estado de cuenta</button>
+    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios, inventario y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros.</div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button></div></nav>
       <section id="view-home">
         <h1 id="welcome" class="pageTitle"></h1>
         <p class="lead">Estos son sus precios exclusivos de Lewar LogDistributors.</p>
