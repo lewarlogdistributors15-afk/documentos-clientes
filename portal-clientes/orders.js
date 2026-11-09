@@ -72,24 +72,27 @@ function render(orders){
   for(const o of orders){
     const tr=document.createElement('tr');
     const created=o.date||new Date(o.createdAt).toLocaleString('es-PR',{timeZone:'America/Puerto_Rico'});
-    const createdBy=o.submittedBy||(o.source==='expo'?'Expo Muebles':'Cliente');
+    const archived=o.status==='historica_correo';
+    const createdBy=archived?'Recuperada de correo':(o.submittedBy||(o.source==='expo'?'Expo Muebles':'Cliente'));
     tr.innerHTML='<td><strong>'+esc(o.id)+'</strong><br><span class="status">v'+esc(o.version)+' · '+esc(created)+'</span></td>'+
       '<td>'+esc(o.cliente)+'</td>'+
       '<td>'+esc(o.vendedor||'—')+'</td>'+
       '<td>'+esc(createdBy)+(o.submittedRole?'<br><span class="status">'+esc(o.submittedRole)+'</span>':'')+'</td>'+
       '<td>'+esc(o.units)+'</td>'+
       '<td class="money"><strong>'+money(o.total)+'</strong></td>'+
-      '<td><span class="pill">'+esc(o.status||'—')+'</span></td>'+
-      '<td><span class="pill">'+esc(o.emailState||'—')+'</span></td>';
+      '<td><span class="pill">'+esc(archived?'Histórica · correo':(o.status||'—'))+'</span></td>'+
+      '<td><span class="pill">'+esc(archived?'Comprobante original':(o.emailState||'—'))+'</span></td>';
     const action=document.createElement('td');
     const btn=document.createElement('button');btn.className='detail-btn';btn.type='button';btn.textContent='Ver orden';
     const detail=document.createElement('div');detail.className='details';detail.hidden=true;
     const lines=(o.lines||[]).map(l=>'<li>'+esc(l.quantity)+' × '+esc(l.product?.modelo||'')+' · '+money(l.total)+'</li>').join('');
     detail.innerHTML='<strong>Contacto:</strong> '+esc(o.contacto||'—')+' · '+esc(o.telefono||'—')+' · '+esc(o.correo||'—')+
       (o.nota?'<br><strong>Notas:</strong> '+esc(o.nota):'')+
+      (archived?'<br><strong>Archivo histórico:</strong> Reconstruida a partir del correo original. Solo consulta; no constituye orden activa ni autoriza despacho. PDF original no disponible.':'')+
       '<br><strong>Artículos:</strong><ul>'+lines+'</ul>';
     btn.onclick=()=>{detail.hidden=!detail.hidden;btn.textContent=detail.hidden?'Ver orden':'Ocultar orden'};
-    const pdf=document.createElement('button');pdf.className='detail-btn';pdf.type='button';pdf.textContent='Ver PDF';pdf.style.marginLeft='6px';
+    const pdf=document.createElement('button');pdf.className='detail-btn';pdf.type='button';pdf.textContent=archived?'Sin PDF original':'Ver PDF';pdf.style.marginLeft='6px';
+    if(archived){pdf.disabled=true;pdf.title='El archivo histórico fue recuperado desde el correo original; no se conserva el PDF original.';}
     pdf.onclick=async()=>{pdf.disabled=true;try{await openPdf(o)}catch(e){alert(e.message)}finally{pdf.disabled=false}};
     const sendWrap=document.createElement('div');sendWrap.className='pdf-send';
     const email=document.createElement('input');email.type='email';email.placeholder='Enviar PDF a: email@ejemplo.com';email.setAttribute('aria-label','Email para enviar PDF');
@@ -110,8 +113,10 @@ async function load(){
     });
     if(!data.ok)throw new Error(data.error||'Acceso denegado.');
     $('access-panel').hidden=true;$('registry').hidden=false;
-    $('status').textContent=(data.orders?.length||0)+' órdenes mostradas.';
-    render(data.orders||[]);
+    const orders=data.orders||[];
+    const archivedCount=orders.filter(o=>o.status==='historica_correo').length;
+    $('status').textContent=orders.length+' órdenes mostradas.'+(archivedCount?' Incluye '+archivedCount+' registros recuperados de correos históricos (solo consulta).':'');
+    render(orders);
   }catch(e){
     $('registry').hidden=true;$('access-panel').hidden=false;
     $('access-status').textContent=e.message;
@@ -123,6 +128,7 @@ async function logout(){
   safeRemove(SESSION_KEY);location.href='./';
 }
 $('refresh').addEventListener('click',load);
+$('all-records').addEventListener('click',()=>{$('search').value='';load()});
 $('search').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();load()}});
 $('logout').addEventListener('click',logout);
 sessionToken=safeGet(SESSION_KEY)||cookieGet(SESSION_KEY)||'';
