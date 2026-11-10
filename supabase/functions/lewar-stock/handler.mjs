@@ -21,7 +21,16 @@ function snapshot(row, internal) {
     seen.add(sku);
     return onHand?{sku,onHand:quantity}:{sku,available:quantity};
   });
-  return {schema:onHand?2:1,asOf:row.as_of,items};
+  const result={schema:onHand?2:1,asOf:row.as_of,items};
+  if(internal&&row.price_items!=null){
+    if(!Array.isArray(row.price_items)||row.price_items.length>MAX_ITEMS)throw Error('prices');
+    result.prices=row.price_items.map(({sku,description,evaluation,lastPurchase,sale2,purchase,sale1})=>{
+      if(!validSku(sku)||typeof description!=='string'||
+        ![evaluation,lastPurchase,sale2,purchase,sale1].every(value=>value===null||Number.isSafeInteger(value)&&value>=0))throw Error('price');
+      return {sku,description,evaluation,lastPurchase,sale2,purchase,sale1};
+    });
+  }
+  return result;
 }
 export function makeStockHandler({url, serviceKey, request = fetch}) {
   return async req => {
@@ -54,7 +63,8 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         if (!access.ok) return json({error:'Sesión inválida o vencida.'},401);
         if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role)) return json({error:'Acceso denegado.'},403);
       }
-      const response = await rpc('lewar_stock_snapshot?id=eq.1&select=as_of,items');
+      const columns=key===null?'as_of,items':'as_of,items,price_items';
+      const response = await rpc('lewar_stock_snapshot?id=eq.1&select='+columns);
       if (!response.ok) throw Error('stock');
       const [row] = await response.json();
       return json(snapshot(row,key!==null));

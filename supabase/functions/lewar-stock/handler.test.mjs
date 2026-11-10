@@ -54,3 +54,13 @@ test('SAP on-hand stock stays distinct from availability and only catalog SKUs r
   assert.deepEqual(await b2b.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',onHand:11}]});
   assert.equal((await internal.json()).items.length,2);
 });
+test('SAP price columns are returned only to the ERP, including items without stock',async()=>{
+  const price={sku:'MODEL-NO-STOCK',description:'Fixture',evaluation:null,lastPurchase:1222,sale2:1800,purchase:1300,sale1:2000};
+  const {handler,calls}=setup({as_of:'2026-11-10',items:fixture.items,price_items:[price]});
+  const external=await handler(client('c'.repeat(32)));
+  assert.equal((await external.json()).prices,undefined);
+  assert.ok(calls.every(url=>!url.includes('price_items')));
+  const internal=await handler(erp(key));
+  assert.deepEqual((await internal.json()).prices,[price]);
+  assert.ok(calls.some(url=>url.includes('price_items')));
+});
