@@ -30,6 +30,13 @@ function snapshot(row, internal) {
       return {sku,description,evaluation,lastPurchase,sale2,purchase,sale1};
     });
   }
+  if(!internal&&row.portal_sale_items!=null){
+    if(!Array.isArray(row.portal_sale_items)||row.portal_sale_items.length>MAX_ITEMS)throw Error('sale prices');
+    result.salePrices=row.portal_sale_items.map(({sku,cents})=>{
+      if(!validSku(sku)||!Number.isSafeInteger(cents)||cents<=0)throw Error('sale price');
+      return {sku,cents};
+    });
+  }
   return result;
 }
 export function makeStockHandler({url, serviceKey, request = fetch}) {
@@ -63,7 +70,7 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         if (!access.ok) return json({error:'Sesión inválida o vencida.'},401);
         if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role)) return json({error:'Acceso denegado.'},403);
       }
-      const columns=key===null?'as_of,items':'as_of,items,price_items';
+      const columns=key===null?'as_of,items,portal_sale_items':'as_of,items,price_items';
       const response = await rpc('lewar_stock_snapshot?id=eq.1&select='+columns);
       if (!response.ok) throw Error('stock');
       const [row] = await response.json();

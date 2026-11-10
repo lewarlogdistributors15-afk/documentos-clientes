@@ -64,3 +64,12 @@ test('SAP price columns are returned only to the ERP, including items without st
   assert.deepEqual((await internal.json()).prices,[price]);
   assert.ok(calls.some(url=>url.includes('price_items')));
 });
+test('the authenticated catalog receives sale prices without stock or internal cost fields',async()=>{
+  const sales=[{sku:'MODEL-NO-STOCK',cents:18995,cost:11000}];
+  const {handler,calls}=setup({as_of:'2026-11-10',items:[{sku:'MODEL-1',onHand:4,portal:true}],
+    portal_sale_items:sales});
+  const result=await handler(client('c'.repeat(32)));
+  assert.deepEqual(await result.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'MODEL-1',onHand:4}],salePrices:[{sku:'MODEL-NO-STOCK',cents:18995}]});
+  assert.ok(calls.some(url=>url.endsWith('as_of,items,portal_sale_items')));
+  assert.ok(calls.every(url=>!url.includes('price_items')));
+});
