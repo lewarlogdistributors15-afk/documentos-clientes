@@ -19,7 +19,7 @@
   }
   let token=get(SESSION)||'', data=null, pending=false, customerId=null, generation=0;
   function saveToken(value) {token=value;try{sessionStorage.setItem(SESSION,value);localStorage.removeItem(SESSION)}catch{}}
-  function clearToken() {token='';data=null;customerId=null;generation++;try{sessionStorage.removeItem(SESSION);localStorage.removeItem(SESSION)}catch{}document.cookie=encodeURIComponent(SESSION)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure';}
+  function clearToken() {window.setPortalStock?.(null);token='';data=null;customerId=null;generation++;try{sessionStorage.removeItem(SESSION);localStorage.removeItem(SESSION)}catch{}document.cookie=encodeURIComponent(SESSION)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure';}
   function status(text,error=false) {el('accountStatus').textContent=text;el('accountStatus').classList.toggle('accountError',error);}
   function clearFigures() {for(const id of ['accountBalance','accountOverdue','accountPayments','accountAging'])el(id).textContent='—';el('accountInvoices').innerHTML='';el('accountPaymentRows').innerHTML='';el('accountCustomer').textContent='';el('accountTables').hidden=true;el('accountStats').hidden=true;el('accountPrint').disabled=true;}
   async function rpc(name,body) {
@@ -34,11 +34,28 @@
     try {
       const value=await rpc('portal_access_login',{p_pin:pin,p_device_id:device(),p_device_info:{browser:navigator.userAgent,platform:navigator.platform,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone}});
       saveToken(value.sessionToken);input.value='';generation++;customerId=null;
-      window.enterAccountPortal(value.actor?.name || 'Mi cuenta');
+      window.enterAccountPortal(value.actor?.name || 'Mi cuenta');refreshStock();
       el('portalPinStatus').textContent='';
     } catch(e) {el('portalPinStatus').textContent=e.message;status(e.message,true)}
     finally {pending=false}
     if(token)await refresh();
+  }
+  let stockPending=false;
+  async function refreshStock() {
+    if(!token||document.hidden||stockPending)return;
+    const currentToken=token;
+    stockPending=true;
+    try {
+      const r=await fetch(URL+'/functions/v1/lewar-stock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:currentToken,deviceId:device()}),cache:'no-store',signal:AbortSignal.timeout(20000)});
+      const stock=await r.json();
+      if(!r.ok||stock.schema!==1||!Array.isArray(stock.items))throw Error('Inventario no disponible.');
+      if(token===currentToken)window.setPortalStock?.(stock);
+    }catch{
+      if(token===currentToken)window.setPortalStock?.(null);
+    }finally{
+      stockPending=false;
+      if(token&&token!==currentToken)refreshStock();
+    }
   }
   async function refresh() {
     if(!token){clearFigures();el('accountGate').hidden=false;el('accountLogout').hidden=true;el('accountCustomerSelect').hidden=true;status('Usa tu PIN autorizado para consultar tu estado de cuenta.');return;}
@@ -80,7 +97,8 @@
   const visible=()=>!document.hidden&&!el('view-account').classList.contains('hidden');
   window.LewarAccount={login,refresh,logout,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
   el('accountPin').addEventListener('keydown',e=>{if(e.key==='Enter')login()});el('portalPin').addEventListener('keydown',e=>{if(e.key==='Enter')login('portalPin')});
-  window.addEventListener('focus',()=>{if(visible())refresh()});document.addEventListener('visibilitychange',()=>{if(visible())refresh()});setInterval(()=>{if(visible())refresh()},60000);
-  if(token){window.enterAccountPortal('Mi cuenta');refresh();}
-  window.addEventListener('pagehide',()=>{data=null;clearFigures()});window.addEventListener('pageshow',()=>{if(visible())refresh()});
+  function refreshVisible(){if(visible())refresh();refreshStock();}
+  window.addEventListener('focus',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);setInterval(refreshVisible,60000);
+  if(token){window.enterAccountPortal('Mi cuenta');refresh();refreshStock();}
+  window.addEventListener('pagehide',()=>{data=null;clearFigures();window.setPortalStock?.(null)});window.addEventListener('pageshow',refreshVisible);
 })();

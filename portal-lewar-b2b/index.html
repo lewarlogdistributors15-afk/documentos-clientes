@@ -228,7 +228,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <div class="helpBox"><b>¿Necesita ayuda?</b>Nuestro equipo está listo para apoyarle.</div>
     </aside>
 
-    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios, inventario y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros.</div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button></div></nav>
+    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros<span id="catalogStockSource"> · Existencias por confirmar.</span></div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button></div></nav>
       <section id="view-home">
         <h1 id="welcome" class="pageTitle"></h1>
         <p class="lead">Estos son sus precios exclusivos de Lewar LogDistributors.</p>
@@ -440,7 +440,23 @@ function clientPrice(p,key=currentKey){
   if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
-function availableUnits(p){let n=0;for(const c of p.sku)n+=c.charCodeAt(0);return 6+(n%31)}
+let stockBySku=new Map(),stockCutoff=null;
+const stockSku=sku=>String(sku).trim().toUpperCase();
+function stockText(sku){
+  const quantity=stockBySku.get(stockSku(sku));
+  return quantity===undefined?'Disponibilidad por confirmar':quantity===0?'Agotado al corte':'Disponible: '+quantity+' unidades';
+}
+function stockTitle(){return stockCutoff?'Existencias verificadas al '+stockCutoff:'Pendiente de confirmación de Lewar';}
+window.setPortalStock=function(snapshot){
+  stockCutoff=snapshot?.asOf||null;
+  stockBySku=new Map(stockCutoff?snapshot.items.map(row=>[row.sku,row.available]):[]);
+  document.querySelectorAll('[data-stock-sku]').forEach(node=>{
+    node.textContent=stockText(node.dataset.stockSku);
+    node.title=stockTitle();
+  });
+  const source=document.getElementById('catalogStockSource');
+  if(source)source.textContent=stockCutoff?' · Existencias al '+stockCutoff+'.':' · Existencias por confirmar.';
+};
 function desc(p){return p.name||p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
 
 function kind(p){const c=(p.category+" "+p.capacity).toUpperCase();if(c.includes("WASH"))return"washer";if(c.includes("DRY"))return"dryer";if(c.includes("REFRIG")||c.includes("WINE"))return"fridge";if(c.includes("RANGE")||c.includes("OVEN"))return"range";if(c.includes("MWO")||c.includes("MICRO"))return"micro";if(c.includes("COOKTOP"))return"cooktop";if(c.includes("HOOD"))return"hood";return"appliance"}
@@ -460,7 +476,7 @@ function svg(p,size="card"){
 
 function divisionProducts(){return ALL_PRODUCTS.filter(p=>p.division===currentDivision)}
 function divisionLabel(d){return d==="small"?"Small Appliances":d==="coriat"?"Coriat Commercial":"Large Appliances"}
-function availabilityText(p){return p.availabilityLabel||("Disponible: "+availableUnits(p)+" unidades")}
+function availabilityText(p){return stockText(p.sku)}
 const CORIAT_IMAGE_FALLBACKS={
   "EC-6-HG":["https://coriat.com.mx/product/image/mediumlarge/16010111_1.%20EC-6%20HG%20MASTER%20V.FRONTAL%281%29.png"],
   "EC-4-HM":["https://www.coriat.com.mx/product/image/mediumlarge/17010111_00_ec-4-hm%20piso%20master%20comp.png"],
@@ -554,7 +570,7 @@ function productCard(p){
  const regularHtml=(regular&&price)?'<div class="priceOld">'+money(regular)+'</div>':'<div class="priceOld">&nbsp;</div>';
  const priceHtml=price?'<div class="priceNow">'+money(price)+'</div>':'<div class="noPrice">Precio según cuenta</div>';
  const action=price?'<select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button>':'<button class="addBtn infoOnly" style="grid-column:1/-1" onclick="openProduct(\''+esc(p.sku)+'\')">Ver ficha</button>';
- return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+'<div class="cardActions">'+action+'</div></article>';
+ return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle())+'">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+'<div class="cardActions">'+action+'</div></article>';
 }
 function renderDashboard(){
  const priced=LARGE_PRODUCTS.filter(p=>clientPrice(p)>0);
@@ -580,7 +596,7 @@ function renderDetail(){
  const specs=(p.specs&&p.specs.length?p.specs:[desc(p),"Producto distribuido por Lewar LogDistributors","Disponibilidad sujeta a confirmación","Garantía según marca y modelo"]).map(x=>'<li>'+esc(x)+'</li>').join("");
 
  const priceBlock=price?'<div class="reg">'+(regular?'Precio regular distribuidor: <s>'+money(regular)+'</s>':'')+'</div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" onclick="addDetailToCart()">Agregar al carrito</button></div>':'<div class="clientPrice">Precio para '+esc(CLIENTS[currentKey].name)+': <strong style="font-size:18px;color:#344054">Pendiente de asignar</strong></div><p class="lead">La gerente puede asignar este precio por cliente desde la hoja maestra de Google Drive.</p>';
- document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="detailMainImage">'+productVisual(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock">● '+esc(availabilityText(p))+'</div><div class="catalogSourceBadge">Fuente: '+esc(p.sourceCatalog||"Catálogo Lewar")+'</div><h3>Información del producto</h3><ul>'+specs+'</ul><div class="detailPriceBlock">'+priceBlock+'</div></div></div>';
+ document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="detailMainImage">'+productVisual(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle())+'">'+esc(availabilityText(p))+'</div><div class="catalogSourceBadge">Fuente: '+esc(p.sourceCatalog||"Catálogo Lewar")+'</div><h3>Información del producto</h3><ul>'+specs+'</ul><div class="detailPriceBlock">'+priceBlock+'</div></div></div>';
 }
 function detailQty(d){const el=document.getElementById("detailQty");el.textContent=Math.max(1,Number(el.textContent)+d)}
 function addDetailToCart(){const q=Number(document.getElementById("detailQty").textContent)||1;cart[selectedSku]=(cart[selectedSku]||0)+q;saveCart();renderCart();updateCartBubble();showView("cart")}
@@ -748,7 +764,7 @@ function enterAccountPortal(name){
 }
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
-<script src="./account.js?v=20261102-1"></script>
+<script src="./account.js?v=20261110-stock"></script>
 </body>
 </html>
 
