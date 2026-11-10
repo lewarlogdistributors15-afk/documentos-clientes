@@ -170,6 +170,23 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .masterGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}.masterCard{display:grid;gap:12px;align-content:start;padding:18px;background:#fff;border:1px solid var(--line);border-radius:10px}.masterPhotoControls{display:grid;gap:8px}.masterCard label{display:grid;gap:5px}.masterCard input,.masterCard select{min-height:40px;max-width:100%;padding:8px;border:1px solid var(--line);border-radius:5px}
 
 @media(max-width:820px){.loginVisual>div{display:none}.loginVisual{background-position:center center}}
+
+/* Inventario público para sesiones autorizadas — cantidades SAP y precios de venta */
+.inventoryIntro{margin:10px 0 18px;color:#596b7d;font-size:13px;line-height:1.5}
+.inventoryControls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.inventoryControls input,.inventoryControls select{min-height:43px;border:1px solid var(--line);border-radius:8px;background:white;padding:9px 12px;font-size:13px}
+.inventoryControls input{flex:2;min-width:220px}.inventoryControls select{flex:1;min-width:175px}
+.inventorySummary{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#485b70;margin:10px 0 12px}
+.inventoryTableWrap{overflow-x:auto;border:1px solid #dbe5f0;border-radius:11px;background:#fff}
+.inventoryTable{width:100%;border-collapse:collapse;min-width:640px;font-size:13px}
+.inventoryTable th{text-align:left;background:#f1f5fa;padding:13px 14px;font-size:12px;color:#344054;white-space:nowrap}
+.inventoryTable td{padding:14px;border-top:1px solid #e8edf3;vertical-align:middle}
+.inventoryTable strong{font-weight:800}.inventoryTable small{display:block;margin-top:4px;color:#63748a;font-size:11px}
+.inventoryTable .price{font-weight:800;color:#0c5837;white-space:nowrap}
+.inventoryTable .sku{color:#123b64;font-weight:800}
+.inventoryTable button{border:1px solid #aecfed;background:#eef7ff;border-radius:7px;color:#075aa2;padding:8px 10px;font-weight:700;white-space:nowrap}
+.inventoryTable .unknown{color:#8b3d0d;font-weight:700}
+@media(max-width:820px){.inventoryControls{flex-direction:column}.inventoryControls input,.inventoryControls select{width:100%;min-width:0}}
 </style>
 <link rel="stylesheet" href="./account.css?v=20261102-1">
 </head>
@@ -223,6 +240,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
     <aside class="sidebar">
       <button class="nav active" data-view="home" onclick="showView('home',this)"><span class="ico">⌂</span>Inicio</button>
       <button class="nav" data-view="catalog" onclick="showView('catalog',this)"><span class="ico">▣</span>Catálogo</button>
+      <button id="inventoryNav" class="nav hidden" data-view="inventory" onclick="showView('inventory',this)"><span class="ico">▦</span>Inventario y precios</button>
       <button class="nav" data-view="orders" onclick="showView('orders',this)"><span class="ico">▤</span>Mis órdenes</button>
       <button class="nav" data-view="account" onclick="showView('account',this)"><span class="ico">▧</span>Estado de cuenta</button>
       <button class="nav" data-view="promos" onclick="showView('promos',this)"><span class="ico">◇</span>Promociones</button>
@@ -234,7 +252,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <div class="helpBox"><b>¿Necesita ayuda?</b>Nuestro equipo está listo para apoyarle.</div>
     </aside>
 
-    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros<span id="catalogStockSource"> · Existencias por confirmar.</span><span id="catalogPriceSource"> Precios SAP por confirmar.</span></div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button><button type="button" id="masterMobile" class="secondary hidden" onclick="showView('master')">Panel maestro</button></div></nav>
+    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros<span id="catalogStockSource"> · Existencias por confirmar.</span><span id="catalogPriceSource"> Precios SAP por confirmar.</span></div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button><button type="button" id="inventoryMobile" class="secondary hidden" style="flex:1;min-height:44px" onclick="showView('inventory')">Inventario y precios</button><button type="button" id="masterMobile" class="secondary hidden" onclick="showView('master')">Panel maestro</button></div></nav>
       <section id="view-home">
         <h1 id="welcome" class="pageTitle"></h1>
         <p class="lead">Estos son sus precios exclusivos de Lewar LogDistributors.</p>
@@ -288,6 +306,24 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
           <select id="sortFilter" onchange="renderCatalog()"><option value="popular">Ordenar por: Más populares</option><option value="low">Precio: menor a mayor</option><option value="high">Precio: mayor a menor</option></select>
         </div>
         <div id="catalogGrid" class="products"></div>
+      </section>
+
+      <section id="view-inventory" class="hidden">
+        <h1 class="pageTitle">Inventario y precios</h1>
+        <p class="inventoryIntro">Consulta los modelos autorizados para este portal, su precio de venta y las existencias del último corte de SAP. La existencia física no garantiza disponibilidad para pedidos; las unidades confirmadas por el portal se identifican por separado.</p>
+        <div class="inventoryControls">
+          <input id="inventorySearch" type="search" placeholder="Buscar modelo, marca o descripción" aria-label="Buscar inventario" oninput="renderInventory()">
+          <select id="inventoryFilter" aria-label="Filtrar inventario" onchange="renderInventory()">
+            <option value="all">Todos los modelos</option>
+            <option value="stock">Con existencia registrada</option>
+            <option value="no-price">Precio por confirmar</option>
+          </select>
+        </div>
+        <div id="inventorySummary" class="inventorySummary" role="status" aria-live="polite">Cargando inventario…</div>
+        <div class="inventoryTableWrap">
+          <table class="inventoryTable"><thead><tr><th>Modelo</th><th>Producto</th><th>Existencia</th><th>Precio de venta</th><th>Detalle</th></tr></thead><tbody id="inventoryRows"><tr><td colspan="5">Inicia sesión para consultar el inventario.</td></tr></tbody></table>
+        </div>
+        <p class="inventoryIntro">Los precios son de venta, no costos internos. El precio final y las unidades para despacho están sujetos a la confirmación de Lewar.</p>
       </section>
 
       <section id="view-detail" class="hidden">
@@ -476,7 +512,7 @@ function clientPrice(p,key=currentKey){
   if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
-let stockBySku=new Map(),sapSaleBySku=new Map(),masterPhotos=new Map(),portalStockOverrides=new Map(),stockCutoff=null,stockOnHand=false,portalMaster=false,portalManagement=null,portalDisplayName=null,portalAccountName='';
+let stockBySku=new Map(),sapSaleBySku=new Map(),masterPhotos=new Map(),portalStockOverrides=new Map(),stockCutoff=null,stockOnHand=false,portalMaster=false,portalManagement=null,portalDisplayName=null,portalAccountName='',inventoryItems=[];
 const stockSku=sku=>String(sku).trim().toUpperCase();
 function availableOverride(sku){return currentKey==='connected'?portalStockOverrides.get(stockSku(sku)):undefined;}
 function stockText(sku){
@@ -490,6 +526,10 @@ window.setPortalStock=function(snapshot){
   stockCutoff=snapshot?.asOf||null;
   stockOnHand=snapshot?.schema===2;
   stockBySku=new Map(stockCutoff?snapshot.items.map(row=>[row.sku,stockOnHand?row.onHand:row.available]):[]);
+  inventoryItems=stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.filter(item=>typeof item.sku==='string'&&Number.isSafeInteger(stockOnHand?item.onHand:item.available)).map(item=>({sku:stockSku(item.sku),quantity:stockOnHand?item.onHand:item.available})) : [];
+  const canViewInventory=currentKey==='connected'&&!!stockCutoff;
+  for(const id of ['inventoryNav','inventoryMobile'])document.getElementById(id).classList.toggle('hidden',!canViewInventory);
+  if(!canViewInventory&&!document.getElementById('view-inventory').classList.contains('hidden'))showView('catalog');
   const salePrices=new Map(stockCutoff?(snapshot.salePrices||[]).map(row=>[row.sku,row.cents]):[]);
   const edits=snapshot?.productEdits||[];
   const availability=new Map(edits.filter(edit=>Number.isSafeInteger(edit.available_qty)&&edit.available_qty>=0).map(edit=>[edit.sku,edit.available_qty]));
@@ -534,6 +574,7 @@ window.setPortalStock=function(snapshot){
   if(pricing)pricing.textContent=sapSaleBySku.size?' Precios de venta SAP al '+stockCutoff+' y ajustes del portal.':' Precios SAP por confirmar.';
   const source=document.getElementById('catalogStockSource');
   if(source)source.textContent=stockCutoff?' · Existencias al '+stockCutoff+(stockOnHand?' · disponibilidad para ordenar por confirmar.':'.'):' · Existencias por confirmar.';
+  if(currentKey==='connected')renderInventory();
 };
 function desc(p){return p.name||p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
 
@@ -666,6 +707,54 @@ function renderCatalog(){
  }
  document.getElementById("catalogGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">No se encontraron productos.</div>';
 }
+
+/* Inventario en sesión: solo SKUs autorizados devueltos por lewar-stock */
+function renderInventory(){
+  const table=document.getElementById('inventoryRows');
+  const summary=document.getElementById('inventorySummary');
+  if(!table||!summary)return;
+  if(currentKey!=='connected'||!stockCutoff){
+    summary.textContent='Inicia sesión con tu PIN autorizado para consultar el inventario.';
+    table.innerHTML='<tr><td colspan="5">El inventario no está disponible en la vista de demostración.</td></tr>';
+    return;
+  }
+  const products=new Map(ALL_PRODUCTS.map(item=>[stockSku(item.sku),item]));
+  const search=document.getElementById('inventorySearch').value.trim().toLocaleLowerCase('es');
+  const filter=document.getElementById('inventoryFilter').value;
+  const amount=new Intl.NumberFormat('es-PR');
+  const date=stockCutoff.split('-').reverse().join('/');
+  const priceFor=row=>{
+    const product=products.get(row.sku);
+    const calculated=product?clientPrice(product):((sapSaleBySku.get(row.sku)||0)/100);
+    return Number.isFinite(calculated)&&calculated>0?calculated:null;
+  };
+  const filtered=inventoryItems.filter(row=>{
+    const p=products.get(row.sku);
+    const full=(row.sku+' '+(p?.brand||'')+' '+desc(p||{category:''})).toLocaleLowerCase('es');
+    if(search&&!full.includes(search))return false;
+    if(filter==='stock'&&row.quantity<=0&&!(availableOverride(row.sku)>0))return false;
+    if(filter==='no-price'&&priceFor(row)!==null)return false;
+    return true;
+  }).sort((a,b)=>a.sku.localeCompare(b.sku,'es'));
+  const priced=inventoryItems.filter(row=>priceFor(row)!==null).length;
+  summary.textContent=filtered.length+' modelos mostrados de '+inventoryItems.length+' autorizados · '+priced+' con precio · Corte de SAP: '+date;
+  table.innerHTML=filtered.length?filtered.map(row=>{
+    const product=products.get(row.sku);
+    const override=availableOverride(row.sku);
+    const isManaged=Number.isSafeInteger(override);
+    const quantity=isManaged?override:row.quantity;
+    const stockLabel=quantity===0?'0 unidades':amount.format(quantity)+' unidades';
+    const source=isManaged?'Disponibilidad ajustada en el portal':stockOnHand?'Existencia física SAP · despacho por confirmar':'Unidades disponibles al corte';
+    const price=priceFor(row);
+    const title=product?(product.brand||'')+' · '+desc(product):'Modelo de inventario SAP';
+    const action=product?'<button type="button" data-inventory-sku="'+esc(product.sku)+'">Ver equipo</button>':'<span class="unknown">Consultar ficha</span>';
+    return '<tr><td class="sku">'+esc(row.sku)+'</td><td>'+esc(title)+'</td><td><strong>'+stockLabel+'</strong><small>'+esc(source)+'</small></td><td>'+(price===null?'<span class="unknown">Precio por confirmar</span>':'<span class="price">'+money(price)+'</span>')+'</td><td>'+action+'</td></tr>';
+  }).join(''):'<tr><td colspan="5">No hay modelos que coincidan con los filtros.</td></tr>';
+}
+document.getElementById('inventoryRows').addEventListener('click',event=>{
+  const trigger=event.target.closest('[data-inventory-sku]');
+  if(trigger)openProduct(trigger.dataset.inventorySku);
+});
 function globalSearch(v){showView("catalog");document.getElementById("catalogSearch").value=v;renderCatalog()}
 function openProduct(sku){selectedSku=sku;renderDetail();showView("detail")}
 function renderDetail(){
@@ -844,6 +933,7 @@ function showView(v,btn){
  document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
  if(v==="master")window.LewarMaster?.open();
+ if(v==="inventory")renderInventory();
  if(v==="account")window.LewarAccount?.refresh();if(v==="catalog")renderCatalog();if(v==="cart")renderCart();if(v==="orders")renderOrders();if(v==="favorites")renderFavorites();if(v==="admin")renderAdmin();
  window.scrollTo({top:0,behavior:"smooth"});
 }
