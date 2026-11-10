@@ -45,3 +45,12 @@ test('missing source is distinguishable from verified zero and malformed rows fa
   assert.deepEqual(await empty.json(),{schema:1,asOf:null,items:[]});
   assert.equal((await setup({...fixture,items:[...fixture.items,fixture.items[0]]}).handler(erp(key))).status,503);
 });
+test('SAP on-hand stock stays distinct from availability and only catalog SKUs reach customers',async()=>{
+  const {handler}=setup({as_of:'2026-11-10',items:[
+    {sku:'AC8820 (110) F',onHand:11,portal:true,cost:999},
+    {sku:'DETERGENTE ENSUEÑO',onHand:164,portal:false}
+  ]});
+  const b2b=await handler(client('c'.repeat(32))),internal=await handler(erp(key));
+  assert.deepEqual(await b2b.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',onHand:11}]});
+  assert.equal((await internal.json()).items.length,2);
+});

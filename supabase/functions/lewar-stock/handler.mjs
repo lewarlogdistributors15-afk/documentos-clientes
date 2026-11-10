@@ -1,7 +1,7 @@
 const PORTAL_ORIGIN = 'https://lewarlogdistributors15-afk.github.io';
 const MAX_ITEMS = 10000;
 const isoDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
-const validSku = value => typeof value === 'string' && /^[A-Z0-9][A-Z0-9._ /+-]{0,79}$/.test(value);
+const validSku = value => typeof value === 'string' && /^[\p{L}\p{N}][\p{L}\p{N}._ /+()"'-]{0,79}$/u.test(value);
 const hash = async value => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))), byte => byte.toString(16).padStart(2, '0')).join('');
 function sameHash(left, right) {
   if (typeof right !== 'string' || left.length !== right.length) return false;
@@ -9,16 +9,19 @@ function sameHash(left, right) {
   for (let i = 0; i < left.length; i++) diff |= left.charCodeAt(i) ^ right.charCodeAt(i);
   return diff === 0;
 }
-function snapshot(row) {
-  if (row.as_of === null && row.items === null) return {asOf:null,items:[]};
+function snapshot(row, internal) {
+  if (row.as_of === null && row.items === null) return {schema:1,asOf:null,items:[]};
   if (!isoDate(row.as_of) || !Array.isArray(row.items) || row.items.length > MAX_ITEMS) throw Error('snapshot');
   const seen = new Set();
-  const items = row.items.map(({sku, available}) => {
-    if (!validSku(sku) || sku !== sku.trim() || seen.has(sku) || !Number.isSafeInteger(available) || available < 0) throw Error('item');
+  const onHand = row.items.some(item => item.onHand !== undefined);
+  const items = row.items.filter(item => internal || !onHand || item.portal === true).map(item => {
+    const {sku}=item;
+    const quantity=onHand?item.onHand:item.available;
+    if (!validSku(sku) || sku !== sku.trim() || seen.has(sku) || !Number.isSafeInteger(quantity) || quantity < 0) throw Error('item');
     seen.add(sku);
-    return {sku,available};
+    return onHand?{sku,onHand:quantity}:{sku,available:quantity};
   });
-  return {asOf:row.as_of,items};
+  return {schema:onHand?2:1,asOf:row.as_of,items};
 }
 export function makeStockHandler({url, serviceKey, request = fetch}) {
   return async req => {
@@ -54,7 +57,7 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
       const response = await rpc('lewar_stock_snapshot?id=eq.1&select=as_of,items');
       if (!response.ok) throw Error('stock');
       const [row] = await response.json();
-      return json({schema:1,...snapshot(row)});
+      return json(snapshot(row,key!==null));
     } catch {
       return json({error:'No se pudo consultar el inventario de Lewar.'},503);
     }

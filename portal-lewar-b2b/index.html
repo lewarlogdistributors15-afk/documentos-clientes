@@ -440,22 +440,23 @@ function clientPrice(p,key=currentKey){
   if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
-let stockBySku=new Map(),stockCutoff=null;
+let stockBySku=new Map(),stockCutoff=null,stockOnHand=false;
 const stockSku=sku=>String(sku).trim().toUpperCase();
 function stockText(sku){
   const quantity=stockBySku.get(stockSku(sku));
-  return quantity===undefined?'Disponibilidad por confirmar':quantity===0?'Agotado al corte':'Disponible: '+quantity+' unidades';
+  return quantity===undefined?'Disponibilidad por confirmar':stockOnHand?'Existencia SAP: '+quantity+' · por confirmar':quantity===0?'Agotado al corte':'Disponible: '+quantity+' unidades';
 }
 function stockTitle(){return stockCutoff?'Existencias verificadas al '+stockCutoff:'Pendiente de confirmación de Lewar';}
 window.setPortalStock=function(snapshot){
   stockCutoff=snapshot?.asOf||null;
-  stockBySku=new Map(stockCutoff?snapshot.items.map(row=>[row.sku,row.available]):[]);
+  stockOnHand=snapshot?.schema===2;
+  stockBySku=new Map(stockCutoff?snapshot.items.map(row=>[row.sku,stockOnHand?row.onHand:row.available]):[]);
   document.querySelectorAll('[data-stock-sku]').forEach(node=>{
     node.textContent=stockText(node.dataset.stockSku);
     node.title=stockTitle();
   });
   const source=document.getElementById('catalogStockSource');
-  if(source)source.textContent=stockCutoff?' · Existencias al '+stockCutoff+'.':' · Existencias por confirmar.';
+  if(source)source.textContent=stockCutoff?' · Existencias al '+stockCutoff+(stockOnHand?' · disponibilidad para ordenar por confirmar.':'.'):' · Existencias por confirmar.';
 };
 function desc(p){return p.name||p.capacity||String(p.category||"").replace(/^T-\d+\s*/,"")||"Producto Lewar"}
 
@@ -764,7 +765,7 @@ function enterAccountPortal(name){
 }
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
-<script src="./account.js?v=20261110-stock"></script>
+<script src="./account.js?v=20261110-sap-cutoff"></script>
 </body>
 </html>
 

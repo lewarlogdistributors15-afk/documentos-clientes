@@ -48,7 +48,7 @@
     try {
       const r=await fetch(URL+'/functions/v1/lewar-stock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:currentToken,deviceId:device()}),cache:'no-store',signal:AbortSignal.timeout(20000)});
       const stock=await r.json();
-      if(!r.ok||stock.schema!==1||!Array.isArray(stock.items))throw Error('Inventario no disponible.');
+      if(!r.ok||![1,2].includes(stock.schema)||!Array.isArray(stock.items))throw Error('Inventario no disponible.');
       if(token===currentToken)window.setPortalStock?.(stock);
     }catch{
       if(token===currentToken)window.setPortalStock?.(null);
