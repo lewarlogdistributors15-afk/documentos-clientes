@@ -130,5 +130,117 @@
     if(!role){sequence++;data=null;}
     buttons();
   }
-  window.LewarMaster={open,permissions};
+  // Archivo Maestro: importación, comparación y publicación explícita de precios generales.
+  const excelFile=byId('masterExcelFile');
+  const reviewBtn=byId('masterExcelReview');
+  const publishBtn=byId('masterExcelPublish');
+  const excelStatus=byId('masterExcelStatus');
+  const excelPreview=byId('masterExcelPreview');
+  const endpoint='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/lewar-master-publicar';
+  let activeBatch=null,reviewChanges=[],reviewWarnings=[],importPending=false;
+  const canPublish=()=>['owner','admin'].includes(role);
+  const safe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  const moneyValue=cents=>cents==null?'Sin precio':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
+  function excelButtons(){
+    reviewBtn.disabled=!canPublish()||importPending||!excelFile.files.length;
+    publishBtn.disabled=!canPublish()||importPending||!activeBatch||reviewChanges.length===0;
+  }
+  function excelMessage(message,failed=false){
+    excelStatus.textContent=message;
+    excelStatus.classList.toggle('accountError',failed);
+  }
+  function authInput(){
+    const sessionToken=sessionStorage.getItem('lewar-client-session-v1')||'';
+    const deviceId=localStorage.getItem('lewar-client-device-v1')||'';
+    if(!sessionToken||!deviceId)throw Error('Entra nuevamente con tu PIN antes de revisar el archivo.');
+    return {sessionToken,deviceId};
+  }
+  async function excelRpc(payload){
+    const response=await fetch(endpoint,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,...authInput()}),
+      cache:'no-store',signal:AbortSignal.timeout(45000)
+    });
+    const body=await response.json().catch(()=>({error:'No se recibió una respuesta válida.'}));
+    if(!response.ok||!body.ok)throw Error(body.error||'No se pudo completar la solicitud.');
+    return body;
+  }
+  function renderExcelPreview(){
+    excelButtons();
+    if(!reviewChanges.length){
+      excelPreview.hidden=true;
+      excelPreview.innerHTML='';
+      return;
+    }
+    excelPreview.hidden=false;
+    excelPreview.innerHTML='<p><strong>'+reviewChanges.length+' cambios de precio listos para revisar.</strong> No publicados.</p>'+
+      '<div style="max-height:340px;overflow:auto"><table class="accountTable"><thead><tr>'+
+      '<th>Modelo</th><th>Precio actual</th><th>Precio aprobado Karla</th><th>Diferencia</th></tr></thead><tbody>'+
+      reviewChanges.slice(0,150).map(c=>
+        '<tr><td>'+safe(c.sku)+'</td><td>'+moneyValue(c.old_cents)+'</td>'+
+        '<td>'+moneyValue(c.new_cents)+'</td><td>'+
+        (c.old_cents==null?'Nuevo precio':moneyValue(c.new_cents-c.old_cents))+
+        '</td></tr>').join('')+'</tbody></table></div>'+
+      (reviewChanges.length>150?'<p>Se muestran los primeros 150 cambios.</p>':'')+
+      (reviewWarnings.length?'<p><strong>Observaciones:</strong> '+reviewWarnings.slice(0,8).map(safe).join(' · ')+
+      (reviewWarnings.length>8?' · y '+(reviewWarnings.length-8)+' adicionales':'')+'</p>':'');
+  }
+  excelFile.addEventListener('change',()=>{
+    activeBatch=null;reviewChanges=[];reviewWarnings=[];
+    excelMessage('Archivo seleccionado. Presiona «Revisar archivo maestro» antes de publicar.');
+    renderExcelPreview();
+  });
+  reviewBtn.addEventListener('click',async()=>{
+    if(!canPublish()||!excelFile.files.length||importPending)return;
+    const file=excelFile.files[0];
+    if(!/\.xlsx$/i.test(file.name)||file.size>6*1024*1024){
+      excelMessage('Selecciona un Excel .xlsx de hasta 6 MB.',true);return;
+    }
+    importPending=true;excelButtons();excelMessage('Comparando los precios aprobados con el Portal General…');
+    try{
+      const fields=new FormData();
+      const auth=authInput();
+      fields.append('file',file,file.name);
+      fields.append('sessionToken',auth.sessionToken);
+      fields.append('deviceId',auth.deviceId);
+      const response=await fetch(endpoint,{method:'POST',body:fields,cache:'no-store',
+        signal:AbortSignal.timeout(60000)});
+      const result=await response.json().catch(()=>({error:'No se recibió una respuesta válida.'}));
+      if(!response.ok||!result.ok)throw Error(result.error||'El archivo no pudo revisarse.');
+      activeBatch=result.batchId||null;
+      reviewChanges=result.changes||[];
+      reviewWarnings=result.warnings||[];
+      excelMessage(result.rowsChecked+' modelos revisados · '+result.approved+' aprobados · '+
+        reviewChanges.length+' precios diferentes · '+reviewWarnings.length+' alertas. '+
+        (activeBatch?'Confirma los cambios antes de publicar.':'No hay cambios aprobados para publicar.'));
+      renderExcelPreview();
+    }catch(error){
+      activeBatch=null;reviewChanges=[];
+      excelMessage(error.message,true);renderExcelPreview();
+    }finally{importPending=false;excelButtons();}
+  });
+  publishBtn.addEventListener('click',async()=>{
+    if(!canPublish()||!activeBatch||!reviewChanges.length||importPending)return;
+    if(!confirm('PUBLICAR '+reviewChanges.length+' cambios de precio generales en el Portal General de Lewar?\n\nEsta acción modifica los precios visibles y quedará registrada. Los impuestos, inventarios y precios especiales por cliente NO se modificarán.'))return;
+    importPending=true;excelButtons();excelMessage('Publicando precios autorizados…');
+    try{
+      const result=await excelRpc({action:'publish',batchId:activeBatch,approveCount:reviewChanges.length});
+      excelMessage('Publicación completada: '+result.published+' precios actualizados. Los clientes verán los nuevos precios al actualizar el catálogo.');
+      activeBatch=null;reviewChanges=[];reviewWarnings=[];
+      excelFile.value='';renderExcelPreview();
+      window.alert('Cambios publicados correctamente. Se actualizará el portal para reflejar los nuevos precios.');
+      window.location.reload();
+    }catch(error){excelMessage(error.message,true);}
+    finally{importPending=false;excelButtons();}
+  });
+  function setPublishPermission(){
+    byId('masterPublishPanel').classList.toggle('hidden',!canPublish());
+    if(!canPublish()){activeBatch=null;reviewChanges=[];reviewWarnings=[];renderExcelPreview();}
+    excelButtons();
+  }
+  const originalPermissions=permissions;
+  function combinedPermissions(next){
+    originalPermissions(next);
+    setPublishPermission();
+  }
+  window.LewarMaster={open,permissions:combinedPermissions};
 })();
