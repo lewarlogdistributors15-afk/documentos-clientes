@@ -5,17 +5,17 @@
   const photoTypes=['image/jpeg','image/png','image/webp'];
   const photoLimit=5*1024*1024;
   let previewUrl='';
-  let data=null, sequence=0, pending=false;
+  let data=null, sequence=0, pending=false, role=null;
   const report=(message,error=false)=>{
     byId('masterStatus').textContent=message;
     byId('masterStatus').classList.toggle('accountError',error);
   };
   function buttons(){
-    const noProduct=pending||!data||!productForm.elements.sku.value;
+    const noProduct=pending||!data||!role||!productForm.elements.sku.value;
     productForm.querySelector('button[type="submit"]').disabled=noProduct;
-    photoInput.disabled=noProduct;
-    uploadButton.disabled=noProduct||!photoInput.files.length;
-    customerForm.querySelector('button').disabled=pending||!data||!customerForm.elements.customer.value;
+    photoInput.disabled=noProduct||role!=='owner';
+    uploadButton.disabled=photoInput.disabled||!photoInput.files.length;
+    customerForm.querySelector('button').disabled=pending||!data||!['owner','admin'].includes(role)||!customerForm.elements.customer.value;
   }
   function options(select,items){
     const prior=select.value;
@@ -27,6 +27,7 @@
     const row=data?.products.find(row=>row.sku===sku);
     productForm.elements.price.value=row?.sale_cents==null?'':(row.sale_cents/100).toFixed(2);
     productForm.elements.price.placeholder=sku&&sapSaleBySku.has(sku)?(sapSaleBySku.get(sku)/100).toFixed(2):'Precio SAP por confirmar';
+    productForm.elements.available.value=row?.available_qty??'';
     productForm.elements.photo.value=row?.photo_url??'';
     photoInput.value='';
     const product=ALL_PRODUCTS.find(product=>stockSku(product.sku)===sku);
@@ -50,6 +51,7 @@
     buttons();
   }
   async function open(message=''){
+    if(!role)return;
     const current=++sequence;
     data=null;buttons();
     report('Cargando catálogo y clientes…');
@@ -62,7 +64,7 @@
       options(productForm.elements.sku,products.map(([sku,product])=>[sku,sku+' · '+desc(product)]));
       options(customerForm.elements.customer,data.customers.map(({id,name,clientCode})=>[id,name+(clientCode?' · '+clientCode:'')]));
       fillProduct();fillCustomer();
-      report(message||'Selecciona un modelo o un cliente para editar.');
+      report(message||(role==='catalog'?'Selecciona un modelo para editar su precio o disponibilidad.':'Selecciona un modelo o un cliente para editar.'));
     }catch(error){
       if(current===sequence)report(error.message,true);
     }
@@ -90,7 +92,7 @@
   });
   uploadButton.addEventListener('click',async()=>{
     const sku=productForm.elements.sku.value,file=photoInput.files[0];
-    if(!data||pending||!sku||!file)return;
+    if(!data||pending||role!=='owner'||!sku||!file)return;
     pending=true;buttons();report('Subiendo la foto…');
     try{
       const {photoUrl}=await window.LewarAccount.uploadProductPhoto(sku,file);
@@ -108,14 +110,25 @@
   });
   productForm.addEventListener('submit',event=>{
     event.preventDefault();
-    const {sku,price,photo}=productForm.elements;
+    const {sku,price,available,photo}=productForm.elements;
     const saleCents=price.value===''?null:Math.round(price.valueAsNumber*100);
-    submit('masterProduct',{sku:sku.value,saleCents,photoUrl:photo.value.trim()||null},'Producto guardado en el Portal General.');
+    const fields={sku:sku.value,saleCents,availableQty:available.value===''?null:available.valueAsNumber};
+    if(role==='owner')fields.photoUrl=photo.value.trim()||null;
+    submit('masterProduct',fields,'Producto guardado en el Portal General.');
   });
   customerForm.addEventListener('submit',event=>{
     event.preventDefault();
     const {customer,displayName,contactEmail}=customerForm.elements;
     submit('masterCustomer',{customerId:customer.value,displayName:displayName.value.trim()||null,contactEmail:contactEmail.value.trim()||null},'Cliente guardado en el Portal General.');
   });
-  window.LewarMaster={open};
+  function permissions(next){
+    if(role===next)return;
+    role=next;
+    byId('masterPhotoControls').classList.toggle('hidden',role!=='owner');
+    customerForm.classList.toggle('hidden',!['owner','admin'].includes(role));
+    byId('managementProductTitle').textContent=role==='owner'?'Fotos, precios y disponibilidad':'Precios y disponibilidad';
+    if(!role){sequence++;data=null;}
+    buttons();
+  }
+  window.LewarMaster={open,permissions};
 })();

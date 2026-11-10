@@ -74,15 +74,24 @@ test('the authenticated catalog receives sale prices without stock or internal c
   assert.ok(calls.some(url=>url.endsWith('as_of,items,portal_sale_items')));
   assert.ok(calls.every(url=>!url.includes('price_items')));
 });
-test('only the registered master can save product and client changes',async()=>{
+test('owner, portal administrators and catalog editors have distinct write permissions',async()=>{
   const owner='owner-id', customer='customer-id', writes=[];
   const handler=makeStockHandler({url:'https://supabase.example',serviceKey:'fixture',
     request:async(url,init)=>{
       if(url.includes('portal_access_bootstrap')){
         const session=JSON.parse(init.body).p_session_token[0];
-        return Response.json({ok:true,actor:session==='c'?{type:'client',id:customer}:{type:'staff',role:'admin',id:session==='a'?owner:'other-admin'},customers:[{id:customer,name:'Client'}]});
+        return Response.json({ok:true,actor:session==='c'?{type:'client',id:customer}:{type:'staff',role:session==='e'?'billing':'admin',id:session==='a'?owner:session==='d'?'portal-admin':session==='e'?'editor':'other-admin'},customers:[{id:customer,name:'Client'}]});
       }
       if(url.includes('lewar_b2b_owner'))return Response.json([{staff_id:owner}]);
+      if(url.includes('lewar_b2b_staff_access')){
+        if(url.includes('portal-admin'))return Response.json([{portal_role:'admin'}]);
+        if(url.includes('editor'))return Response.json([{portal_role:'catalog'}]);
+        return Response.json([]);
+      }
+      if(url.includes('lewar_b2b_set_product_offer')){
+        writes.push(JSON.parse(init.body));return Response.json(true);
+      }
+
       if(url.includes('b2b_inventory'))return Response.json([{sku:'MODEL-1'}]);
       if(init.method==='POST'){
         assert.equal(init.headers.apikey,'fixture');
@@ -103,9 +112,21 @@ test('only the registered master can save product and client changes',async()=>{
   const edit={action:'masterCustomer',customerId:customer,displayName:'New name',contactEmail:'contact@example.com'};
   assert.equal((await invoke('a',{...edit,customerId:'missing'})).status,404);
   assert.equal((await invoke('a',edit)).status,200);
-  assert.equal(writes[0].sale_cents,10995);
+  assert.equal(writes[0].p_sale_cents,10995);
+  assert.equal(writes[0].p_staff_id,owner);
   assert.equal(writes[1].customer_id,customer);
-  assert.ok(writes.every(row=>row.updated_by===owner));
+  assert.equal(writes[1].updated_by,owner);
+  const offer={action:'masterProduct',sku:'MODEL-1',saleCents:20000,availableQty:0};
+  assert.equal((await invoke('d',product)).status,403);
+  assert.equal((await invoke('e',product)).status,403);
+  assert.equal((await invoke('e',edit)).status,403);
+  const editors=await (await invoke('e',{action:'masterRead'})).json();
+  assert.deepEqual(editors.customers,[]);
+  assert.equal((await invoke('e',{...offer,availableQty:-1})).status,400);
+  assert.equal((await invoke('e',offer)).status,200);
+  assert.deepEqual(writes[2],{p_sku:'MODEL-1',p_sale_cents:20000,p_available_qty:0,p_set_available:true,p_photo_url:null,p_set_photo:false,p_staff_id:'editor'});
+  assert.equal((await invoke('d',offer)).status,200);
+  assert.equal((await invoke('d',edit)).status,200);
 });
 test('photo upload checks the owner and image, then publishes only the photo field',async()=>{
   const stored=[],changes=[];
