@@ -165,6 +165,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 @media(max-width:980px){.adminPriceTools{grid-template-columns:1fr 1fr}.adminBulkBar{grid-template-columns:1fr 1fr}.adminBulkBar div{grid-column:1/-1}}
 @media(max-width:620px){.adminPriceTools{grid-template-columns:1fr}.adminBulkBar{grid-template-columns:1fr}.adminPriceSummary{flex-wrap:wrap}.adminPriceSummary .primary{margin-left:0}}
 
+.masterGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}.masterCard{display:grid;gap:12px;align-content:start;padding:18px;background:#fff;border:1px solid var(--line);border-radius:10px}.masterCard label{display:grid;gap:5px}.masterCard input,.masterCard select{min-height:40px;max-width:100%;padding:8px;border:1px solid var(--line);border-radius:5px}
 </style>
 <link rel="stylesheet" href="./account.css?v=20261102-1">
 </head>
@@ -223,12 +224,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <button class="nav" data-view="promos" onclick="showView('promos',this)"><span class="ico">◇</span>Promociones</button>
       <button class="nav" data-view="favorites" onclick="showView('favorites',this)"><span class="ico">♡</span>Favoritos</button>
       <button class="nav" data-view="profile" onclick="showView('profile',this)"><span class="ico">♙</span>Mi perfil</button>
+      <button id="masterNav" type="button" class="nav hidden" data-view="master" onclick="showView('master',this)">Panel maestro</button>
       <button id="adminNav" class="nav hidden" data-view="admin" onclick="showView('admin',this)"><span class="ico">⚙</span>Administración</button>
       <button class="nav" onclick="logout()"><span class="ico">↪</span>Cerrar sesión</button>
       <div class="helpBox"><b>¿Necesita ayuda?</b>Nuestro equipo está listo para apoyarle.</div>
     </aside>
 
-    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros<span id="catalogStockSource"> · Existencias por confirmar.</span><span id="catalogPriceSource"> Precios SAP por confirmar.</span></div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button></div></nav>
+    <main class="content"><div id="catalogPilotNotice" class="accountStatus" hidden>El catálogo está en validación: precios y órdenes sujetos a confirmación. El estado de cuenta muestra los registros reales de Control de cobros<span id="catalogStockSource"> · Existencias por confirmar.</span><span id="catalogPriceSource"> Precios SAP por confirmar.</span></div><nav class="mobileAccountLink" aria-label="Navegación del portal"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" style="flex:1;min-height:44px" onclick="showView('catalog')">Ver catálogo</button><button type="button" class="secondary" style="flex:1;min-height:44px" onclick="showView('account')">Mi estado de cuenta</button><button type="button" id="masterMobile" class="secondary hidden" onclick="showView('master')">Panel maestro</button></div></nav>
       <section id="view-home">
         <h1 id="welcome" class="pageTitle"></h1>
         <p class="lead">Estos son sus precios exclusivos de Lewar LogDistributors.</p>
@@ -329,6 +331,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
       <section id="view-favorites" class="hidden"><div class="sectionHead"><h2>Favoritos</h2></div><div id="favoritesGrid" class="products"></div></section>
       <section id="view-profile" class="hidden"><div class="sectionHead"><h2>Mi perfil</h2></div><div id="profilePanel" class="panel"></div></section>
 
+      <section id="view-master" class="hidden">
+        <h1>Panel maestro</h1>
+        <p id="masterStatus" class="accountStatus" role="status" aria-live="polite"></p>
+        <div class="masterGrid">
+          <form id="masterProductForm" class="masterCard">
+            <h2>Fotos y precios</h2>
+            <label>Modelo<select name="sku" required></select></label>
+            <label>Precio de venta del portal (USD)<input name="price" type="number" min="0.01" step="0.01" max="1000000"></label>
+            <label>Enlace HTTPS de la foto<input name="photo" type="url" maxlength="2048"></label>
+            <p class="lead">Deja un campo vacío para usar el precio SAP o la foto original. El precio editado se aplica a las cuentas autorizadas del Portal General.</p>
+            <button class="primary" type="submit" disabled>Guardar producto</button>
+          </form>
+          <form id="masterCustomerForm" class="masterCard">
+            <h2>Clientes</h2>
+            <label>Cliente<select name="customer" required></select></label>
+            <label>Nombre visible<input name="displayName" maxlength="150"></label>
+            <label>Correo de contacto<input name="contactEmail" type="email" maxlength="254"></label>
+            <p class="lead">El nombre visible se usa en el Portal General. El correo queda en este panel.</p>
+            <button class="primary" type="submit" disabled>Guardar cliente</button>
+          </form>
+        </div>
+      </section>
       <section id="view-admin" class="hidden">
         <div class="adminIntro">
           <div><h1>Precios por cliente</h1><div class="lead" style="margin:4px 0 0">Editor rápido para revisar y preparar cambios. La base maestra oficial permanece en Google Drive.</div></div>
@@ -441,7 +465,7 @@ function clientPrice(p,key=currentKey){
   if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
-let stockBySku=new Map(),sapSaleBySku=new Map(),stockCutoff=null,stockOnHand=false;
+let stockBySku=new Map(),sapSaleBySku=new Map(),masterPhotos=new Map(),stockCutoff=null,stockOnHand=false,portalMaster=false,portalDisplayName=null,portalAccountName='';
 const stockSku=sku=>String(sku).trim().toUpperCase();
 function stockText(sku){
   const quantity=stockBySku.get(stockSku(sku));
@@ -457,9 +481,23 @@ window.setPortalStock=function(snapshot){
     node.title=stockTitle();
   });
   const salePrices=new Map(stockCutoff?(snapshot.salePrices||[]).map(row=>[row.sku,row.cents]):[]);
+  const edits=snapshot?.productEdits||[];
+  for(const edit of edits)if(Number.isSafeInteger(edit.sale_cents)&&edit.sale_cents>0)salePrices.set(edit.sku,edit.sale_cents);
+  const photos=new Map(edits.filter(edit=>edit.photo_url).map(edit=>[edit.sku,edit.photo_url]));
+  const photosChanged=photos.size!==masterPhotos.size||[...photos].some(([sku,url])=>masterPhotos.get(sku)!==url);
+  masterPhotos=photos;
+  portalMaster=snapshot?.master===true&&currentKey==='connected';
+  document.getElementById('masterNav').classList.toggle('hidden',!portalMaster);
+  document.getElementById('masterMobile').classList.toggle('hidden',!portalMaster);
+  if(currentKey==='connected'){
+    document.getElementById('topRole').textContent=portalMaster?'Cuenta maestra':'Cliente';
+    portalDisplayName=snapshot?.customerDisplayName||null;
+    applyAccountDisplay();
+    if(!portalMaster&&!document.getElementById('view-master').classList.contains('hidden'))showView('catalog');
+  }
   const salesChanged=salePrices.size!==sapSaleBySku.size||[...salePrices].some(([sku,cents])=>sapSaleBySku.get(sku)!==cents);
   sapSaleBySku=salePrices;
-  if(salesChanged&&currentKey==='connected'){
+  if((salesChanged||photosChanged)&&currentKey==='connected'){
     renderDashboard();renderCatalog();renderFavorites();renderCart();
     if(!document.getElementById('view-detail').classList.contains('hidden')){
       const quantity=document.getElementById('detailQty')?.textContent;
@@ -468,7 +506,7 @@ window.setPortalStock=function(snapshot){
     }
   }
   const pricing=document.getElementById('catalogPriceSource');
-  if(pricing)pricing.textContent=sapSaleBySku.size?' Precios de venta SAP al '+stockCutoff+'.':' Precios SAP por confirmar.';
+  if(pricing)pricing.textContent=sapSaleBySku.size?' Precios de venta SAP al '+stockCutoff+' y ajustes del portal.':' Precios SAP por confirmar.';
   const source=document.getElementById('catalogStockSource');
   if(source)source.textContent=stockCutoff?' · Existencias al '+stockCutoff+(stockOnHand?' · disponibilidad para ordenar por confirmar.':'.'):' · Existencias por confirmar.';
 };
@@ -517,7 +555,7 @@ const CORIAT_IMAGE_FALLBACKS={
   "SP-2T-90CM":["https://coriat.us/cdn/shop/files/SP-2T.png?v=1769529586&width=1946"]
 };
 function productImageSources(p){
-  return [...new Set([window.LEWAR_PRODUCT_ORIGINALS?.[p.sku]?.src,p.image,...(CORIAT_IMAGE_FALLBACKS[p.sku]||[]),window.LEWAR_PRODUCT_PHOTOS?.[p.sku]].filter(Boolean))];
+  return [...new Set([currentKey==='connected'?masterPhotos.get(stockSku(p.sku)):null,window.LEWAR_PRODUCT_ORIGINALS?.[p.sku]?.src,p.image,...(CORIAT_IMAGE_FALLBACKS[p.sku]||[]),window.LEWAR_PRODUCT_PHOTOS?.[p.sku]].filter(Boolean))];
 }
 function productImageError(img,sku){
   const p=ALL_PRODUCTS.find(p=>p.sku===sku);
@@ -534,7 +572,7 @@ function productVisual(p,size="card"){
   const cls=size==="detail"?"realProductPhoto detailPhoto":"realProductPhoto";
   const source=productImageSources(p)[0];
   if(source){
-    return '<img class="'+cls+'" src="'+esc(source)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="'+(size==="detail"?"eager":"lazy")+'" decoding="async" onload="fitProductPhoto(this)" onerror="productImageError(this,\''+esc(p.sku||"")+'\')"><span style="display:none">'+svg(p,size)+'</span>';
+    return '<img class="'+cls+'" src="'+esc(source)+'" alt="'+esc(((p.brand||"")+" "+p.sku).trim())+'" loading="'+(size==="detail"?"eager":"lazy")+'" decoding="async" referrerpolicy="no-referrer" onload="fitProductPhoto(this)" onerror="productImageError(this,\''+esc(p.sku||"")+'\')"><span style="display:none">'+svg(p,size)+'</span>';
   }
   return svg(p,size);
 }
@@ -770,20 +808,33 @@ function saveAdminDrafts(){
 }
 
 function showView(v,btn){
+ if(v==="master"&&!portalMaster)return;
  document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
+ if(v==="master")window.LewarMaster?.open();
  if(v==="account")window.LewarAccount?.refresh();if(v==="catalog")renderCatalog();if(v==="cart")renderCart();if(v==="orders")renderOrders();if(v==="favorites")renderFavorites();if(v==="admin")renderAdmin();
  window.scrollTo({top:0,behavior:"smooth"});
 }
-function setAccountCustomerName(name){if(currentKey==='connected'){CLIENTS.connected.name=name;document.getElementById('topName').textContent=name;document.getElementById('welcome').textContent='Hola, '+name;}}
+function applyAccountDisplay(){
+ if(currentKey!=='connected')return;
+ const name=portalDisplayName||portalAccountName;
+ if(!name||CLIENTS.connected.name===name)return;
+ CLIENTS.connected.name=name;
+ document.getElementById('topName').textContent=name;
+ document.getElementById('welcome').textContent='Hola, '+name;
+ renderProfile();
+}
+function setAccountCustomerName(name){portalAccountName=name;applyAccountDisplay();}
 function enterAccountPortal(name){
+ portalAccountName=name;portalDisplayName=null;
  document.getElementById('catalogPilotNotice').hidden=false;
  CLIENTS.connected={user:'connected',name,level:'',term:'Consultar estado de cuenta',credit:0,balance:0,seller:'Equipo Lewar',factor:1};currentKey='connected';orders=[];
  document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');init();showView('account');
 }
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
-<script src="./account.js?v=20261110-sap-sale"></script>
+<script src="./account.js?v=20261110-master"></script>
+<script src="./master.js?v=20261110-master"></script>
 </body>
 </html>
 

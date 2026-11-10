@@ -1,3 +1,4 @@
+import {masterAction,portalCustomization} from './portal-master.mjs';
 const PORTAL_ORIGIN = 'https://lewarlogdistributors15-afk.github.io';
 const MAX_ITEMS = 10000;
 const isoDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -50,8 +51,9 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
     if (req.method !== 'POST') return json({error:'Método no permitido.'},405);
     const key = req.headers.get('X-Lewar-Stock-Key');
     const service = {apikey:serviceKey,Authorization:'Bearer '+serviceKey,'Content-Type':'application/json'};
-    const rpc = (path, init={}) => request(url+'/rest/v1/'+path,{...init,headers:service,redirect:'error',signal:AbortSignal.timeout(10000)});
+    const rpc = (path, init={}) => request(url+'/rest/v1/'+path,{...init,headers:{...service,...init.headers},redirect:'error',signal:AbortSignal.timeout(10000)});
     try {
+      let actor;
       if (key !== null) {
         if (origin || !/^[0-9a-f]{64}$/.test(key)) return json({error:'Acceso denegado.'},403);
         const settings = await rpc('lewar_stock_snapshot?id=eq.1&select=key_hash');
@@ -69,12 +71,16 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         const access = await auth.json();
         if (!access.ok) return json({error:'Sesión inválida o vencida.'},401);
         if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role)) return json({error:'Acceso denegado.'},403);
+        if(body.action)return await masterAction(rpc,json,access,body);
+        actor=access.actor;
       }
       const columns=key===null?'as_of,items,portal_sale_items':'as_of,items,price_items';
       const response = await rpc('lewar_stock_snapshot?id=eq.1&select='+columns);
       if (!response.ok) throw Error('stock');
       const [row] = await response.json();
-      return json(snapshot(row,key!==null));
+      const data=snapshot(row,key!==null);
+      if(actor)Object.assign(data,await portalCustomization(rpc,actor).catch(()=>({})));
+      return json(data);
     } catch {
       return json({error:'No se pudo consultar el inventario de Lewar.'},503);
     }

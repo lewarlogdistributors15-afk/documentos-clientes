@@ -17,6 +17,7 @@ function setup(row=fixture){
         const token=JSON.parse(init.body).p_session_token;
         return Response.json(token==='c'.repeat(32)?{ok:true,actor:{type:'client'}}:{ok:false});
       }
+      if(url.includes('lewar_b2b_'))return Response.json([]);
       return Response.json([url.endsWith('key_hash')?{key_hash:keyHash}:row]);
     }});
   return {handler,calls};
@@ -30,7 +31,7 @@ test('portal PIN and ERP key see the same stock and zero remains zero',async()=>
   assert.equal(b2b.headers.get('Access-Control-Allow-Origin'),origin);
   assert.equal(internal.status,200);
   const expected={schema:1,asOf:'2026-11-09',items:[{sku:'MODEL-1',available:0},{sku:'MODEL-2',available:12}]};
-  assert.deepEqual(await b2b.json(),expected);
+  assert.deepEqual(await b2b.json(),{...expected,productEdits:[],master:false,customerDisplayName:null});
   assert.deepEqual(await internal.json(),expected);
 });
 test('unauthorized requests cannot read snapshot and writes are rejected',async()=>{
@@ -51,7 +52,7 @@ test('SAP on-hand stock stays distinct from availability and only catalog SKUs r
     {sku:'DETERGENTE ENSUEÑO',onHand:164,portal:false}
   ]});
   const b2b=await handler(client('c'.repeat(32))),internal=await handler(erp(key));
-  assert.deepEqual(await b2b.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',onHand:11}]});
+  assert.deepEqual(await b2b.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',onHand:11}],productEdits:[],master:false,customerDisplayName:null});
   assert.equal((await internal.json()).items.length,2);
 });
 test('SAP price columns are returned only to the ERP, including items without stock',async()=>{
@@ -69,7 +70,40 @@ test('the authenticated catalog receives sale prices without stock or internal c
   const {handler,calls}=setup({as_of:'2026-11-10',items:[{sku:'MODEL-1',onHand:4,portal:true}],
     portal_sale_items:sales});
   const result=await handler(client('c'.repeat(32)));
-  assert.deepEqual(await result.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'MODEL-1',onHand:4}],salePrices:[{sku:'MODEL-NO-STOCK',cents:18995}]});
+  assert.deepEqual(await result.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'MODEL-1',onHand:4}],salePrices:[{sku:'MODEL-NO-STOCK',cents:18995}],productEdits:[],master:false,customerDisplayName:null});
   assert.ok(calls.some(url=>url.endsWith('as_of,items,portal_sale_items')));
   assert.ok(calls.every(url=>!url.includes('price_items')));
+});
+test('only the registered master can save product and client changes',async()=>{
+  const owner='owner-id', customer='customer-id', writes=[];
+  const handler=makeStockHandler({url:'https://supabase.example',serviceKey:'fixture',
+    request:async(url,init)=>{
+      if(url.includes('portal_access_bootstrap')){
+        const session=JSON.parse(init.body).p_session_token[0];
+        return Response.json({ok:true,actor:session==='c'?{type:'client',id:customer}:{type:'staff',role:'admin',id:session==='a'?owner:'other-admin'},customers:[{id:customer,name:'Client'}]});
+      }
+      if(url.includes('lewar_b2b_owner'))return Response.json([{staff_id:owner}]);
+      if(url.includes('b2b_inventory'))return Response.json([{sku:'MODEL-1'}]);
+      if(init.method==='POST'){
+        assert.equal(init.headers.apikey,'fixture');
+        assert.equal(init.headers.Prefer,'resolution=merge-duplicates,return=minimal');
+        writes.push(JSON.parse(init.body));
+        return new Response(null,{status:201});
+      }
+      return Response.json([]);
+    }});
+  const invoke=(session,fields)=>handler(new Request('https://stock.example/',{method:'POST',headers:{Origin:origin},
+    body:JSON.stringify({...fields,sessionToken:session.repeat(32),deviceId:'fixture'})}));
+  const product={action:'masterProduct',sku:'MODEL-1',saleCents:10995,photoUrl:'https://images.example.com/item.jpg'};
+  assert.equal((await invoke('b',product)).status,403);
+  assert.equal((await invoke('c',product)).status,403);
+  assert.equal((await invoke('a',{...product,photoUrl:'https://127.0.0.1/image'})).status,400);
+  assert.equal(writes.length,0);
+  assert.equal((await invoke('a',product)).status,200);
+  const edit={action:'masterCustomer',customerId:customer,displayName:'New name',contactEmail:'contact@example.com'};
+  assert.equal((await invoke('a',{...edit,customerId:'missing'})).status,404);
+  assert.equal((await invoke('a',edit)).status,200);
+  assert.equal(writes[0].sale_cents,10995);
+  assert.equal(writes[1].customer_id,customer);
+  assert.ok(writes.every(row=>row.updated_by===owner));
 });

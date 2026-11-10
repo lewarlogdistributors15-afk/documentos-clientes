@@ -95,7 +95,17 @@
   }
   async function logout() {const old=token;clearToken();clearFigures();el('accountGate').hidden=false;el('accountLogout').hidden=true;el('accountCustomerSelect').hidden=true;status('Usa tu PIN autorizado para consultar tu estado de cuenta.');await refresh();if(old)try{await rpc('portal_access_logout',{p_session_token:old,p_device_id:device()})}catch{}}
   const visible=()=>!document.hidden&&!el('view-account').classList.contains('hidden');
-  window.LewarAccount={login,refresh,logout,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
+  async function master(action,fields={}) {
+    if(!token)throw Error('Entra con tu PIN autorizado.');
+    const currentToken=token;
+    const response=await fetch(URL+'/functions/v1/lewar-stock',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...fields,action,sessionToken:currentToken,deviceId:device()}),cache:'no-store',signal:AbortSignal.timeout(20000)});
+    const result=await response.json();
+    if(!response.ok||!result.ok||token!==currentToken)throw Error(result.error||'No se pudo guardar el cambio.');
+    if(action!=='masterRead')await refreshStock();
+    return result;
+  }
+  window.LewarAccount={login,refresh,logout,master,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
   el('accountPin').addEventListener('keydown',e=>{if(e.key==='Enter')login()});el('portalPin').addEventListener('keydown',e=>{if(e.key==='Enter')login('portalPin')});
   function refreshVisible(){if(visible())refresh();refreshStock();}
   window.addEventListener('focus',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);setInterval(refreshVisible,60000);
