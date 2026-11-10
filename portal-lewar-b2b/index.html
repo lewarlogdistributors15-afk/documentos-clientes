@@ -340,7 +340,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             <div id="cartTotals" class="totals"></div>
           </div>
           <p class="lead" style="margin-top:12px">El IVU de 11.5 % se calcula sobre el subtotal después del descuento por volumen.</p>
-          <div class="cartBtns"><button class="secondary" onclick="showView('catalog')">Seguir comprando</button><button class="primary" onclick="placeOrder()">Enviar orden a Lewar</button></div>
+          <div class="cartBtns"><button class="secondary" onclick="showView('catalog')">Seguir comprando</button><button class="primary" id="sendOrderButton" onclick="placeOrder()">Enviar orden a Lewar</button></div>
         </div>
       </section>
 
@@ -348,7 +348,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
         <div class="sectionHead"><h2>Mis órdenes</h2></div>
         <div class="panel">
           <div class="orderFilters"><select><option>Todas las órdenes</option></select><input type="date"><input type="date"></div>
-          <div id="ordersWrap"></div>
+          <p id="ordersStatus" class="lead">El formato del PDF corresponde al diseño AR de Lewar. La orden no se contabiliza como factura.</p><div id="ordersWrap"></div>
         </div>
       </section>
 
@@ -807,17 +807,110 @@ function renderCart(){
  }
  document.getElementById("cartTotals").innerHTML='<div class="sumrow"><span>Subtotal</span><b>'+money(totals.subtotal)+'</b></div><div class="sumrow discount"><span>Descuento por volumen</span><b>'+(totals.discount?'-'+money(totals.discount):money(0))+'</b></div><div class="sumrow"><span>IVU (11.5 %)</span><b>'+money(totals.ivu)+'</b></div><div class="sumrow total"><span>Total con IVU</span><span>'+money(totals.total)+'</span></div>';
 }
-function placeOrder(){
- const entries=Object.entries(cart);if(!entries.length){alert("El carrito está vacío.");return}
- let totals;try{totals=calculateOrderTotals()}catch(e){alert(e.message);return}
- if(!confirm("Confirmar orden\n\nSubtotal: "+money(totals.subtotal)+"\nDescuento por volumen: -"+money(totals.discount)+"\nIVU (11.5 %): "+money(totals.ivu)+"\nTotal con IVU: "+money(totals.total)))return;
- const id="LW-"+new Date().getFullYear()+"-"+String(Math.floor(1000+Math.random()*8999));
- orders.unshift({id,date:new Date().toLocaleDateString("en-US"),status:"Procesando",...totals});
- localStorage.setItem("lewarOrders",JSON.stringify(orders));cart={};saveCart();updateCartBubble();renderCart();renderOrders();showView("orders");alert("Orden demo registrada como "+id+". No fue enviada a SAP ni a facturación.");
+
+let lewarOrderSending=false,lewarOrderSyncing=false;
+const LEWAR_ORDER_ENDPOINT='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/lewar-general-order';
+function lewarOrderSession(){
+ const token=sessionStorage.getItem('lewar-client-session-v1')||'';
+ const deviceId=localStorage.getItem('lewar-client-device-v1')||'';
+ if(!token||!deviceId)throw Error('Inicia sesión con tu PIN autorizado para enviar órdenes.');
+ return {sessionToken:token,deviceId};
+}
+async function lewarOrderApi(action,fields={}){
+ const res=await fetch(LEWAR_ORDER_ENDPOINT,{
+  method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({action,...fields,...lewarOrderSession()}),
+  cache:'no-store',signal:AbortSignal.timeout(45000)
+ });
+ const data=await res.json().catch(()=>({error:'El servidor no devolvió una respuesta válida.'}));
+ if(!res.ok||!data.ok)throw Error(data.error||'No se pudo procesar la orden.');
+ return data;
+}
+function lewarDownloadB64PDF(base64,filename){
+ const binary=atob(base64),bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ const href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+ const a=document.createElement('a');a.href=href;a.download=filename;
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(href),60000);
+}
+async function downloadOrderPdf(orderId){
+ if(currentKey!=='connected')return;
+ try{
+  const pdf=await lewarOrderApi('pdf',{orderId});
+  lewarDownloadB64PDF(pdf.pdfBase64,pdf.reference+'.pdf');
+ }catch(error){alert('No se pudo descargar el PDF: '+error.message);}
+}
+async function refreshServerOrders(){
+ if(currentKey!=='connected'||lewarOrderSyncing)return;
+ lewarOrderSyncing=true;
+ try{
+  const data=await lewarOrderApi('list');
+  if(currentKey!=='connected')return;
+  orders=data.orders.map(row=>({
+   id:row.reference,serverId:row.id,
+   date:new Date(row.createdAt).toLocaleDateString('es-PR',{timeZone:'America/Puerto_Rico'}),
+   status:row.emailStatus==='sent'?'Recibida · aviso enviado':'Registrada · aviso pendiente',
+   total:row.totalCents/100
+  }));
+  renderOrders();
+ }catch(error){
+  document.getElementById('ordersStatus').textContent='No se pudo actualizar el historial: '+error.message;
+ }finally{lewarOrderSyncing=false;}
+}
+async function placeOrder(){
+ if(currentKey!=='connected'){alert('Para enviar pedidos reales, entra con tu PIN autorizado. El acceso de demostración no envía órdenes.');return;}
+ if(lewarOrderSending)return;
+ const entries=Object.entries(cart);
+ if(!entries.length){alert('El carrito está vacío.');return;}
+ let totals;
+ try{totals=calculateOrderTotals();}catch(error){alert(error.message);return;}
+ const confirmation='CONFIRMAR SOLICITUD DE PEDIDO\n\nSubtotal: '+money(totals.subtotal)+
+   '\nDescuento: -'+money(totals.discount)+'\nIVU (11.5%): '+money(totals.ivu)+
+   '\nTOTAL: '+money(totals.total)+
+   '\n\nSe guardará como orden, no como AR Invoice emitida. Se notificará únicamente a Karla Solá.';
+ if(!confirm(confirmation))return;
+ const note=document.getElementById('orderNotes')?.value?.trim()||'';
+ const items=entries.map(([sku,quantity])=>({sku,quantity}));
+ const fingerprint=JSON.stringify({items,note});
+ let pending;
+ try{pending=JSON.parse(sessionStorage.getItem('lewar-order-pending')||'null')}catch{}
+ const requestKey=pending?.fingerprint===fingerprint&&pending?.key?pending.key:crypto.randomUUID();
+ sessionStorage.setItem('lewar-order-pending',JSON.stringify({fingerprint,key:requestKey}));
+ lewarOrderSending=true;
+ const button=document.getElementById('sendOrderButton');
+ if(button){button.disabled=true;button.textContent='Registrando pedido…';}
+ try{
+  const result=await lewarOrderApi('create',{requestKey,items,note});
+  if(!result.saved)throw Error('El pedido no pudo confirmarse.');
+  sessionStorage.removeItem('lewar-order-pending');
+  orders.unshift({id:result.reference,serverId:result.id,
+    date:new Date().toLocaleDateString('es-PR'),total:result.totalCents/100,
+    status:result.emailStatus==='sent'?'Recibida · aviso enviado':'Registrada · aviso pendiente'});
+  cart={};saveCart();updateCartBubble();renderCart();renderOrders();showView('orders');
+  if(result.pdfBase64){
+   lewarDownloadB64PDF(result.pdfBase64,result.reference+'.pdf');
+  }
+  const message=result.emailStatus==='sent'
+   ?'Orden '+result.reference+' registrada. El servicio de correo aceptó el aviso para ksola@lewardistributors.com. Se generó el PDF.'
+   :'Orden '+result.reference+' registrada. El correo a Karla está pendiente o falló; no se considera enviado. Puedes descargar el PDF desde Mis órdenes.';
+  alert(message);
+  refreshServerOrders();
+ }catch(error){
+  alert('No se confirmó el envío de esta orden: '+error.message+
+    '\n\nNo se borró el carrito. Reintentar conserva el mismo número de solicitud para evitar duplicados.');
+ }finally{
+  lewarOrderSending=false;
+  if(button){button.disabled=false;button.textContent='Enviar orden a Lewar';}
+ }
 }
 function statusClass(s){if(s==="Cancelada")return"cancelled";if(s==="En tránsito"||s==="Procesando")return"transit";return"ok"}
 function renderOrders(){
- document.getElementById("ordersWrap").innerHTML='<table class="orderTable"><thead><tr><th># Orden</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead><tbody>'+orders.map(o=>'<tr><td><b>'+esc(o.id)+'</b></td><td>'+esc(o.date)+'</td><td><span class="status '+statusClass(o.status)+'">'+esc(o.status)+'</span></td><td><b>'+money(o.total)+'</b></td><td><button class="pdfBtn" onclick="alert(\'PDF disponible al integrar el generador de órdenes.\')">Ver PDF</button></td></tr>').join("")+'</tbody></table>';
+ const wrap=document.getElementById('ordersWrap');
+ if(!orders.length){wrap.innerHTML='<div class="empty">Todavía no hay órdenes registradas para esta cuenta.</div>';return;}
+ wrap.innerHTML='<table class="orderTable"><thead><tr><th># Orden</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Documento</th></tr></thead><tbody>'+
+ orders.map(o=>'<tr><td><b>'+esc(o.id)+'</b></td><td>'+esc(o.date)+'</td><td><span class="status '+statusClass(o.status)+'">'+esc(o.status)+'</span></td><td><b>'+money(o.total)+'</b></td><td>'+
+ (o.serverId?'<button class="pdfBtn" data-order-id="'+esc(o.serverId)+'" onclick="downloadOrderPdf(this.dataset.orderId)">Descargar PDF</button>':'<span>Demostración</span>')+'</td></tr>').join('')+'</tbody></table>';
 }
 function toggleFav(sku){favorites=favorites.includes(sku)?favorites.filter(x=>x!==sku):[...favorites,sku];localStorage.setItem("lewarFav",JSON.stringify(favorites));renderDashboard();renderCatalog();renderFavorites()}
 function renderFavorites(){const arr=ALL_PRODUCTS.filter(p=>favorites.includes(p.sku));document.getElementById("favoritesGrid").innerHTML=arr.length?arr.map(productCard).join(""):'<div class="empty">Aún no has añadido productos a favoritos.</div>'}
@@ -934,7 +1027,7 @@ function showView(v,btn){
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
  if(v==="master")window.LewarMaster?.open();
  if(v==="inventory")renderInventory();
- if(v==="account")window.LewarAccount?.refresh();if(v==="catalog")renderCatalog();if(v==="cart")renderCart();if(v==="orders")renderOrders();if(v==="favorites")renderFavorites();if(v==="admin")renderAdmin();
+ if(v==="account")window.LewarAccount?.refresh();if(v==="orders"&&currentKey==="connected")refreshServerOrders();if(v==="catalog")renderCatalog();if(v==="cart")renderCart();if(v==="orders")renderOrders();if(v==="favorites")renderFavorites();if(v==="admin")renderAdmin();
  window.scrollTo({top:0,behavior:"smooth"});
 }
 function applyAccountDisplay(){
@@ -951,7 +1044,7 @@ function enterAccountPortal(name){
  portalAccountName=name;portalDisplayName=null;
  document.getElementById('catalogPilotNotice').hidden=false;
  CLIENTS.connected={user:'connected',name,level:'',term:'Consultar estado de cuenta',credit:0,balance:0,seller:'Equipo Lewar',factor:1};currentKey='connected';orders=[];
- document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');init();showView('account');
+ document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');init();showView('account');refreshServerOrders();
 }
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
