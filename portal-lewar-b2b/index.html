@@ -18,11 +18,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 /* LOGIN */
 .loginScreen{min-height:100vh;display:grid;grid-template-columns:minmax(330px,1.08fr) minmax(420px,.92fr);background:#071f38}
 .loginVisual{position:relative;min-height:100vh;padding:54px 58px;color:white;background:
- linear-gradient(90deg,rgba(2,17,32,.55),rgba(2,17,32,.42)),
- url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1800&q=82") center/cover no-repeat}
-.loginVisual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,15,28,.05),rgba(2,15,28,.55));pointer-events:none}
-.loginVisual>*{position:relative;z-index:1}.loginVisual .logo{font-size:48px;margin-top:78px}.loginVisual .logo small{font-size:17px;letter-spacing:3px}
-.loginVisual h1{font-size:28px;margin:30px 0 8px}.loginVisual p{font-size:18px;line-height:1.65;max-width:520px;color:#eef6ff}
+ linear-gradient(180deg,rgba(2,17,32,.02),rgba(2,17,32,.06)),
+ url("./assets/login-warehouse-brands.jpg") center/cover no-repeat}
+.loginVisual:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,15,28,.08),transparent 70%);pointer-events:none}
+.loginVisual>*{position:relative;z-index:1}
+.loginVisual>div{position:absolute;bottom:24px;left:24px;max-width:min(285px,calc(100% - 48px));padding:14px 18px;border-radius:12px;background:rgba(3,27,50,.82);box-shadow:0 8px 26px rgba(2,17,32,.20)}
+.loginVisual .logo{font-size:27px;margin-top:0}.loginVisual .logo small{font-size:10px;letter-spacing:2px}
+.loginVisual h1{font-size:20px;margin:15px 0 6px}.loginVisual p{font-size:12px;line-height:1.5;max-width:260px;color:#eef6ff}
 .loginDots{font-size:16px;letter-spacing:.8px}.loginCardWrap{background:#f6f8fb;display:grid;place-items:center;padding:36px}
 .loginCard{background:white;border:1px solid var(--line);width:min(460px,100%);padding:34px;border-radius:14px;box-shadow:0 18px 50px rgba(0,25,56,.16)}
 .loginCard h2{font-size:27px;margin:0 0 8px}.loginCard .sub{color:var(--muted);font-size:13px;margin-bottom:24px}.field{margin:16px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border:1px solid #cfd7e3;border-radius:8px;background:#f8fbff;outline:none}.field input:focus{border-color:#78aeea;box-shadow:0 0 0 3px #dbeeff}
@@ -166,6 +168,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 @media(max-width:620px){.adminPriceTools{grid-template-columns:1fr}.adminBulkBar{grid-template-columns:1fr}.adminPriceSummary{flex-wrap:wrap}.adminPriceSummary .primary{margin-left:0}}
 
 .masterGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}.masterCard{display:grid;gap:12px;align-content:start;padding:18px;background:#fff;border:1px solid var(--line);border-radius:10px}.masterPhotoControls{display:grid;gap:8px}.masterCard label{display:grid;gap:5px}.masterCard input,.masterCard select{min-height:40px;max-width:100%;padding:8px;border:1px solid var(--line);border-radius:5px}
+
+@media(max-width:820px){.loginVisual>div{display:none}.loginVisual{background-position:center center}}
 </style>
 <link rel="stylesheet" href="./account.css?v=20261102-1">
 </head>
