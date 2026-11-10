@@ -398,6 +398,19 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             <p class="lead">El nombre visible se usa en el Portal General. El correo queda en este panel.</p>
             <button class="primary" type="submit" disabled>Guardar cliente</button>
           </form>
+          <section id="masterPublishPanel" class="masterCard hidden" aria-labelledby="masterPublishTitle" style="grid-column:1/-1">
+            <h2 id="masterPublishTitle">Archivo Maestro · Revisar y publicar cambios</h2>
+            <p class="lead">Karla y los administradores autorizados pueden importar el Excel de Lewar. Solo se preparan cambios de <strong>precio general</strong> donde la columna «Estado precio» esté marcada APROBADO. Nada se publica hasta confirmar.</p>
+            <label for="masterExcelFile">Archivo Maestro de Lewar (.xlsx)</label>
+            <input id="masterExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <div style="display:flex;flex-wrap:wrap;gap:10px">
+              <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar archivo maestro</button>
+              <button id="masterExcelPublish" type="button" class="primary" disabled>Publicar cambios</button>
+            </div>
+            <p id="masterExcelStatus" class="accountStatus" role="status" aria-live="polite">Selecciona el archivo Excel actualizado por Karla.</p>
+            <div id="masterExcelPreview" class="accountTableScroll" hidden></div>
+            <p class="lead">Los cambios de impuestos, inventario y precios especiales por cliente todavía requieren validación independiente: este botón no los modifica. Solo se publican precios de modelos autorizados en el catálogo.</p>
+          </section>
         </div>
       </section>
       <section id="view-admin" class="hidden">
@@ -1049,7 +1062,7 @@ function enterAccountPortal(name){
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
 <script src="./account.js?v=20261110-login-refresh"></script>
-<script src="./master.js?v=20261110-login-refresh"></script>
+<script src="./master.js?v=20261110-master-publish"></script>
 </body>
 </html>
 
