@@ -15,6 +15,11 @@ export async function isMaster(rpc,actor){
   const [owner]=await read(rpc,'lewar_b2b_owner?id=eq.true&select=staff_id');
   return owner?.staff_id===actor.id;
 }
+export async function isCatalogSku(rpc,sku){
+  if(typeof sku!=='string'||!skuPattern.test(sku))return false;
+  const params=new URLSearchParams({sku:'eq.'+sku,visible:'eq.true',select:'sku',limit:'1'});
+  return (await read(rpc,'b2b_inventory?'+params)).length>0;
+}
 function photo(value){
   if(value===null)return null;
   if(typeof value!=='string'||value.length>2048)throw Error('photo');
@@ -42,8 +47,7 @@ export async function masterAction(rpc,json,access,body){
       saleCents!==null&&(!Number.isSafeInteger(saleCents)||saleCents<=0||saleCents>100000000))return json({error:'Revisa el modelo y el precio.'},400);
     let photo_url;
     try{photo_url=photo(photoUrl)}catch{return json({error:'Usa un enlace HTTPS válido para la foto.'},400)}
-    const params=new URLSearchParams({sku:'eq.'+sku,visible:'eq.true',select:'sku',limit:'1'});
-    if(!(await read(rpc,'b2b_inventory?'+params)).length)return json({error:'El modelo no está en el catálogo B2B.'},404);
+    if(!await isCatalogSku(rpc,sku))return json({error:'El modelo no está en el catálogo B2B.'},404);
     await save(rpc,products,{sku,sale_cents:saleCents,photo_url,...audit});
     return json({ok:true});
   }

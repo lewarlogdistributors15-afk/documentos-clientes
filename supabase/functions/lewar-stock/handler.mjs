@@ -1,4 +1,5 @@
 import {masterAction,portalCustomization} from './portal-master.mjs';
+import {replaceProductPhoto} from './product-photo.mjs';
 const PORTAL_ORIGIN = 'https://lewarlogdistributors15-afk.github.io';
 const MAX_ITEMS = 10000;
 const isoDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -43,7 +44,7 @@ function snapshot(row, internal) {
 export function makeStockHandler({url, serviceKey, request = fetch}) {
   return async req => {
     const origin = req.headers.get('Origin');
-    const cors = origin === PORTAL_ORIGIN ? {'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'content-type'} : {};
+    const cors = origin === PORTAL_ORIGIN ? {'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'authorization, content-type, x-lewar-photo-sku, x-lewar-device'} : {};
     const headers = {'Cache-Control':'private, no-store', 'Content-Type':'application/json', 'Vary':'Origin', ...cors};
     const json = (value, status=200) => new Response(JSON.stringify(value),{status,headers});
     if (origin && origin !== PORTAL_ORIGIN) return json({error:'Origen no permitido.'},403);
@@ -52,6 +53,8 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
     const key = req.headers.get('X-Lewar-Stock-Key');
     const service = {apikey:serviceKey,Authorization:'Bearer '+serviceKey,'Content-Type':'application/json'};
     const rpc = (path, init={}) => request(url+'/rest/v1/'+path,{...init,headers:{...service,...init.headers},redirect:'error',signal:AbortSignal.timeout(10000)});
+    const storage = (path,init) => request(url+'/storage/v1/'+path,{...init,headers:{...service,...init.headers},redirect:'error',signal:AbortSignal.timeout(20000)});
+    const photoSku=req.headers.get('X-Lewar-Photo-Sku');
     try {
       let actor;
       if (key !== null) {
@@ -61,9 +64,17 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         const [row] = await settings.json();
         if (!sameHash(await hash(key),row?.key_hash)) return json({error:'Acceso denegado.'},403);
       } else {
-        const raw = await req.text();
-        if (raw.length > 4096) return json({error:'Solicitud demasiado grande.'},413);
-        let body; try {body=JSON.parse(raw)} catch {return json({error:'Solicitud inválida.'},400)}
+        let body,sku;
+        if(photoSku!==null){
+          try{
+            sku=decodeURIComponent(photoSku);
+            body={sessionToken:/^Bearer (\S+)$/.exec(req.headers.get('Authorization')||'')?.[1],deviceId:decodeURIComponent(req.headers.get('X-Lewar-Device')||'')};
+          }catch{return json({error:'Solicitud inválida.'},400)}
+        }else{
+          const raw = await req.text();
+          if (raw.length > 4096) return json({error:'Solicitud demasiado grande.'},413);
+          try {body=JSON.parse(raw)} catch {return json({error:'Solicitud inválida.'},400)}
+        }
         if (!body || typeof body.sessionToken !== 'string' || !/^[A-Za-z0-9_-]{32,200}$/.test(body.sessionToken) ||
           typeof body.deviceId !== 'string' || !body.deviceId || body.deviceId.length > 1000) return json({error:'Entra con tu PIN autorizado.'},401);
         const auth = await rpc('rpc/portal_access_bootstrap',{method:'POST',body:JSON.stringify({p_session_token:body.sessionToken,p_device_id:body.deviceId,p_customer_id:null})});
@@ -71,6 +82,7 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         const access = await auth.json();
         if (!access.ok) return json({error:'Sesión inválida o vencida.'},401);
         if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role)) return json({error:'Acceso denegado.'},403);
+        if(photoSku!==null)return await replaceProductPhoto({req,sku,actor:access.actor,rpc,json,url,storage});
         if(body.action)return await masterAction(rpc,json,access,body);
         actor=access.actor;
       }
@@ -82,7 +94,7 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
       if(actor)Object.assign(data,await portalCustomization(rpc,actor).catch(()=>({})));
       return json(data);
     } catch {
-      return json({error:'No se pudo consultar el inventario de Lewar.'},503);
+      return json({error:photoSku!==null?'No se pudo guardar la foto. Intenta nuevamente.':'No se pudo consultar el inventario de Lewar.'},503);
     }
   };
 }

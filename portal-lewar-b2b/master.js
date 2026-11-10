@@ -1,13 +1,20 @@
 (() => {
   const byId=id=>document.getElementById(id);
   const productForm=byId('masterProductForm'), customerForm=byId('masterCustomerForm');
+  const photoInput=productForm.elements.photoFile, uploadButton=byId('masterPhotoUpload'), preview=byId('masterPhotoPreview');
+  const photoTypes=['image/jpeg','image/png','image/webp'];
+  const photoLimit=5*1024*1024;
+  let previewUrl='';
   let data=null, sequence=0, pending=false;
   const report=(message,error=false)=>{
     byId('masterStatus').textContent=message;
     byId('masterStatus').classList.toggle('accountError',error);
   };
   function buttons(){
-    productForm.querySelector('button').disabled=pending||!data||!productForm.elements.sku.value;
+    const noProduct=pending||!data||!productForm.elements.sku.value;
+    productForm.querySelector('button[type="submit"]').disabled=noProduct;
+    photoInput.disabled=noProduct;
+    uploadButton.disabled=noProduct||!photoInput.files.length;
     customerForm.querySelector('button').disabled=pending||!data||!customerForm.elements.customer.value;
   }
   function options(select,items){
@@ -21,7 +28,18 @@
     productForm.elements.price.value=row?.sale_cents==null?'':(row.sale_cents/100).toFixed(2);
     productForm.elements.price.placeholder=sku&&sapSaleBySku.has(sku)?(sapSaleBySku.get(sku)/100).toFixed(2):'Precio SAP por confirmar';
     productForm.elements.photo.value=row?.photo_url??'';
+    photoInput.value='';
+    const product=ALL_PRODUCTS.find(product=>stockSku(product.sku)===sku);
+    showPreview(row?.photo_url||(product&&productImageSources(product)[0]));
     buttons();
+  }
+  function showPreview(src,file){
+    if(previewUrl)URL.revokeObjectURL(previewUrl);
+    previewUrl=file?URL.createObjectURL(file):'';
+    const source=previewUrl||src;
+    preview.hidden=!source;
+    if(source)preview.src=source;
+    else preview.removeAttribute('src');
   }
   function fillCustomer(){
     const id=customerForm.elements.customer.value;
@@ -60,6 +78,34 @@
   }
   productForm.elements.sku.addEventListener('change',fillProduct);
   customerForm.elements.customer.addEventListener('change',fillCustomer);
+  photoInput.addEventListener('change',()=>{
+    const file=photoInput.files[0];
+    if(file&&(!photoTypes.includes(file.type)||!file.size||file.size>photoLimit)){
+      photoInput.value='';
+      report('Selecciona una foto JPG, PNG o WebP de hasta 5 MB.',true);
+    }
+    const product=ALL_PRODUCTS.find(product=>stockSku(product.sku)===productForm.elements.sku.value);
+    showPreview(productForm.elements.photo.value||(product&&productImageSources(product)[0]),photoInput.files[0]);
+    buttons();
+  });
+  uploadButton.addEventListener('click',async()=>{
+    const sku=productForm.elements.sku.value,file=photoInput.files[0];
+    if(!data||pending||!sku||!file)return;
+    pending=true;buttons();report('Subiendo la foto…');
+    try{
+      const {photoUrl}=await window.LewarAccount.uploadProductPhoto(sku,file);
+      const previous=data?.products.find(row=>row.sku===sku);
+      if(previous)previous.photo_url=photoUrl;
+      else data?.products.push({sku,photo_url:photoUrl});
+      if(productForm.elements.sku.value===sku){
+        productForm.elements.photo.value=photoUrl;
+        photoInput.value='';
+        showPreview(photoUrl);
+      }
+      report('Foto sustituida en el Portal General.');
+    }catch(error){report(error.message,true)}
+    finally{pending=false;buttons()}
+  });
   productForm.addEventListener('submit',event=>{
     event.preventDefault();
     const {sku,price,photo}=productForm.elements;

@@ -107,3 +107,42 @@ test('only the registered master can save product and client changes',async()=>{
   assert.equal(writes[1].customer_id,customer);
   assert.ok(writes.every(row=>row.updated_by===owner));
 });
+test('photo upload checks the owner and image, then publishes only the photo field',async()=>{
+  const stored=[],changes=[];
+  const originUrl='https://aznoakixjklsxuwuyshw.supabase.co';
+  const handler=makeStockHandler({url:originUrl,serviceKey:'fixture',
+    request:async(url,init)=>{
+      if(url.includes('portal_access_bootstrap')){
+        const session=JSON.parse(init.body).p_session_token[0];
+        return Response.json({ok:true,actor:{type:'staff',role:'admin',id:session==='a'?'owner':'other-admin'}});
+      }
+      if(url.includes('lewar_b2b_owner'))return Response.json([{staff_id:'owner'}]);
+      if(url.includes('b2b_inventory'))return Response.json([{sku:'MODEL-1'}]);
+      if(url.includes('/storage/')){
+        stored.push({url,mime:init.headers['Content-Type'],bytes:init.body});
+        return new Response(null,{status:201});
+      }
+      if(url.includes('lewar_b2b_set_product_photo')){
+        changes.push(JSON.parse(init.body));
+        return Response.json(true);
+      }
+      throw Error('Unexpected request');
+    }});
+  const png=new Uint8Array([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,0x00]);
+  const send=(session,body=png,overrides={})=>handler(new Request('https://stock.example/',{method:'POST',
+    headers:{Origin:origin,Authorization:'Bearer '+session.repeat(32),'X-Lewar-Photo-Sku':'MODEL-1',
+      'X-Lewar-Device':encodeURIComponent('device browser'),'Content-Type':'image/png',...overrides},body}));
+  assert.equal((await send('b')).status,403);
+  assert.equal((await send('a',png,{'Content-Type':'image/svg+xml'})).status,415);
+  assert.equal((await send('a',new Uint8Array([1,2,3]))).status,415);
+  assert.equal((await send('a',png,{'Content-Length':String(5*1024*1024+1)})).status,413);
+  assert.equal((await send('a',new Uint8Array(5*1024*1024+1))).status,413);
+  assert.equal(stored.length,0);
+  const res=await send('a');
+  assert.equal(res.status,200);
+  const {photoUrl}=await res.json();
+  assert.equal(stored[0].mime,'image/png');
+  assert.deepEqual(stored[0].bytes,png);
+  assert.match(photoUrl,/\/object\/public\/lewar-b2b-product-photos\/[a-f0-9-]+\.png$/);
+  assert.deepEqual(changes,[{p_sku:'MODEL-1',p_photo_url:photoUrl,p_staff_id:'owner'}]);
+});

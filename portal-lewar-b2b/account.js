@@ -105,7 +105,18 @@
     if(action!=='masterRead')await refreshStock();
     return result;
   }
-  window.LewarAccount={login,refresh,logout,master,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
+  async function uploadProductPhoto(sku,file) {
+    if(!token)throw Error('Entra con tu PIN autorizado.');
+    const currentToken=token;
+    const response=await fetch(URL+'/functions/v1/lewar-stock',{method:'POST',headers:{'Content-Type':file.type,
+      'Authorization':'Bearer '+currentToken,'X-Lewar-Photo-Sku':encodeURIComponent(sku),'X-Lewar-Device':encodeURIComponent(device())},
+      body:file,cache:'no-store',signal:AbortSignal.timeout(45000)});
+    const result=await response.json();
+    if(!response.ok||!result.ok||token!==currentToken)throw Error(result.error||'No se pudo sustituir la foto.');
+    await refreshStock();
+    return result;
+  }
+  window.LewarAccount={login,refresh,logout,master,uploadProductPhoto,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
   el('accountPin').addEventListener('keydown',e=>{if(e.key==='Enter')login()});el('portalPin').addEventListener('keydown',e=>{if(e.key==='Enter')login('portalPin')});
   function refreshVisible(){if(visible())refresh();refreshStock();}
   window.addEventListener('focus',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);setInterval(refreshVisible,60000);
