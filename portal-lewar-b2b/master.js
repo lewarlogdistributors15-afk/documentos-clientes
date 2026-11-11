@@ -169,9 +169,18 @@
     excelStatus.classList.toggle('accountError',failed);
   }
   function authInput(){
-    const sessionToken=sessionStorage.getItem('lewar-client-session-v1')||'';
-    const deviceId=localStorage.getItem('lewar-client-device-v1')||'';
-    if(!sessionToken||!deviceId)throw Error('Entra nuevamente con tu PIN antes de revisar el archivo.');
+    // Reuse the same storage fallbacks as the PIN login in account.js.
+    const sessionKey='lewar-client-session-v1';
+    const deviceKey='lewar-client-device-v1';
+    const cookieValue=key=>{
+      const encoded=encodeURIComponent(key)+'=';
+      const entry=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith(encoded));
+      return entry?decodeURIComponent(entry.slice(encoded.length)):'';
+    };
+    const sessionToken=sessionStorage.getItem(sessionKey)||localStorage.getItem(sessionKey)||cookieValue(sessionKey);
+    const deviceId=localStorage.getItem(deviceKey)||sessionStorage.getItem(deviceKey)||cookieValue(deviceKey);
+    if(!sessionToken||!deviceId)
+      throw Error('La sesión de Karla no está disponible en esta pestaña. Cierra sesión y entra nuevamente con su PIN.');
     return {sessionToken,deviceId};
   }
   async function excelRpc(payload){
@@ -180,7 +189,12 @@
       cache:'no-store',signal:AbortSignal.timeout(65000)
     });
     const body=await response.json().catch(()=>({error:'No se recibió una respuesta válida.'}));
-    if(!response.ok||!body.ok)throw Error(body.error||'No se pudo completar la solicitud.');
+    if(!response.ok||!body.ok){
+      if(response.status===401||response.status===403){
+        throw Error('El servidor rechazó la sesión de esta pestaña. Cierra sesión y vuelve a ingresar con el PIN de Karla. Si tienes varias pestañas abiertas, utiliza la que tenga el inicio de sesión más reciente.');
+      }
+      throw Error(body.error||'No se pudo completar la solicitud.');
+    }
     return body;
   }
   function renderExcelPreview(){
