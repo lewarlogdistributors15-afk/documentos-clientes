@@ -133,6 +133,7 @@
   // Archivo Maestro: importación, comparación y publicación explícita de precios generales.
   const excelFile=byId('masterExcelFile');
   const reviewBtn=byId('masterExcelReview');
+  const driveDraftBtn=byId('masterDriveDraftRefresh');
   const publishBtn=byId('masterExcelPublish');
   const excelStatus=byId('masterExcelStatus');
   const excelPreview=byId('masterExcelPreview');
@@ -143,6 +144,7 @@
   const moneyValue=cents=>cents==null?'Sin precio':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
   function excelButtons(){
     reviewBtn.disabled=!canPublish()||importPending||!excelFile.files.length;
+    driveDraftBtn.disabled=!canPublish()||importPending;
     publishBtn.disabled=!canPublish()||importPending||!activeBatch||reviewChanges.length===0;
   }
   function excelMessage(message,failed=false){
@@ -194,6 +196,42 @@
       (reviewWarnings.length>12?' · y '+(reviewWarnings.length-12)+' más':'')+'</p>';
     excelPreview.innerHTML=markup;
   }
+  async function loadDriveDraft(){
+    if(!canPublish()||importPending)return;
+    importPending=true;excelButtons();
+    excelMessage('Consultando los borradores automáticos de Google Sheets…');
+    try{
+      const result=await excelRpc({action:'driveDraft'});
+      if(!canPublish())return;
+      const draft=result.draft;
+      if(draft&&Array.isArray(draft.changes)&&draft.changes.length>0){
+        activeBatch=draft.id;
+        reviewChanges=draft.changes;
+        reviewWarnings=Array.isArray(draft.warnings)?draft.warnings:[];
+        activeMode='karla_promotions';
+        validThrough=draft.valid_through;
+        excelFile.value='';
+        excelMessage('Borrador automático detectado: '+reviewChanges.length+' precios pendientes de aprobación · '+
+          reviewWarnings.length+' alertas · vigencia hasta '+validThrough+
+          '. Revisa la tabla y presiona «Publicar cambios aprobados» solamente si estás de acuerdo.');
+      }else{
+        activeBatch=null;reviewChanges=[];reviewWarnings=[];
+        activeMode='karla_promotions';validThrough=null;
+        const checked=result.lastChecked?new Date(result.lastChecked).toLocaleString('es-PR',{
+          timeZone:'America/Puerto_Rico',dateStyle:'short',timeStyle:'short'}):'sin revisión registrada';
+        excelMessage('No hay cambios nuevos pendientes de aprobación. Última revisión: '+checked+
+          '. La hoja se revisa automáticamente cada hora.');
+      }
+      renderExcelPreview();
+    }catch(error){
+      activeBatch=null;reviewChanges=[];reviewWarnings=[];validThrough=null;
+      excelMessage('No se pudieron consultar los borradores: '+error.message,true);
+      renderExcelPreview();
+    }finally{
+      importPending=false;excelButtons();
+    }
+  }
+  driveDraftBtn.addEventListener('click',loadDriveDraft);
   excelFile.addEventListener('change',()=>{
     activeBatch=null;reviewChanges=[];reviewWarnings=[];activeMode='master';validThrough=null;
     excelMessage('Archivo seleccionado. Presiona «Revisar tabla de Karla» antes de publicar.');
@@ -258,7 +296,7 @@
   });
   function setPublishPermission(){
     byId('masterPublishPanel').classList.toggle('hidden',!canPublish());
-    if(!canPublish()){activeBatch=null;reviewChanges=[];reviewWarnings=[];renderExcelPreview();}
+    if(!canPublish()){activeBatch=null;reviewChanges=[];reviewWarnings=[];validThrough=null;renderExcelPreview();}
     excelButtons();
   }
 
@@ -329,6 +367,7 @@
   async function openCombined(){
     await open();
     if(mayViewOrders())loadOrders();
+    if(canPublish()&&!importPending)loadDriveDraft();
   }
   window.LewarMaster={open:openCombined,permissions:combinedPermissions};
 })();
