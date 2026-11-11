@@ -167,7 +167,36 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 @media(max-width:980px){.adminPriceTools{grid-template-columns:1fr 1fr}.adminBulkBar{grid-template-columns:1fr 1fr}.adminBulkBar div{grid-column:1/-1}}
 @media(max-width:620px){.adminPriceTools{grid-template-columns:1fr}.adminBulkBar{grid-template-columns:1fr}.adminPriceSummary{flex-wrap:wrap}.adminPriceSummary .primary{margin-left:0}}
 
-.masterGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}.masterCard{display:grid;gap:12px;align-content:start;padding:18px;background:#fff;border:1px solid var(--line);border-radius:10px}.masterPhotoControls{display:grid;gap:8px}.masterCard label{display:grid;gap:5px}.masterCard input,.masterCard select{min-height:40px;max-width:100%;padding:8px;border:1px solid var(--line);border-radius:5px}
+/* Panel maestro: dos columnas reales, sin pistas fantasma creadas por auto-fit
+   al coexistir tarjetas de ancho completo para órdenes y publicación. */
+.masterGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:18px;
+  width:100%;
+  min-width:0
+}
+.masterGrid>.masterCard{min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+.masterCard{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;align-content:start;min-width:0;
+  padding:18px;background:#fff;border:1px solid var(--line);border-radius:10px
+}
+.masterCard h2{margin:0 0 8px;min-width:0;font-size:clamp(17px,1.7vw,21px);line-height:1.3;overflow-wrap:break-word}
+.masterPhotoControls{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0;width:100%}
+.masterCard label{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;min-width:0;width:100%;white-space:normal}
+.masterCard input:not([type="checkbox"]),.masterCard select,.masterCard textarea{
+  display:block;box-sizing:border-box;
+  min-width:0;width:100%;max-width:100%;min-height:40px;
+  padding:8px 10px;border:1px solid var(--line);border-radius:6px
+}
+.masterCard button{box-sizing:border-box;max-width:100%;min-width:0}
+.masterCard p{min-width:0;max-width:100%;overflow-wrap:break-word}
+.masterGrid>section.masterCard{grid-column:1/-1;min-width:0;width:100%}
+@media(max-width:1160px){.masterGrid{grid-template-columns:minmax(0,1fr)}.masterGrid>section.masterCard{grid-column:1/-1}}
+@media(max-width:520px){.masterCard{padding:14px}.masterGrid{gap:12px}}
 
 @media(max-width:820px){.loginVisual>div{display:none}.loginVisual{background-position:center center}}
 
