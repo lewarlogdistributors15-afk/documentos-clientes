@@ -137,15 +137,32 @@
   const publishBtn=byId('masterExcelPublish');
   const excelStatus=byId('masterExcelStatus');
   const excelPreview=byId('masterExcelPreview');
+  const bridgeIndicator=byId('masterBridgeIndicator');
+  const bridgeSetup=byId('masterBridgeSetup');
+  const bridgeInstructions=byId('masterBridgeInstructions');
+  const bridgeToken=byId('masterBridgeToken');
+  const bridgeUrl=byId('masterBridgeUrl');
+  const bridgeGenerate=byId('masterBridgeGenerate');
+  const bridgeCopy=byId('masterBridgeCopy');
+  const bridgeConnect=byId('masterBridgeConnect');
+  const bridgeStatus=byId('masterBridgeStatus');
   const endpoint='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/lewar-master-publicar';
   let activeBatch=null,reviewChanges=[],reviewWarnings=[],importPending=false,activeMode='master',validThrough=null;
   const canPublish=()=>['owner','admin'].includes(role);
+  const canConfigure=()=>role==='owner';
+  const scriptUrlPattern=/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]{20,200}\/exec$/;
+  const bridgeSecretPattern=/^[a-f0-9]{64}$/;
   const safe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   const moneyValue=cents=>cents==null?'Sin precio':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
   function excelButtons(){
     reviewBtn.disabled=!canPublish()||importPending||!excelFile.files.length;
     driveDraftBtn.disabled=!canPublish()||importPending;
     publishBtn.disabled=!canPublish()||importPending||!activeBatch||reviewChanges.length===0;
+    bridgeGenerate.disabled=!canConfigure()||importPending;
+    bridgeCopy.disabled=!canConfigure()||!bridgeSecretPattern.test(bridgeToken.value);
+    bridgeConnect.disabled=!canConfigure()||importPending||
+      !scriptUrlPattern.test(bridgeUrl.value.trim())||
+      !bridgeSecretPattern.test(bridgeToken.value);
   }
   function excelMessage(message,failed=false){
     excelStatus.textContent=message;
@@ -160,7 +177,7 @@
   async function excelRpc(payload){
     const response=await fetch(endpoint,{
       method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,...authInput()}),
-      cache:'no-store',signal:AbortSignal.timeout(45000)
+      cache:'no-store',signal:AbortSignal.timeout(65000)
     });
     const body=await response.json().catch(()=>({error:'No se recibió una respuesta válida.'}));
     if(!response.ok||!body.ok)throw Error(body.error||'No se pudo completar la solicitud.');
@@ -196,12 +213,35 @@
       (reviewWarnings.length>12?' · y '+(reviewWarnings.length-12)+' más':'')+'</p>';
     excelPreview.innerHTML=markup;
   }
-  async function loadDriveDraft(){
+  function shortDate(iso){
+    if(!iso)return 'sin revisión registrada';
+    const date=new Date(iso);
+    return Number.isNaN(date.valueOf())?'desconocida':date.toLocaleString('es-PR',{
+      timeZone:'America/Puerto_Rico',dateStyle:'short',timeStyle:'short'});
+  }
+  async function checkLiveConnection(){
+    if(!canPublish())return;
+    try{
+      const result=await excelRpc({action:'bridgeStatus'});
+      if(!canPublish())return;
+      bridgeIndicator.textContent=result.configured?
+        'Conexión privada de Google Sheets configurada. Presiona «Verificar Google Sheets ahora» para consultar precios y generar borradores inmediatamente.':
+        'La lectura directa de Google Sheets todavía requiere una autorización inicial de la cuenta maestra. La consulta de borradores anteriores sigue disponible.';
+      bridgeStatus.textContent=result.configured?
+        'Conexión activa. Si necesitas cambiarla, usa una clave nueva y vuelve a vincular el Apps Script.':
+        'Pendiente: crea y despliega el puente seguro una sola vez para habilitar la consulta directa.';
+      if(!result.configured&&canConfigure())bridgeInstructions.open=true;
+    }catch(error){
+      bridgeIndicator.textContent='No se pudo verificar el estado de la conexión con Google Sheets: '+error.message;
+    }
+  }
+  async function loadDriveDraft(verifyNow=false){
     if(!canPublish()||importPending)return;
     importPending=true;excelButtons();
-    excelMessage('Consultando los borradores automáticos de Google Sheets…');
+    excelMessage(verifyNow?'Leyendo Google Sheets y comparando los precios actuales…':
+      'Consultando los borradores guardados de Google Sheets…');
     try{
-      const result=await excelRpc({action:'driveDraft'});
+      const result=await excelRpc({action:verifyNow?'refreshNow':'driveDraft'});
       if(!canPublish())return;
       const draft=result.draft;
       if(draft&&Array.isArray(draft.changes)&&draft.changes.length>0){
@@ -211,27 +251,72 @@
         activeMode='karla_promotions';
         validThrough=draft.valid_through;
         excelFile.value='';
-        excelMessage('Borrador automático detectado: '+reviewChanges.length+' precios pendientes de aprobación · '+
-          reviewWarnings.length+' alertas · vigencia hasta '+validThrough+
-          '. Revisa la tabla y presiona «Publicar cambios aprobados» solamente si estás de acuerdo.');
+        excelMessage((verifyNow?'Revisión directa terminada · ':'Borrador de última revisión · ')+
+          reviewChanges.length+' precio(s) pendientes de aprobación · '+
+          reviewWarnings.length+' observaciones · vigencia hasta '+validThrough+
+          ' · comprobado '+shortDate(result.lastChecked)+
+          '. Revisa los importes antes de presionar «Publicar cambios aprobados».');
       }else{
         activeBatch=null;reviewChanges=[];reviewWarnings=[];
         activeMode='karla_promotions';validThrough=null;
-        const checked=result.lastChecked?new Date(result.lastChecked).toLocaleString('es-PR',{
-          timeZone:'America/Puerto_Rico',dateStyle:'short',timeStyle:'short'}):'sin revisión registrada';
-        excelMessage('No hay cambios nuevos pendientes de aprobación. Última revisión: '+checked+
-          '. La hoja se revisa automáticamente cada hora.');
+        excelMessage((verifyNow?'Revisión directa terminada. ':'')+
+          'No hay cambios pendientes para los modelos autorizados en «Precios Especiales Clientes Lew». '+
+          (verifyNow?String(result.checkedRows||0)+' modelos revisados. ':'')+
+          (verifyNow&&result.warningsCount?' '+result.warningsCount+' observaciones requieren revisión.':'')+
+          ' Última revisión: '+shortDate(result.lastChecked)+'.');
       }
       renderExcelPreview();
     }catch(error){
       activeBatch=null;reviewChanges=[];reviewWarnings=[];validThrough=null;
-      excelMessage('No se pudieron consultar los borradores: '+error.message,true);
+      excelMessage((verifyNow?'No se pudo realizar una revisión nueva: ':'No se pudieron consultar los borradores: ')+
+        error.message,true);
+      if(verifyNow&&canConfigure()&&/conexión|vincul|Apps Script/i.test(error.message)){
+        bridgeInstructions.open=true;
+        bridgeIndicator.textContent='Conexión directa pendiente. Completa la configuración única indicada abajo.';
+      }
       renderExcelPreview();
     }finally{
       importPending=false;excelButtons();
     }
   }
-  driveDraftBtn.addEventListener('click',loadDriveDraft);
+  driveDraftBtn.addEventListener('click',()=>loadDriveDraft(true));
+  bridgeGenerate.addEventListener('click',()=>{
+    if(!canConfigure()||importPending)return;
+    const bytes=crypto.getRandomValues(new Uint8Array(32));
+    bridgeToken.value=[...bytes].map(v=>v.toString(16).padStart(2,'0')).join('');
+    bridgeStatus.textContent='Clave segura generada. Cópiala en las propiedades del Google Apps Script antes de vincularlo.';
+    excelButtons();
+  });
+  bridgeCopy.addEventListener('click',async()=>{
+    if(!canConfigure()||!bridgeSecretPattern.test(bridgeToken.value))return;
+    try{
+      await navigator.clipboard.writeText(bridgeToken.value);
+      bridgeStatus.textContent='Clave copiada. Pégala en LEWAR_KARLA_SYNC_TOKEN dentro de Apps Script.';
+    }catch{
+      bridgeToken.type='text';
+      bridgeToken.select();
+      bridgeStatus.textContent='El navegador no permitió copiar. Copia el texto seleccionado y vuelve a ocultarlo después.';
+    }
+  });
+  bridgeUrl.addEventListener('input',excelButtons);
+  bridgeConnect.addEventListener('click',async()=>{
+    if(!canConfigure()||importPending||bridgeConnect.disabled)return;
+    importPending=true;excelButtons();
+    bridgeStatus.textContent='Validando el acceso al Google Sheet privado…';
+    try{
+      const result=await excelRpc({action:'configureBridge',
+        scriptUrl:bridgeUrl.value.trim(),bridgeSecret:bridgeToken.value});
+      if(!result.configured)throw Error('La conexión no pudo confirmarse.');
+      bridgeToken.value='';bridgeToken.type='password';
+      bridgeUrl.value='';bridgeInstructions.open=false;
+      bridgeStatus.textContent='Conexión privada configurada correctamente.';
+      await checkLiveConnection();
+    }catch(error){
+      bridgeStatus.textContent='No se pudo vincular la hoja: '+error.message+
+        '. Verifica la clave, la URL /exec y los permisos de despliegue del Apps Script.';
+    }finally{importPending=false;excelButtons();}
+    if(canPublish()&&!bridgeInstructions.open)loadDriveDraft(true);
+  });
   excelFile.addEventListener('change',()=>{
     activeBatch=null;reviewChanges=[];reviewWarnings=[];activeMode='master';validThrough=null;
     excelMessage('Archivo seleccionado. Presiona «Revisar tabla de Karla» antes de publicar.');
@@ -296,7 +381,12 @@
   });
   function setPublishPermission(){
     byId('masterPublishPanel').classList.toggle('hidden',!canPublish());
-    if(!canPublish()){activeBatch=null;reviewChanges=[];reviewWarnings=[];validThrough=null;renderExcelPreview();}
+    bridgeSetup.classList.toggle('hidden',!canConfigure());
+    if(!canPublish()){
+      activeBatch=null;reviewChanges=[];reviewWarnings=[];validThrough=null;
+      bridgeToken.value='';bridgeToken.type='password';bridgeUrl.value='';
+      renderExcelPreview();
+    }
     excelButtons();
   }
 
@@ -367,7 +457,10 @@
   async function openCombined(){
     await open();
     if(mayViewOrders())loadOrders();
-    if(canPublish()&&!importPending)loadDriveDraft();
+    if(canPublish()&&!importPending){
+      checkLiveConnection();
+      loadDriveDraft(false);
+    }
   }
   window.LewarMaster={open:openCombined,permissions:combinedPermissions};
 })();
