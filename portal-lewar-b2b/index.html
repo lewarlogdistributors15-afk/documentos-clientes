@@ -430,25 +430,27 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   <p id="masterOrdersStatus" class="lead" role="status" aria-live="polite">Actualiza para consultar las órdenes.</p>
   <div id="masterOrdersList" style="overflow-x:auto"></div>
 </section>
-<section id="masterPublishPanel" class="masterCard hidden' aria-labelledby="masterPublishTitle" style="grid-column:1/-1">
-            <h2 id="masterPublishTitle">Archivo Maestro · Revisar y publicar cambios</h2>
-            <p class="lead">Karla y los administradores autorizados pueden importar el Excel de Lewar. Solo se preparan cambios de <strong>precio general</strong> donde la columna «Estado precio» esté marcada APROBADO. Nada se publica hasta confirmar.</p>
-            <label for="masterExcelFile">Archivo Maestro de Lewar (.xlsx)</label>
+<section id="masterPublishPanel" class="masterCard hidden" aria-labelledby="masterPublishTitle" style="grid-column:1/-1">
+            <h2 id="masterPublishTitle">Tabla de Karla · Revisar y publicar precios</h2>
+            <p class="lead">Este panel acepta directamente el archivo original de Karla, conservando sus 20 pestañas. Revisa la hoja <strong>«Precios Especiales Clientes Lew»</strong>: columna K (1–2 unidades), columna L (3 o más) y fecha de vigencia. Las hojas de costos y el inventario interno <strong>no se publican</strong>.</p>
+            <p><a href="https://docs.google.com/spreadsheets/d/1FXNyHZ1mWHHhWWrDbV0Vo9ClY6MCBfk5/edit" target="_blank" rel="noopener" style="font-weight:700">Abrir la tabla original de Karla en Drive</a></p>
+            <p class="lead">Después de editarla en Drive, usa Archivo → Descargar → Microsoft Excel (.xlsx), selecciónala aquí y revisa los cambios antes de publicarlos. No se crea ni mantiene un segundo archivo maestro.</p>
+            <label for="masterExcelFile">Excel de Karla actualizado (.xlsx)</label>
             <input id="masterExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
             <div style="display:flex;flex-wrap:wrap;gap:10px">
-              <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar archivo maestro</button>
+              <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar tabla de Karla</button>
               <button id="masterExcelPublish" type="button" class="primary" disabled>Publicar cambios</button>
             </div>
             <p id="masterExcelStatus" class="accountStatus" role="status" aria-live="polite">Selecciona el archivo Excel actualizado por Karla.</p>
             <div id="masterExcelPreview" class="accountTableScroll" hidden></div>
-            <p class="lead">Los cambios de impuestos, inventario y precios especiales por cliente todavía requieren validación independiente: este botón no los modifica. Solo se publican precios de modelos autorizados en el catálogo.</p>
+            <p class="lead">Solo se publican precios autorizados del catálogo B2B. Las promociones expiran en la fecha que aparece en el Excel y el volumen aplica desde 3 unidades del mismo modelo. Los precios especiales individuales, impuestos, inventario y costos siguen protegidos y requieren validación independiente.</p>
           </section>
         </div>
       </section>
       <section id="view-admin" class="hidden">
         <div class="adminIntro">
           <div><h1>Precios por cliente</h1><div class="lead" style="margin:4px 0 0">Editor rápido para revisar y preparar cambios. La base maestra oficial permanece en Google Drive.</div></div>
-          <a class="primary" style="text-decoration:none" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1K-B6GbBeh0Ng-gXOhuzoRVNTETXBPn0MfQedX8ldgus/edit#gid=2070203600">Abrir base maestra ↗</a>
+          <a class="primary" style="text-decoration:none" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1FXNyHZ1mWHHhWWrDbV0Vo9ClY6MCBfk5/edit">Abrir tabla de Karla ↗</a>
         </div>
         <div class="adminLayout">
           <div class="adminSide">
@@ -1143,7 +1145,7 @@ function enterAccountPortal(name){
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
 <script src="./account.js?v=20261111-stock-privacy"></script>
-<script src="./master.js?v=20261111-orders-aging"></script>
+<script src="./master.js?v=20261111-karla-workbook"></script>
 </body>
 </html>
 
