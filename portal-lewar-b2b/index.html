@@ -557,25 +557,38 @@ function clientPrice(p,key=currentKey){
   if(overrides[key]&&overrides[key][p.sku]!=null&&overrides[key][p.sku]!=="") return Number(overrides[key][p.sku]);
   const b=basePrice(p); if(!b)return 0; if(key==="admin")return b; return Math.max(1,Math.round(b*CLIENTS[key].factor));
 }
-let stockBySku=new Map(),sapSaleBySku=new Map(),masterPhotos=new Map(),portalStockOverrides=new Map(),stockCutoff=null,stockOnHand=false,portalMaster=false,portalManagement=null,portalDisplayName=null,portalAccountName='',inventoryItems=[];
+let stockBySku=new Map(),sapSaleBySku=new Map(),masterPhotos=new Map(),portalStockOverrides=new Map(),stockCutoff=null,stockOnHand=false,customerStockMode=false,portalMaster=false,portalManagement=null,portalDisplayName=null,portalAccountName='',inventoryItems=[];
 const stockSku=sku=>String(sku).trim().toUpperCase();
-function availableOverride(sku){return currentKey==='connected'?portalStockOverrides.get(stockSku(sku)):undefined;}
+function availableOverride(sku){return currentKey==='connected'&&!customerStockMode?portalStockOverrides.get(stockSku(sku)):undefined;}
+function customerAvailability(sku){return customerStockMode?stockBySku.get(stockSku(sku)):undefined;}
 function stockText(sku){
+  if(customerStockMode){
+    const state=customerAvailability(sku);
+    return state==='low'?'Quedan pocas unidades':state==='out'?'Agotado':state==='available'?'Disponible':'Disponibilidad por confirmar';
+  }
   const managed=availableOverride(sku);
   if(managed!==undefined)return managed===0?'Agotado':'Disponible: '+managed+' unidades';
   const quantity=stockBySku.get(stockSku(sku));
   return quantity===undefined?'Disponibilidad por confirmar':stockOnHand?'Existencia SAP: '+quantity+' · por confirmar':quantity===0?'Agotado al corte':'Disponible: '+quantity+' unidades';
 }
-function stockTitle(sku){return availableOverride(sku)!==undefined?'Disponibilidad actualizada en el Portal General':stockCutoff?'Existencias verificadas al '+stockCutoff:'Pendiente de confirmación de Lewar';}
+function stockTitle(sku){
+  if(customerStockMode)return stockCutoff?'Disponibilidad orientativa al '+stockCutoff+'; sujeta a confirmación.':'Disponibilidad por confirmar.';
+  return availableOverride(sku)!==undefined?'Disponibilidad actualizada en el Portal General':stockCutoff?'Existencias registradas al '+stockCutoff:'Pendiente de confirmación de Lewar';
+}
 window.setPortalStock=function(snapshot){
   stockCutoff=snapshot?.asOf||null;
   stockOnHand=snapshot?.schema===2;
-  stockBySku=new Map(stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.map(row=>[stockSku(row.sku),stockOnHand?row.onHand:row.available]):[]);
-  inventoryItems=stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.filter(item=>typeof item.sku==='string'&&Number.isSafeInteger(stockOnHand?item.onHand:item.available)).map(item=>({sku:stockSku(item.sku),quantity:stockOnHand?item.onHand:item.available})) : [];
-  // A client may enter the inventory view even while the server refresh is pending.
-  const canViewInventory=currentKey==='connected';
+  customerStockMode=snapshot?.schema===3;
+  const role=snapshot?.managementRole||(snapshot?.master===true?'owner':null);
+  portalManagement=currentKey==='connected'&&['owner','admin','catalog'].includes(role)?role:null;
+  portalMaster=portalManagement==='owner';
+  stockBySku=new Map(stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.map(row=>[stockSku(row.sku),customerStockMode?row.status:(stockOnHand?row.onHand:row.available)]):[]);
+  inventoryItems=!customerStockMode&&stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.filter(item=>typeof item.sku==='string'&&Number.isSafeInteger(stockOnHand?item.onHand:item.available)).map(item=>({sku:stockSku(item.sku),quantity:stockOnHand?item.onHand:item.available})) : [];
+  // Inventario numérico solamente para el personal interno autorizado.
+  const canViewInventory=currentKey==='connected'&&!!portalManagement;
   for(const id of ['inventoryNav','inventoryMobile','catalogInventoryAction'])document.getElementById(id).classList.toggle('hidden',!canViewInventory);
-  const message=stockCutoff?inventoryItems.length+' modelos con existencia publicada · Corte SAP '+stockCutoff+'.':'El inventario está pendiente de actualización. Puedes volver a intentar.';
+  if(!canViewInventory&&!document.getElementById('view-inventory').classList.contains('hidden'))showView('catalog');
+  const message=canViewInventory&&stockCutoff?inventoryItems.length+' modelos con existencia interna · Corte SAP '+stockCutoff+'.':canViewInventory?'El inventario está pendiente de actualización.':'Solo el personal interno autorizado puede consultar cantidades.';
   document.getElementById('inventoryLoadMessage').textContent=message;
   document.getElementById('catalogInventoryMessage').textContent=message;
   const salePrices=new Map(stockCutoff?(snapshot.salePrices||[]).map(row=>[stockSku(row.sku),row.cents]):[]);
@@ -591,9 +604,6 @@ window.setPortalStock=function(snapshot){
   const photos=new Map(edits.filter(edit=>edit.photo_url).map(edit=>[edit.sku,edit.photo_url]));
   const photosChanged=photos.size!==masterPhotos.size||[...photos].some(([sku,url])=>masterPhotos.get(sku)!==url);
   masterPhotos=photos;
-  const role=snapshot?.managementRole||(snapshot?.master===true?'owner':null);
-  portalManagement=currentKey==='connected'&&['owner','admin','catalog'].includes(role)?role:null;
-  portalMaster=portalManagement==='owner';
   const panelName=portalMaster?'Panel maestro':portalManagement==='admin'?'Administración':'Precios y disponibilidad';
   for(const id of ['masterNav','masterMobile']){
     const button=document.getElementById(id);
@@ -736,8 +746,8 @@ function productCard(p){
  const price=clientPrice(p),regular=currentKey==='connected'?0:Number(p.map||p.convention||0),fav=favorites.includes(p.sku);
  const regularHtml=(regular&&price)?'<div class="priceOld">'+money(regular)+'</div>':'<div class="priceOld">&nbsp;</div>';
  const priceHtml=price?'<div class="priceNow">'+money(price)+'</div>':'<div class="noPrice">Precio por confirmar</div>';
- const stockHtml='<div class="inventoryProductStock'+(stockCutoff?'':' pending')+'" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</div>';
- const action=price&&availableOverride(p.sku)!==0?'<select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button>':'<button class="addBtn infoOnly" style="grid-column:1/-1" onclick="openProduct(\''+esc(p.sku)+'\')">Ver ficha</button>';
+ const stockHtml=!customerStockMode?'<div class="inventoryProductStock'+(stockCutoff?'':' pending')+'" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</div>':'';
+ const action=price&&customerAvailability(p.sku)!=='out'&&availableOverride(p.sku)!==0?'<select class="qty" id="qty-'+cid(p.sku)+'"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select><button class="addBtn" onclick="addToCart(\''+esc(p.sku)+'\')">Agregar</button>':'<button class="addBtn infoOnly" style="grid-column:1/-1" onclick="openProduct(\''+esc(p.sku)+'\')">Ver ficha</button>';
  return '<article class="productCard"><div class="productImage" onclick="openProduct(\''+esc(p.sku)+'\')"><span class="avail" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</span><button class="heart" onclick="event.stopPropagation();toggleFav(\''+esc(p.sku)+'\')">'+(fav?'♥':'♡')+'</button>'+productVisual(p)+'</div><div class="productBrand">'+esc(p.brand)+'</div><div class="productSku" onclick="openProduct(\''+esc(p.sku)+'\')">'+esc(p.sku)+'</div><div class="productDesc">'+esc(desc(p))+'</div><div class="catalogSourceBadge">'+esc(divisionLabel(p.division))+'</div>'+regularHtml+priceHtml+stockHtml+'<div class="cardActions">'+action+'</div></article>';
 }
 function renderDashboard(){
@@ -762,9 +772,9 @@ function renderInventory(){
   const table=document.getElementById('inventoryRows');
   const summary=document.getElementById('inventorySummary');
   if(!table||!summary)return;
-  if(currentKey!=='connected'){
-    summary.textContent='Inicia sesión con tu PIN autorizado para consultar el inventario.';
-    table.innerHTML='<tr><td colspan="5">El inventario no está disponible en la vista de demostración.</td></tr>';
+  if(currentKey!=='connected'||!portalManagement){
+    summary.textContent='Las cantidades de inventario son información privada de Gerencia.';
+    table.innerHTML='<tr><td colspan="5">Consulta la disponibilidad general en el catálogo de productos.</td></tr>';
     return;
   }
   if(!stockCutoff){
@@ -816,13 +826,14 @@ function renderDetail(){
  const price=clientPrice(p),regular=currentKey==='connected'?0:Number(p.map||p.convention||0);
  const specs=(p.specs&&p.specs.length?p.specs:[desc(p),"Producto distribuido por Lewar LogDistributors","Disponibilidad sujeta a confirmación","Garantía según marca y modelo"]).map(x=>'<li>'+esc(x)+'</li>').join("");
 
- const priceBlock=price?'<div class="reg">'+(regular?'Precio regular distribuidor: <s>'+money(regular)+'</s>':'')+'</div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" '+(availableOverride(p.sku)===0?'disabled':'')+' onclick="addDetailToCart()">Agregar al carrito</button></div>':'<div class="clientPrice">Precio para '+esc(CLIENTS[currentKey].name)+': <strong style="font-size:18px;color:#344054">Pendiente de asignar</strong></div><p class="lead">Confirma el precio con el equipo de Lewar.</p>';
+ const priceBlock=price?'<div class="reg">'+(regular?'Precio regular distribuidor: <s>'+money(regular)+'</s>':'')+'</div><div class="clientPrice">Su precio ('+esc(CLIENTS[currentKey].name)+'): <strong>'+money(price)+'</strong></div><div class="detailBuy"><div class="stepper"><button onclick="detailQty(-1)">−</button><span id="detailQty">1</span><button onclick="detailQty(1)">+</button></div><button class="primary" '+(customerAvailability(p.sku)==='out'||availableOverride(p.sku)===0?'disabled':'')+' onclick="addDetailToCart()">Agregar al carrito</button></div>':'<div class="clientPrice">Precio para '+esc(CLIENTS[currentKey].name)+': <strong style="font-size:18px;color:#344054">Pendiente de asignar</strong></div><p class="lead">Confirma el precio con el equipo de Lewar.</p>';
  document.getElementById("detailWrap").innerHTML='<div class="detail"><div class="detailMainImage">'+productVisual(p,"detail")+'</div><div class="detailInfo"><div class="productBrand">'+esc(p.brand)+'</div><h1>'+esc(p.sku)+'</h1><div class="detailSub">'+esc(desc(p))+'</div><div class="stock" data-stock-sku="'+esc(p.sku)+'" title="'+esc(stockTitle(p.sku))+'">'+esc(availabilityText(p))+'</div><div class="catalogSourceBadge">Fuente: '+esc(p.sourceCatalog||"Catálogo Lewar")+'</div><h3>Información del producto</h3><ul>'+specs+'</ul><div class="detailPriceBlock">'+priceBlock+'</div></div></div>';
 }
 function detailQty(d){const el=document.getElementById("detailQty");el.textContent=Math.max(1,Number(el.textContent)+d)}
 function addDetailToCart(){const q=Number(document.getElementById("detailQty").textContent)||1;if(!addQuantity(selectedSku,q))return;saveCart();renderCart();updateCartBubble();showView("cart")}
 function addToCart(sku){const q=Number(document.getElementById("qty-"+cid(sku))?.value)||1;if(!addQuantity(sku,q))return;saveCart();updateCartBubble()}
 function addQuantity(sku,q){
+ if(customerAvailability(sku)==='out'){alert('Este modelo está agotado.');return false;}
  const next=(cart[sku]||0)+q,available=availableOverride(sku);
  if(available!==undefined&&next>available){alert("Unidades disponibles de "+sku+": "+available);return false;}
  cart[sku]=next;return true;
@@ -837,7 +848,8 @@ function calculateOrderTotals(){
    const p=ALL_PRODUCTS.find(x=>x.sku===sku);
    if(!p||!Number.isSafeInteger(q)||q<1)throw new Error("Revisa los productos y las cantidades del carrito.");
    const available=availableOverride(sku);
-   if(available!==undefined&&q>available)throw new Error("Ajusta "+sku+" a "+available+" unidades disponibles.");
+   if(customerAvailability(sku)==='out')throw new Error('El modelo '+sku+' está agotado.');
+   if(available!==undefined&&q>available)throw new Error('Verifica la cantidad solicitada de '+sku+' con Lewar.');
    const unitPrice=clientPrice(p);
    if(!Number.isFinite(unitPrice)||unitPrice<=0)throw new Error("El producto "+sku+" requiere un precio válido antes de ordenar.");
    const unitCents=Math.round(unitPrice*100);
@@ -1083,6 +1095,7 @@ function saveAdminDrafts(){
 
 function showView(v,btn){
  if(v==="master"&&!portalManagement)return;
+ if(v==="inventory"&&!portalManagement)return showView("catalog");
  document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
  if(v==="master")window.LewarMaster?.open();
@@ -1105,12 +1118,13 @@ function enterAccountPortal(name){
  document.getElementById('catalogPilotNotice').hidden=false;
  CLIENTS.connected={user:'connected',name,level:'',term:'Consultar estado de cuenta',credit:0,balance:0,seller:'Equipo Lewar',factor:1};currentKey='connected';orders=[];
  document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');init();
- for(const id of ['inventoryNav','inventoryMobile','catalogInventoryAction'])document.getElementById(id).classList.remove('hidden');
+ // Se habilita el inventario numérico únicamente después de validar un rol interno.
+ for(const id of ['inventoryNav','inventoryMobile','catalogInventoryAction'])document.getElementById(id).classList.add('hidden');
  showView('account');refreshServerOrders();
 }
 const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
 </script>
-<script src="./account.js?v=20261111-inventory-visible"></script>
+<script src="./account.js?v=20261111-stock-privacy"></script>
 <script src="./master.js?v=20261111-orders-aging"></script>
 </body>
 </html>
