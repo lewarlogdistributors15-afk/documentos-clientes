@@ -186,8 +186,16 @@
   function renderExcelPreview(){
     excelButtons();
     if(!reviewChanges.length){
-      excelPreview.hidden=true;
-      excelPreview.innerHTML='';
+      if(reviewWarnings.length){
+        excelPreview.hidden=false;
+        excelPreview.innerHTML='<p><strong>Se encontraron precios que necesitan corrección.</strong> No se pueden publicar estos modelos hasta resolver las observaciones:</p>'+
+          '<ul style="padding-left:22px;line-height:1.65">'+
+          reviewWarnings.slice(0,30).map(w=>'<li>'+safe(w)+'</li>').join('')+
+          '</ul>'+(reviewWarnings.length>30?'<p>Y '+(reviewWarnings.length-30)+' observaciones adicionales.</p>':'');
+      }else{
+        excelPreview.hidden=true;
+        excelPreview.innerHTML='';
+      }
       return;
     }
     const karla=activeMode==='karla_promotions';
@@ -247,7 +255,10 @@
       if(draft&&Array.isArray(draft.changes)&&draft.changes.length>0){
         activeBatch=draft.id;
         reviewChanges=draft.changes;
-        reviewWarnings=Array.isArray(draft.warnings)?draft.warnings:[];
+        reviewWarnings=[...new Set([
+          ...(Array.isArray(draft.warnings)?draft.warnings:[]),
+          ...(Array.isArray(result.validationIssues)?result.validationIssues:[])
+        ])];
         activeMode='karla_promotions';
         validThrough=draft.valid_through;
         excelFile.value='';
@@ -257,13 +268,17 @@
           ' · comprobado '+shortDate(result.lastChecked)+
           '. Revisa los importes antes de presionar «Publicar cambios aprobados».');
       }else{
-        activeBatch=null;reviewChanges=[];reviewWarnings=[];
+        activeBatch=null;reviewChanges=[];
+        reviewWarnings=Array.isArray(result.validationIssues)?result.validationIssues:[];
         activeMode='karla_promotions';validThrough=null;
         excelMessage((verifyNow?'Revisión directa terminada. ':'')+
-          'No hay cambios pendientes para los modelos autorizados en «Precios PORTAL DE LEWAR». '+
+          'No hay cambios válidos pendientes de publicación en «Precios PORTAL DE LEWAR». '+
           (verifyNow?String(result.checkedRows||0)+' modelos revisados. ':'')+
-          (verifyNow&&result.warningsCount?' '+result.warningsCount+' observaciones requieren revisión.':'')+
-          ' Última revisión: '+shortDate(result.lastChecked)+'.');
+          (reviewWarnings.length?' ATENCIÓN: '+reviewWarnings.length+
+            ' errores detectados en la hoja. Consulta los modelos y la explicación debajo.':
+            (verifyNow&&result.warningsCount?' '+result.warningsCount+' observaciones requieren revisión.':''))+
+          ' Última revisión: '+shortDate(result.lastChecked)+'.',
+          reviewWarnings.length>0);
       }
       renderExcelPreview();
     }catch(error){
