@@ -260,7 +260,7 @@
         activeBatch=null;reviewChanges=[];reviewWarnings=[];
         activeMode='karla_promotions';validThrough=null;
         excelMessage((verifyNow?'Revisión directa terminada. ':'')+
-          'No hay cambios pendientes para los modelos autorizados en «Precios Especiales Clientes Lew». '+
+          'No hay cambios pendientes para los modelos autorizados en «Precios PORTAL DE LEWAR». '+
           (verifyNow?String(result.checkedRows||0)+' modelos revisados. ':'')+
           (verifyNow&&result.warningsCount?' '+result.warningsCount+' observaciones requieren revisión.':'')+
           ' Última revisión: '+shortDate(result.lastChecked)+'.');
