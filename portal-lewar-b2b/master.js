@@ -191,7 +191,7 @@
     const body=await response.json().catch(()=>({error:'No se recibió una respuesta válida.'}));
     if(!response.ok||!body.ok){
       if(response.status===401||response.status===403){
-        throw Error('El servidor rechazó la sesión de esta pestaña. Cierra sesión y vuelve a ingresar con el PIN de Karla. Si tienes varias pestañas abiertas, utiliza la que tenga el inicio de sesión más reciente.');
+        throw Error(body.error||'Tu sesión ya no está vigente. Vuelve a entrar con tu PIN autorizado.');
       }
       throw Error(body.error||'No se pudo completar la solicitud.');
     }
