@@ -903,7 +903,7 @@ async function placeOrder(){
  const customerConfirmationEmail=(document.getElementById('customerConfirmationEmail')?.value||'').trim().toLowerCase();
  const consent=!!document.getElementById('customerEmailConsent')?.checked;
  if(customerConfirmationEmail){
-   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerConfirmationEmail)){alert('Revisa el correo de confirmación.');return;}
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerConfirmationEmail)){alert('Revisa el correo de confirmación.');return;}
    if(!consent){alert('Confirma que la dirección de correo ingresada es correcta.');return;}
  }
  const items=entries.map(([sku,quantity])=>({sku,quantity}));
@@ -929,7 +929,7 @@ async function placeOrder(){
   const aging=result.agingSyncStatus==='synced'?'Quedó registrada como pendiente de facturar en Lewar AR Collections.':'La sincronización con el aging está pendiente; la orden quedó guardada.';
   const aviso=result.emailStatus==='sent'?'Aviso a los correos internos aceptado.':'Aviso interno no confirmado; requiere seguimiento.';
   const cliente=result.clientEmailStatus==='sent'?'Confirmación al cliente aceptada.':result.clientEmailStatus==='failed'?'Confirmación al cliente fallida.':'Sin confirmación al cliente solicitada.';
-  alert('Orden '+result.reference+' registrada.\\n\\n'+aging+'\\n'+aviso+'\\n'+cliente+'\\n\\nPDF disponible en Mis órdenes. No es una AR Invoice.');
+  alert('Orden '+result.reference+' registrada.\n\n'+aging+'\n'+aviso+'\n'+cliente+'\n\nPDF disponible en Mis órdenes. No es una AR Invoice.');
   refreshServerOrders();
  }catch(error){
   alert('No se confirmó el envío de esta orden: '+error.message+
