@@ -19,7 +19,7 @@
   }
   let token=get(SESSION)||'', data=null, pending=false, customerId=null, generation=0;
   function saveToken(value) {token=value;try{sessionStorage.setItem(SESSION,value);localStorage.removeItem(SESSION)}catch{}}
-  function clearToken() {window.setPortalStock?.(null);token='';data=null;customerId=null;generation++;try{sessionStorage.removeItem(SESSION);localStorage.removeItem(SESSION)}catch{}document.cookie=encodeURIComponent(SESSION)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure';}
+  function clearToken() {hasLoadedStock=false;window.setPortalStock?.(null);token='';data=null;customerId=null;generation++;try{sessionStorage.removeItem(SESSION);localStorage.removeItem(SESSION)}catch{}document.cookie=encodeURIComponent(SESSION)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure';}
   function status(text,error=false) {el('accountStatus').textContent=text;el('accountStatus').classList.toggle('accountError',error);}
   function clearFigures() {for(const id of ['accountBalance','accountOverdue','accountPayments','accountAging'])el(id).textContent='—';el('accountInvoices').innerHTML='';el('accountPaymentRows').innerHTML='';el('accountCustomer').textContent='';el('accountTables').hidden=true;el('accountStats').hidden=true;el('accountPrint').disabled=true;}
   async function rpc(name,body) {
@@ -40,20 +40,33 @@
     finally {pending=false}
     if(token)await refresh();
   }
-  let stockPending=false;
+  let stockPending=false,hasLoadedStock=false;
   async function refreshStock() {
     if(!token||document.hidden||stockPending)return;
     const currentToken=token;
     stockPending=true;
+    const refreshButton=el('inventoryRefresh');
+    if(refreshButton)refreshButton.disabled=true;
+    const message=el('inventoryLoadMessage');
+    if(message)message.textContent='Consultando inventario autorizado de Lewar…';
     try {
       const r=await fetch(URL+'/functions/v1/lewar-stock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:currentToken,deviceId:device()}),cache:'no-store',signal:AbortSignal.timeout(20000)});
       const stock=await r.json();
-      if(!r.ok||![1,2].includes(stock.schema)||!Array.isArray(stock.items))throw Error('Inventario no disponible.');
-      if(token===currentToken)window.setPortalStock?.(stock);
-    }catch{
-      if(token===currentToken)window.setPortalStock?.(null);
+      if(!r.ok||![1,2].includes(stock.schema)||!Array.isArray(stock.items))throw Error(stock.error||'Inventario no disponible.');
+      if(token===currentToken){
+        window.setPortalStock?.(stock);
+        hasLoadedStock=true;
+      }
+    }catch(error){
+      if(token===currentToken){
+        if(!hasLoadedStock)window.setPortalStock?.(null);
+        const notice=el('inventoryLoadMessage');
+        if(notice)notice.textContent=(hasLoadedStock?'No se pudo actualizar; se mantiene el último corte cargado. ':'No se pudo consultar el inventario. ')+
+          'Presiona «Actualizar existencias» para volver a intentar.';
+      }
     }finally{
       stockPending=false;
+      if(refreshButton)refreshButton.disabled=false;
       if(token&&token!==currentToken)refreshStock();
     }
   }
@@ -116,7 +129,7 @@
     await refreshStock();
     return result;
   }
-  window.LewarAccount={login,refresh,logout,master,uploadProductPhoto,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
+  window.LewarAccount={login,refresh,refreshStock,logout,master,uploadProductPhoto,select:async id=>{customerId=id||null;generation++;data=null;clearFigures();await refresh()},print:()=>{if(data?.linked){document.body.classList.add('printingAccount');window.print();document.body.classList.remove('printingAccount')}}};
   el('accountPin').addEventListener('keydown',e=>{if(e.key==='Enter')login()});el('portalPin').addEventListener('keydown',e=>{if(e.key==='Enter')login('portalPin')});
   function refreshVisible(){if(visible())refresh();refreshStock();}
   window.addEventListener('focus',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);setInterval(refreshVisible,60000);
