@@ -348,7 +348,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 </div>
             <div id="cartTotals" class="totals"></div>
           </div>
-          <p class="lead" style="margin-top:12px">El IVU de 11.5 % se calcula sobre el subtotal después del descuento por volumen.</p>
+          <p class="lead" style="margin-top:12px">El IVU de 11.5 % que aparece aquí es provisional. La tasa definitiva puede variar por cliente y producto y deberá validarse antes de emitir la AR Invoice.</p>
           <div class="cartBtns"><button class="secondary" onclick="showView('catalog')">Seguir comprando</button><button class="primary" id="sendOrderButton" onclick="placeOrder()">Enviar orden a Lewar</button></div>
         </div>
       </section>
@@ -895,7 +895,7 @@ async function placeOrder(){
  let totals;
  try{totals=calculateOrderTotals();}catch(error){alert(error.message);return;}
  const confirmation='CONFIRMAR SOLICITUD DE PEDIDO\n\nSubtotal: '+money(totals.subtotal)+
-   '\nDescuento: -'+money(totals.discount)+'\nIVU (11.5%): '+money(totals.ivu)+
+   '\nDescuento: -'+money(totals.discount)+'\nIVU estimado (11.5%): '+money(totals.ivu)+
    '\nTOTAL: '+money(totals.total)+
    '\n\nSe guardará como orden, no como AR Invoice emitida. Se avisará a Karla, Reynaldo, Valery, Jessica y Emmanuel. La orden queda pendiente de facturar; no crea una AR Invoice.';
  if(!confirm(confirmation))return;
