@@ -137,7 +137,7 @@
   const excelStatus=byId('masterExcelStatus');
   const excelPreview=byId('masterExcelPreview');
   const endpoint='https://aznoakixjklsxuwuyshw.supabase.co/functions/v1/lewar-master-publicar';
-  let activeBatch=null,reviewChanges=[],reviewWarnings=[],importPending=false;
+  let activeBatch=null,reviewChanges=[],reviewWarnings=[],importPending=false,activeMode='master',validThrough=null;
   const canPublish=()=>['owner','admin'].includes(role);
   const safe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   const moneyValue=cents=>cents==null?'Sin precio':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
@@ -171,22 +171,32 @@
       excelPreview.innerHTML='';
       return;
     }
+    const karla=activeMode==='karla_promotions';
     excelPreview.hidden=false;
-    excelPreview.innerHTML='<p><strong>'+reviewChanges.length+' cambios de precio listos para revisar.</strong> No publicados.</p>'+
-      '<div style="max-height:340px;overflow:auto"><table class="accountTable"><thead><tr>'+
-      '<th>Modelo</th><th>Precio actual</th><th>Precio aprobado Karla</th><th>Diferencia</th></tr></thead><tbody>'+
-      reviewChanges.slice(0,150).map(c=>
-        '<tr><td>'+safe(c.sku)+'</td><td>'+moneyValue(c.old_cents)+'</td>'+
-        '<td>'+moneyValue(c.new_cents)+'</td><td>'+
-        (c.old_cents==null?'Nuevo precio':moneyValue(c.new_cents-c.old_cents))+
-        '</td></tr>').join('')+'</tbody></table></div>'+
-      (reviewChanges.length>150?'<p>Se muestran los primeros 150 cambios.</p>':'')+
-      (reviewWarnings.length?'<p><strong>Observaciones:</strong> '+reviewWarnings.slice(0,8).map(safe).join(' · ')+
-      (reviewWarnings.length>8?' · y '+(reviewWarnings.length-8)+' adicionales':'')+'</p>':'');
+    let markup='<p><strong>'+reviewChanges.length+' cambios para revisar.</strong> Sin publicar.'+
+      (karla?' Promociones con vigencia hasta '+safe(validThrough)+'.':'')+'</p>'+
+      '<div style="max-height:380px;overflow:auto"><table class="accountTable"><thead><tr>'+
+      (karla?'<th>Modelo</th><th>Promoción anterior</th><th>Nuevo precio (1–2)</th><th>Nuevo precio (3+)</th><th>Vigencia</th>':
+        '<th>Modelo</th><th>Precio actual</th><th>Precio aprobado Karla</th><th>Diferencia</th>')+
+      '</tr></thead><tbody>';
+    markup+=reviewChanges.slice(0,150).map(c=>karla?
+      '<tr><td>'+safe(c.sku)+'</td><td>'+moneyValue(c.old_cents)+'</td>'+
+      '<td>'+moneyValue(c.new_cents)+'</td><td>'+(c.new_volume_cents==null?'Sin descuento adicional':moneyValue(c.new_volume_cents))+'</td>'+
+      '<td>'+safe(c.valid_through)+'</td></tr>':
+      '<tr><td>'+safe(c.sku)+'</td><td>'+moneyValue(c.old_cents)+'</td>'+
+      '<td>'+moneyValue(c.new_cents)+'</td><td>'+
+      (c.old_cents==null?'Nuevo precio':moneyValue(c.new_cents-c.old_cents))+'</td></tr>'
+    ).join('');
+    markup+='</tbody></table></div>';
+    if(reviewChanges.length>150)markup+='<p>Se muestran los primeros 150 cambios.</p>';
+    if(reviewWarnings.length)markup+='<p><strong>Modelos que no se publicarán:</strong> '+
+      reviewWarnings.slice(0,12).map(safe).join(' · ')+
+      (reviewWarnings.length>12?' · y '+(reviewWarnings.length-12)+' más':'')+'</p>';
+    excelPreview.innerHTML=markup;
   }
   excelFile.addEventListener('change',()=>{
-    activeBatch=null;reviewChanges=[];reviewWarnings=[];
-    excelMessage('Archivo seleccionado. Presiona «Revisar archivo maestro» antes de publicar.');
+    activeBatch=null;reviewChanges=[];reviewWarnings=[];activeMode='master';validThrough=null;
+    excelMessage('Archivo seleccionado. Presiona «Revisar tabla de Karla» antes de publicar.');
     renderExcelPreview();
   });
   reviewBtn.addEventListener('click',async()=>{
@@ -209,9 +219,14 @@
       activeBatch=result.batchId||null;
       reviewChanges=result.changes||[];
       reviewWarnings=result.warnings||[];
-      excelMessage(result.rowsChecked+' modelos revisados · '+result.approved+' aprobados · '+
-        reviewChanges.length+' precios diferentes · '+reviewWarnings.length+' alertas. '+
-        (activeBatch?'Confirma los cambios antes de publicar.':'No hay cambios aprobados para publicar.'));
+      activeMode=result.mode||'master';
+      validThrough=result.validThrough||null;
+      const karla=activeMode==='karla_promotions';
+      excelMessage(result.rowsChecked+' modelos revisados · '+reviewChanges.length+
+        (karla?' promociones listas para revisión · ':' precios aprobados diferentes · ')+
+        reviewWarnings.length+' alertas. '+
+        (karla?'Vigencia hasta '+validThrough+'. ':'')+
+        (activeBatch?'Verifica los importes y confirma antes de publicar.':'No hay cambios pendientes de publicación.'));
       renderExcelPreview();
     }catch(error){
       activeBatch=null;reviewChanges=[];
@@ -220,11 +235,20 @@
   });
   publishBtn.addEventListener('click',async()=>{
     if(!canPublish()||!activeBatch||!reviewChanges.length||importPending)return;
-    if(!confirm('PUBLICAR '+reviewChanges.length+' cambios de precio generales en el Portal General de Lewar?\n\nEsta acción modifica los precios visibles y quedará registrada. Los impuestos, inventarios y precios especiales por cliente NO se modificarán.'))return;
+    const karla=activeMode==='karla_promotions';
+    const warning=karla?
+      'PUBLICAR '+reviewChanges.length+' promociones de la tabla de Karla, vigentes hasta '+validThrough+
+      '?\n\nSe aplicarán los precios de 1–2 unidades y los precios desde 3 unidades por modelo. Al expirar se volverá al precio base publicado.'+
+      '\n\nNo se publican costos, cantidades internas, impuestos ni columnas particulares de clientes.':
+      'PUBLICAR '+reviewChanges.length+' cambios de precio generales en el Portal General de Lewar?'+
+      '\n\nLos impuestos, inventarios y precios especiales por cliente NO se modificarán.';
+    if(!confirm(warning))return;
     importPending=true;excelButtons();excelMessage('Publicando precios autorizados…');
     try{
       const result=await excelRpc({action:'publish',batchId:activeBatch,approveCount:reviewChanges.length});
-      excelMessage('Publicación completada: '+result.published+' precios actualizados. Los clientes verán los nuevos precios al actualizar el catálogo.');
+      excelMessage('Publicación completada: '+result.published+
+        (activeMode==='karla_promotions'?' promociones con vencimiento '+validThrough:' precios generales')+
+        '. Los clientes verán los precios nuevos al actualizar el catálogo.');
       activeBatch=null;reviewChanges=[];reviewWarnings=[];
       excelFile.value='';renderExcelPreview();
       window.alert('Cambios publicados correctamente. Se actualizará el portal para reflejar los nuevos precios.');
