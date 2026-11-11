@@ -456,19 +456,21 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             <h2 id="masterPublishTitle">Tabla maestra de Karla · Google Sheets</h2>
             <p class="lead">Karla trabaja directamente en la hoja compartida, con las mismas 20 pestañas y fórmulas. La detección de cambios se ejecuta cada hora, sin descargar ni subir el Excel. Solo se leen los modelos y precios de la pestaña <strong>«Precios Especiales Clientes Lew»</strong> (columnas D, K y L).</p>
             <p><a href="https://docs.google.com/spreadsheets/d/1D5lJbfPKWmUgfYGiI0T-jYXZT5UHzRVCdeSoio9_-7g/edit" target="_blank" rel="noopener" style="font-weight:700">Abrir la tabla maestra editable de Karla en Google Sheets</a></p>
-            <p class="lead"><strong>Estado:</strong> la revisión automática prepara los cambios sin publicarlos. La aprobación directa de los borradores desde este panel aún necesita completar su conexión con el servidor. Ningún precio se publica solo por editar una celda.</p>
-            <details style="margin:6px 0 14px"><summary style="cursor:pointer;font-weight:700;color:#0b62ab">Importación manual de respaldo (opcional)</summary>
-              <p class="lead">Si es necesario publicar inmediatamente antes de completar la conexión de aprobación automática, puedes usar el Excel como respaldo.</p>
-            <label for="masterExcelFile">Excel de Karla (.xlsx)</label>
-            <input id="masterExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-            <div style="display:flex;flex-wrap:wrap;gap:10px">
-              <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar tabla de Karla</button>
-              <button id="masterExcelPublish" type="button" class="primary" disabled>Publicar cambios</button>
+            <h3 style="font-size:16px;margin:4px 0 0">Borradores automáticos pendientes</h3>
+            <p class="lead">La revisión horaria compara los precios de Google Sheets con el portal y guarda las diferencias como borradores. Solamente Karla y los administradores pueden aprobarlas. <strong>Editar la hoja no publica precios.</strong></p>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <button id="masterDriveDraftRefresh" type="button" class="secondary">Consultar cambios de Google Sheets</button>
+              <button id="masterExcelPublish" type="button" class="primary" disabled>Publicar cambios aprobados</button>
             </div>
-            <p id="masterExcelStatus" class="accountStatus" role="status" aria-live="polite">Selecciona el archivo Excel actualizado por Karla.</p>
+            <p id="masterExcelStatus" class="accountStatus" role="status" aria-live="polite">Abre esta sección para consultar los borradores de Google Sheets.</p>
             <div id="masterExcelPreview" class="accountTableScroll" hidden></div>
-            <p class="lead">Solo se publican precios autorizados del catálogo B2B, con su fecha de vencimiento. Los costos internos, inventarios, impuestos y precios especiales exclusivos por cliente continúan protegidos.</p>
+            <details style="margin:8px 0 4px"><summary style="cursor:pointer;font-weight:700;color:#0b62ab">Importación manual de respaldo (opcional)</summary>
+              <p class="lead">Usa este método solamente si necesitas revisar un Excel sin esperar la próxima revisión automática. No es necesario para los cambios habituales de Karla.</p>
+              <label for="masterExcelFile">Excel de Karla (.xlsx)</label>
+              <input id="masterExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+              <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar Excel manualmente</button>
             </details>
+            <p class="lead">Solo se publican precios autorizados del catálogo B2B y se respeta su fecha de vencimiento. Los costos, cantidades de inventario, impuestos y precios exclusivos por cliente permanecen fuera de esta publicación.</p>
           </section>
         </div>
       </section>
@@ -1186,7 +1188,7 @@ setInterval(()=>{
 },60000);
 </script>
 <script src="./account.js?v=20261111-stock-privacy"></script>
-<script src="./master.js?v=20261111-november-promo-cleanlogin"></script>
+<script src="./master.js?v=20261111-drafts-connected"></script>
 </body>
 </html>
 
