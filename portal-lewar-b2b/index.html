@@ -585,7 +585,7 @@ window.setPortalStock=function(snapshot){
   stockBySku=new Map(stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.map(row=>[stockSku(row.sku),customerStockMode?row.status:(stockOnHand?row.onHand:row.available)]):[]);
   inventoryItems=!customerStockMode&&stockCutoff&&Array.isArray(snapshot?.items)?snapshot.items.filter(item=>typeof item.sku==='string'&&Number.isSafeInteger(stockOnHand?item.onHand:item.available)).map(item=>({sku:stockSku(item.sku),quantity:stockOnHand?item.onHand:item.available})) : [];
   // Inventario numérico solamente para el personal interno autorizado.
-  const canViewInventory=currentKey==='connected'&&!!portalManagement;
+  const canViewInventory=currentKey==='connected'&&['owner','admin'].includes(portalManagement);
   for(const id of ['inventoryNav','inventoryMobile','catalogInventoryAction'])document.getElementById(id).classList.toggle('hidden',!canViewInventory);
   if(!canViewInventory&&!document.getElementById('view-inventory').classList.contains('hidden'))showView('catalog');
   const message=canViewInventory&&stockCutoff?inventoryItems.length+' modelos con existencia interna · Corte SAP '+stockCutoff+'.':canViewInventory?'El inventario está pendiente de actualización.':'Solo el personal interno autorizado puede consultar cantidades.';
@@ -772,7 +772,7 @@ function renderInventory(){
   const table=document.getElementById('inventoryRows');
   const summary=document.getElementById('inventorySummary');
   if(!table||!summary)return;
-  if(currentKey!=='connected'||!portalManagement){
+  if(currentKey!=='connected'||!['owner','admin'].includes(portalManagement)){
     summary.textContent='Las cantidades de inventario son información privada de Gerencia.';
     table.innerHTML='<tr><td colspan="5">Consulta la disponibilidad general en el catálogo de productos.</td></tr>';
     return;
@@ -1095,7 +1095,7 @@ function saveAdminDrafts(){
 
 function showView(v,btn){
  if(v==="master"&&!portalManagement)return;
- if(v==="inventory"&&!portalManagement)return showView("catalog");
+ if(v==="inventory"&&!['owner','admin'].includes(portalManagement))return showView("catalog");
  document.querySelectorAll("main.content>section").forEach(s=>s.classList.add("hidden"));const el=document.getElementById("view-"+v);if(el)el.classList.remove("hidden");
  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));const active=btn||document.querySelector('.nav[data-view="'+v+'"]');if(active)active.classList.add("active");
  if(v==="master")window.LewarMaster?.open();
