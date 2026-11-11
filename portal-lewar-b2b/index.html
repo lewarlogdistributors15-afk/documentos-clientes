@@ -210,14 +210,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   </div>
   <div class="loginCardWrap">
     <div class="loginCard">
-      <h2>Iniciar sesión</h2><div class="pinEntry"><p>Clientes y personal de Lewar: ingresa tu PIN autorizado de <strong>6 dígitos</strong> para acceder a las funciones de tu cuenta.</p><div class="field"><label for="portalPin">PIN de acceso (clientes y personal)</label><input id="portalPin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" placeholder="6 dígitos" aria-describedby="portalPinHelp"></div><p id="portalPinHelp" style="font-size:12px;color:#667085;margin:0 0 12px">Para administrar precios o disponibilidad, utiliza tu PIN de personal; no uses el acceso de demostración.</p><button class="primary loginBtn" onclick="LewarAccount.login('portalPin')">Entrar al portal</button><p id="portalPinStatus" role="status" aria-live="polite" style="font-size:13px;color:#b42318"></p></div><details class="pilotAccess"><summary>Vista previa del catálogo y administración</summary>
-      <div class="sub">Accede a tu cuenta mayorista de Lewar.</div>
-      <div class="field"><label>Usuario o correo</label><input id="loginUser" value="muebleriala15" autocomplete="username"></div>
-      <div class="field"><label>Contraseña</label><input id="loginPass" type="password" value="LEWAR2026" autocomplete="current-password"></div>
-      <div class="loginMeta"><label><input type="checkbox" checked> Recordarme</label><a href="#" onclick="return forgot()">¿Olvidaste tu contraseña?</a></div>
-      <button class="primary loginBtn" onclick="login()">Entrar</button>
-      <div class="demoHint"><b>Acceso piloto</b> · Usa <b>muebleriala15</b>, <b>ahorromuebles</b>, <b>casamuebles</b>, <b>clientecod</b> o <b>admin</b>. Contraseña: <b>LEWAR2026</b>. Los precios son demostrativos y no representan cotizaciones vigentes.</div>
-      </details><div class="loginBrandPanel">
+      <h2>Iniciar sesión</h2><div class="pinEntry"><p>Clientes y personal de Lewar: ingresa tu PIN autorizado de <strong>6 dígitos</strong> para acceder a las funciones de tu cuenta.</p><div class="field"><label for="portalPin">PIN de acceso (clientes y personal)</label><input id="portalPin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" placeholder="6 dígitos" aria-describedby="portalPinHelp"></div><p id="portalPinHelp" style="font-size:12px;color:#667085;margin:0 0 12px">El acceso se realiza únicamente con el PIN autorizado. Si necesitas restablecerlo, solicita apoyo al equipo de Lewar.</p><button class="primary loginBtn" onclick="LewarAccount.login('portalPin')">Entrar al portal</button><p id="portalPinStatus" role="status" aria-live="polite" style="font-size:13px;color:#b42318"></p></div><div class="loginBrandPanel">
         <div class="loginBrandTitle">Nuestras marcas</div>
         <div class="loginBrandGrid">
           <div class="brandTile"><span class="brandMark brand-whirlpool">Whirlpool</span></div>
@@ -724,15 +717,7 @@ function setDivision(d,btn){
   renderCatalog();
 }
 
-function login(){
- const user=document.getElementById("loginUser").value.trim().toLowerCase();
- const pass=document.getElementById("loginPass").value;
- if(pass!=="LEWAR2026"||!USERMAP[user]){alert("Usuario o contraseña demo incorrectos.");return}
- currentKey=USERMAP[user];sessionStorage.setItem("lewarUser",currentKey);
- document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()
-}
 function logout(){window.LewarAccount?.logout();sessionStorage.removeItem("lewarUser");document.getElementById("app").classList.add("hidden");document.getElementById("loginScreen").classList.remove("hidden")}
-function forgot(){alert("En producción, aquí se conectará el restablecimiento seguro de contraseña.");return false}
 
 function init(){
  const c=CLIENTS[currentKey];
@@ -1142,10 +1127,11 @@ function enterAccountPortal(name){
  for(const id of ['inventoryNav','inventoryMobile','catalogInventoryAction'])document.getElementById(id).classList.add('hidden');
  showView('account');refreshServerOrders();
 }
-const saved=sessionStorage.getItem("lewarUser");if(saved&&CLIENTS[saved]){currentKey=saved;document.getElementById("loginScreen").classList.add("hidden");document.getElementById("app").classList.remove("hidden");init()}
+// El acceso de demostración dejó de estar habilitado; solo se acepta una sesión validada por PIN.
+try{sessionStorage.removeItem("lewarUser");}catch{}
 </script>
 <script src="./account.js?v=20261111-stock-privacy"></script>
-<script src="./master.js?v=20261111-karla-workbook"></script>
+<script src="./master.js?v=20261111-november-promo-cleanlogin"></script>
 </body>
 </html>
 
