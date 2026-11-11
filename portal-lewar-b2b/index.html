@@ -453,11 +453,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   <div id="masterOrdersList" style="overflow-x:auto"></div>
 </section>
 <section id="masterPublishPanel" class="masterCard hidden" aria-labelledby="masterPublishTitle" style="grid-column:1/-1">
-            <h2 id="masterPublishTitle">Tabla de Karla · Revisar y publicar precios</h2>
-            <p class="lead">Este panel acepta directamente el archivo original de Karla, conservando sus 20 pestañas. Revisa la hoja <strong>«Precios Especiales Clientes Lew»</strong>: columna K (1–2 unidades), columna L (3 o más) y fecha de vigencia. Las hojas de costos y el inventario interno <strong>no se publican</strong>.</p>
-            <p><a href="https://docs.google.com/spreadsheets/d/1FXNyHZ1mWHHhWWrDbV0Vo9ClY6MCBfk5/edit" target="_blank" rel="noopener" style="font-weight:700">Abrir la tabla original de Karla en Drive</a></p>
-            <p class="lead">Después de editarla en Drive, usa Archivo → Descargar → Microsoft Excel (.xlsx), selecciónala aquí y revisa los cambios antes de publicarlos. No se crea ni mantiene un segundo archivo maestro.</p>
-            <label for="masterExcelFile">Excel de Karla actualizado (.xlsx)</label>
+            <h2 id="masterPublishTitle">Tabla maestra de Karla · Google Sheets</h2>
+            <p class="lead">Karla trabaja directamente en la hoja compartida, con las mismas 20 pestañas y fórmulas. La detección de cambios se ejecuta cada hora, sin descargar ni subir el Excel. Solo se leen los modelos y precios de la pestaña <strong>«Precios Especiales Clientes Lew»</strong> (columnas D, K y L).</p>
+            <p><a href="https://docs.google.com/spreadsheets/d/1D5lJbfPKWmUgfYGiI0T-jYXZT5UHzRVCdeSoio9_-7g/edit" target="_blank" rel="noopener" style="font-weight:700">Abrir la tabla maestra editable de Karla en Google Sheets</a></p>
+            <p class="lead"><strong>Estado:</strong> la revisión automática prepara los cambios sin publicarlos. La aprobación directa de los borradores desde este panel aún necesita completar su conexión con el servidor. Ningún precio se publica solo por editar una celda.</p>
+            <details style="margin:6px 0 14px"><summary style="cursor:pointer;font-weight:700;color:#0b62ab">Importación manual de respaldo (opcional)</summary>
+              <p class="lead">Si es necesario publicar inmediatamente antes de completar la conexión de aprobación automática, puedes usar el Excel como respaldo.</p>
+            <label for="masterExcelFile">Excel de Karla (.xlsx)</label>
             <input id="masterExcelFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
             <div style="display:flex;flex-wrap:wrap;gap:10px">
               <button id="masterExcelReview" type="button" class="secondary" disabled>Revisar tabla de Karla</button>
@@ -465,14 +467,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
             </div>
             <p id="masterExcelStatus" class="accountStatus" role="status" aria-live="polite">Selecciona el archivo Excel actualizado por Karla.</p>
             <div id="masterExcelPreview" class="accountTableScroll" hidden></div>
-            <p class="lead">Solo se publican precios autorizados del catálogo B2B. Las promociones expiran en la fecha que aparece en el Excel y el volumen aplica desde 3 unidades del mismo modelo. Los precios especiales individuales, impuestos, inventario y costos siguen protegidos y requieren validación independiente.</p>
+            <p class="lead">Solo se publican precios autorizados del catálogo B2B, con su fecha de vencimiento. Los costos internos, inventarios, impuestos y precios especiales exclusivos por cliente continúan protegidos.</p>
+            </details>
           </section>
         </div>
       </section>
       <section id="view-admin" class="hidden">
         <div class="adminIntro">
           <div><h1>Precios por cliente</h1><div class="lead" style="margin:4px 0 0">Editor rápido para revisar y preparar cambios. La base maestra oficial permanece en Google Drive.</div></div>
-          <a class="primary" style="text-decoration:none" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1FXNyHZ1mWHHhWWrDbV0Vo9ClY6MCBfk5/edit">Abrir tabla de Karla ↗</a>
+          <a class="primary" style="text-decoration:none" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1D5lJbfPKWmUgfYGiI0T-jYXZT5UHzRVCdeSoio9_-7g/edit">Abrir tabla de Karla ↗</a>
         </div>
         <div class="adminLayout">
           <div class="adminSide">
