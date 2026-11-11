@@ -237,10 +237,74 @@
     if(!canPublish()){activeBatch=null;reviewChanges=[];reviewWarnings=[];renderExcelPreview();}
     excelButtons();
   }
+
+  // Listado administrativo de pedidos pendientes de AR Invoice.
+  const ordersPanel=byId('masterOrdersPanel');
+  const ordersStatus=byId('masterOrdersStatus');
+  const ordersList=byId('masterOrdersList');
+  const ordersRefresh=byId('masterOrdersRefresh');
+  let ordersBusy=false;
+  const mayViewOrders=()=>['owner','admin','catalog'].includes(role);
+  const orderMoney=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format((Number(cents)||0)/100);
+  function orderStatusLine(message,error=false){
+    ordersStatus.textContent=message;
+    ordersStatus.classList.toggle('accountError',error);
+  }
+  async function loadOrders(){
+    if(!mayViewOrders()||ordersBusy)return;
+    ordersBusy=true;ordersRefresh.disabled=true;
+    orderStatusLine('Consultando las órdenes registradas…');
+    try{
+      if(typeof window.lewarOrderApi!=='function')throw Error('Servicio de órdenes no disponible.');
+      const payload=await window.lewarOrderApi('staffList');
+      if(!mayViewOrders())return;
+      const list=Array.isArray(payload.orders)?payload.orders:[];
+      const outstanding=list.filter(item=>item.agingSyncStatus!=='synced').length;
+      orderStatusLine(list.length+' solicitudes recientes · '+outstanding+
+        ' con sincronización de aging pendiente · Todas requieren factura AR validada.');
+      ordersList.innerHTML=list.length?
+        '<table class="orderTable" style="min-width:850px"><thead><tr>'+
+        '<th>Referencia</th><th>Cliente</th><th>Fecha</th><th>Total previsto</th>'+
+        '<th>Seguimiento aging</th><th>Notificación</th><th>PDF</th></tr></thead><tbody>'+
+        list.map(item=>{
+          const date=new Date(item.createdAt).toLocaleDateString('es-PR',{timeZone:'America/Puerto_Rico'});
+          const aging=item.agingSyncStatus==='synced'?'En aging · pendiente de AR':'Pendiente de sincronizar';
+          const email=item.emailStatus==='sent'?'Aviso interno aceptado':'Aviso interno sin confirmar';
+          const customer=item.clientEmailStatus==='sent'?' · Copia cliente aceptada':item.clientEmailStatus==='failed'?' · Copia cliente fallida':'';
+          return '<tr><td><b>'+safe(item.reference)+'</b></td>'+
+            '<td>'+safe(item.customerName)+(item.customerCode?' <small>'+safe(item.customerCode)+'</small>':'')+'</td>'+
+            '<td>'+safe(date)+'</td><td><b>'+orderMoney(item.totalCents)+'</b></td>'+
+            '<td>'+safe(aging)+'</td><td>'+safe(email+customer)+'</td>'+
+            '<td><button class="pdfBtn" type="button" data-order-id="'+safe(item.id)+'">Descargar PDF</button></td></tr>';
+        }).join('')+'</tbody></table>':
+        '<p class="lead">Aún no se han recibido solicitudes reales desde el Portal General.</p>';
+    }catch(error){orderStatusLine('No fue posible consultar las órdenes: '+error.message,true);}
+    finally{ordersBusy=false;ordersRefresh.disabled=false;}
+  }
+  ordersRefresh.addEventListener('click',loadOrders);
+  ordersList.addEventListener('click',async event=>{
+    const button=event.target.closest('[data-order-id]');
+    if(!button||!mayViewOrders())return;
+    button.disabled=true;
+    try{
+      const result=await window.lewarOrderApi('staffPdf',{orderId:button.dataset.orderId});
+      window.lewarDownloadB64PDF(result.pdfBase64,result.reference+'.pdf');
+    }catch(error){orderStatusLine('No se pudo descargar el PDF: '+error.message,true);}
+    finally{button.disabled=false;}
+  });
+  function orderPermissions(){
+    ordersPanel.classList.toggle('hidden',!mayViewOrders());
+    if(!mayViewOrders())ordersList.replaceChildren();
+  }
   const originalPermissions=permissions;
   function combinedPermissions(next){
     originalPermissions(next);
     setPublishPermission();
+    orderPermissions();
   }
-  window.LewarMaster={open,permissions:combinedPermissions};
+  async function openCombined(){
+    await open();
+    if(mayViewOrders())loadOrders();
+  }
+  window.LewarMaster={open:openCombined,permissions:combinedPermissions};
 })();
