@@ -64,7 +64,7 @@ function doPost(e) {
     }
 
     const sheet = SpreadsheetApp.openById(LEWAR_SOURCE_SPREADSHEET_ID)
-      .getSheetByName(LEWAR_PRICE_TAB);
+      .getSheets().find(tab => tab.getSheetId() === 791736842);
     if (!sheet) throw new Error('No se encontró la pestaña autorizada');
     const validThrough = parseExpiry_(sheet.getRange('A1').getDisplayValue());
     const skus = sheet.getRange('D4:D100').getDisplayValues();
