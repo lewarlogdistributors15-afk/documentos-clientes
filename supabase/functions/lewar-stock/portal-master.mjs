@@ -43,7 +43,7 @@ export async function masterAction(rpc,json,access,body){
   const customers='lewar_b2b_customer_edits';
   const choices=role==='catalog'?[]:Array.isArray(access.customers)?access.customers:[];
   if(body.action==='masterRead'){
-    const fields=role==='owner'?'sku,sale_cents,available_qty,photo_url':'sku,sale_cents,available_qty';
+    const fields=role==='owner'?'sku,sale_cents,available_qty,photo_url':role==='admin'?'sku,sale_cents,available_qty':'sku,sale_cents';
     const [productEdits,customerEdits]=await Promise.all([
       read(rpc,products+'?select='+fields+'&limit=1000'),
       role==='catalog'?[]:read(rpc,customers+'?select=customer_id,display_name,contact_email&limit=1000'),
@@ -86,6 +86,14 @@ export async function portalCustomization(rpc,actor){
   const products=read(rpc,'lewar_b2b_product_edits?select=sku,sale_cents,available_qty,photo_url&limit=1000');
   const role=managementRole(rpc,actor);
   const profile=actor.type==='client'?read(rpc,'lewar_b2b_customer_edits?'+new URLSearchParams({customer_id:'eq.'+actor.id,select:'display_name',limit:'1'})):Promise.resolve([]);
-  const [productEdits,managementRoleName,[customer]]=await Promise.all([products,role,profile]);
-  return {productEdits:productEdits.map(({sku,sale_cents,available_qty,photo_url})=>({sku,sale_cents,available_qty,photo_url})),master:managementRoleName==='owner',...(managementRoleName?{managementRole:managementRoleName}:{}),customerDisplayName:customer?.display_name??null};
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Puerto_Rico',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+  const today=parts.year+'-'+parts.month+'-'+parts.day;
+  const activePromos=read(rpc,'lewar_b2b_promo_offers?'+new URLSearchParams({
+    valid_through:'gte.'+today,select:'sku,price_cents,volume_cents,volume_min_qty,valid_through',limit:'1000'
+  }));
+  const [productEdits,managementRoleName,[customer],promoRules]=await Promise.all([products,role,profile,activePromos]);
+  return {productEdits:productEdits.map(({sku,sale_cents,available_qty,photo_url})=>({sku,sale_cents,available_qty,photo_url})),
+    promoRules:promoRules.map(({sku,price_cents,volume_cents,volume_min_qty,valid_through})=>({sku,price_cents,volume_cents,volume_min_qty,valid_through})),
+    master:managementRoleName==='owner',...(managementRoleName?{managementRole:managementRoleName}:{}),
+    customerDisplayName:customer?.display_name??null};
 }

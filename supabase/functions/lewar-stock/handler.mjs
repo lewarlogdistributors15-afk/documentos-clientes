@@ -1,6 +1,7 @@
 import {masterAction,portalCustomization} from './portal-master.mjs';
 import {replaceProductPhoto} from './product-photo.mjs';
 const PORTAL_ORIGIN = 'https://lewarlogdistributors15-afk.github.io';
+const ALLOWED_ORIGINS = new Set([PORTAL_ORIGIN, 'https://www.lewardistributors.com']);
 const MAX_ITEMS = 10000;
 const isoDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 const validSku = value => typeof value === 'string' && /^[\p{L}\p{N}][\p{L}\p{N}._ /+()"'-]{0,79}$/u.test(value);
@@ -44,10 +45,10 @@ function snapshot(row, internal) {
 export function makeStockHandler({url, serviceKey, request = fetch}) {
   return async req => {
     const origin = req.headers.get('Origin');
-    const cors = origin === PORTAL_ORIGIN ? {'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'authorization, content-type, x-lewar-photo-sku, x-lewar-device'} : {};
+    const cors = ALLOWED_ORIGINS.has(origin) ? {'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'authorization, content-type, x-lewar-photo-sku, x-lewar-device'} : {};
     const headers = {'Cache-Control':'private, no-store', 'Content-Type':'application/json', 'Vary':'Origin', ...cors};
     const json = (value, status=200) => new Response(JSON.stringify(value),{status,headers});
-    if (origin && origin !== PORTAL_ORIGIN) return json({error:'Origen no permitido.'},403);
+    if (origin && !ALLOWED_ORIGINS.has(origin)) return json({error:'Origen no permitido.'},403);
     if (req.method === 'OPTIONS') return new Response(null,{status:204,headers});
     if (req.method !== 'POST') return json({error:'Método no permitido.'},405);
     const key = req.headers.get('X-Lewar-Stock-Key');
@@ -81,7 +82,11 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
         if (!auth.ok) throw Error('auth');
         const access = await auth.json();
         if (!access.ok) return json({error:'Sesión inválida o vencida.'},401);
-        if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role)) return json({error:'Acceso denegado.'},403);
+        const sellerCatalogRead = access.actor?.type === 'staff' && access.actor.role === 'seller' &&
+          photoSku === null && !body.action;
+        if (access.actor?.type !== 'client' && !['admin','billing'].includes(access.actor?.role) && !sellerCatalogRead) {
+          return json({error:'Acceso denegado.'},403);
+        }
         if(photoSku!==null)return await replaceProductPhoto({req,sku,actor:access.actor,rpc,json,url,storage});
         if(body.action)return await masterAction(rpc,json,access,body);
         actor=access.actor;
@@ -92,6 +97,22 @@ export function makeStockHandler({url, serviceKey, request = fetch}) {
       const [row] = await response.json();
       const data=snapshot(row,key!==null);
       if(actor)Object.assign(data,await portalCustomization(rpc,actor).catch(()=>({})));
+      // El inventario numérico es exclusivamente interno. A cuentas cliente
+      // solo se envía el estado calculado; nunca cantidades ni ajustes de stock.
+      if(actor && !['owner','admin'].includes(data.managementRole)){
+        const overrides=new Map((data.productEdits||[])
+          .filter(edit=>Number.isSafeInteger(edit.available_qty)&&edit.available_qty>=0)
+          .map(edit=>[String(edit.sku).trim().toUpperCase(),edit.available_qty]));
+        data.items=data.items.map(item=>{
+          const actual=overrides.get(String(item.sku).trim().toUpperCase());
+          const quantity=actual===undefined?(item.onHand??item.available):actual;
+          return {sku:item.sku,status:quantity===0?'out':quantity<5?'low':'available'};
+        });
+        data.schema=3;
+        data.productEdits=(data.productEdits||[]).map(({sku,sale_cents,photo_url})=>({
+          sku,sale_cents,photo_url
+        }));
+      }
       return json(data);
     } catch {
       return json({error:photoSku!==null?'No se pudo guardar la foto. Intenta nuevamente.':'No se pudo consultar el inventario de Lewar.'},503);

@@ -7,7 +7,7 @@ const key='ab'.repeat(32);
 const keyHash=createHash('sha256').update(key).digest('hex');
 const origin='https://lewarlogdistributors15-afk.github.io';
 const fixture={as_of:'2026-11-09',items:[{sku:'MODEL-1',available:0,cost:12000},{sku:'MODEL-2',available:12}]};
-function setup(row=fixture){
+function setup(row=fixture, promoRules=[]){
   const calls=[];
   const handler=makeStockHandler({url:'https://supabase.example',serviceKey:'fixture-service-key',
     request:async(url,init)=>{
@@ -15,23 +15,27 @@ function setup(row=fixture){
       calls.push(url);
       if(url.includes('portal_access_bootstrap')){
         const token=JSON.parse(init.body).p_session_token;
+        if(token==='s'.repeat(32))return Response.json({ok:true,actor:{type:'staff',role:'seller',id:'seller-id'}});
         return Response.json(token==='c'.repeat(32)?{ok:true,actor:{type:'client'}}:{ok:false});
       }
+      if(url.includes('lewar_b2b_promo_offers'))return Response.json(promoRules);
       if(url.includes('lewar_b2b_'))return Response.json([]);
       return Response.json([url.endsWith('key_hash')?{key_hash:keyHash}:row]);
     }});
   return {handler,calls};
 }
-const client=token=>new Request('https://stock.example/',{method:'POST',headers:{Origin:origin},body:JSON.stringify({sessionToken:token,deviceId:'test-device'})});
+const client=(token,fields={})=>new Request('https://stock.example/',{method:'POST',headers:{Origin:origin},body:JSON.stringify({...fields,sessionToken:token,deviceId:'test-device'})});
 const erp=value=>new Request('https://stock.example/',{method:'POST',headers:{'X-Lewar-Stock-Key':value}});
-test('portal PIN and ERP key see the same stock and zero remains zero',async()=>{
+test('portal PIN shows availability status and the ERP retains exact stock',async()=>{
   const {handler}=setup();
   const b2b=await handler(client('c'.repeat(32))),internal=await handler(erp(key));
   assert.equal(b2b.status,200);
   assert.equal(b2b.headers.get('Access-Control-Allow-Origin'),origin);
   assert.equal(internal.status,200);
   const expected={schema:1,asOf:'2026-11-09',items:[{sku:'MODEL-1',available:0},{sku:'MODEL-2',available:12}]};
-  assert.deepEqual(await b2b.json(),{...expected,productEdits:[],master:false,customerDisplayName:null});
+  assert.deepEqual(await b2b.json(),{schema:3,asOf:expected.asOf,
+    items:[{sku:'MODEL-1',status:'out'},{sku:'MODEL-2',status:'available'}],
+    productEdits:[],promoRules:[],master:false,customerDisplayName:null});
   assert.deepEqual(await internal.json(),expected);
 });
 test('unauthorized requests cannot read snapshot and writes are rejected',async()=>{
@@ -52,7 +56,7 @@ test('SAP on-hand stock stays distinct from availability and only catalog SKUs r
     {sku:'DETERGENTE ENSUEÑO',onHand:164,portal:false}
   ]});
   const b2b=await handler(client('c'.repeat(32))),internal=await handler(erp(key));
-  assert.deepEqual(await b2b.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',onHand:11}],productEdits:[],master:false,customerDisplayName:null});
+  assert.deepEqual(await b2b.json(),{schema:3,asOf:'2026-11-10',items:[{sku:'AC8820 (110) F',status:'available'}],productEdits:[],promoRules:[],master:false,customerDisplayName:null});
   assert.equal((await internal.json()).items.length,2);
 });
 test('SAP price columns are returned only to the ERP, including items without stock',async()=>{
@@ -70,8 +74,31 @@ test('the authenticated catalog receives sale prices without stock or internal c
   const {handler,calls}=setup({as_of:'2026-11-10',items:[{sku:'MODEL-1',onHand:4,portal:true}],
     portal_sale_items:sales});
   const result=await handler(client('c'.repeat(32)));
-  assert.deepEqual(await result.json(),{schema:2,asOf:'2026-11-10',items:[{sku:'MODEL-1',onHand:4}],salePrices:[{sku:'MODEL-NO-STOCK',cents:18995}],productEdits:[],master:false,customerDisplayName:null});
+  assert.deepEqual(await result.json(),{schema:3,asOf:'2026-11-10',items:[{sku:'MODEL-1',status:'low'}],salePrices:[{sku:'MODEL-NO-STOCK',cents:18995}],productEdits:[],promoRules:[],master:false,customerDisplayName:null});
   assert.ok(calls.some(url=>url.endsWith('as_of,items,portal_sale_items')));
+  assert.ok(calls.every(url=>!url.includes('price_items')));
+});
+test('seller and customer sessions receive the same sale prices and promotions',async()=>{
+  const promo={sku:'MODEL-1',price_cents:37000,volume_cents:36500,volume_min_qty:3,valid_through:'2026-11-30'};
+  const {handler,calls}=setup({...fixture,portal_sale_items:[{sku:'MODEL-1',cents:40000,cost:10000}]},[promo]);
+  const customer=await handler(client('c'.repeat(32)));
+  const seller=await handler(client('s'.repeat(32)));
+  assert.equal(customer.status,200);
+  assert.equal(seller.status,200);
+  const sellerCatalog=await seller.json();
+  assert.deepEqual(sellerCatalog,await customer.json());
+  assert.deepEqual(sellerCatalog.salePrices,[{sku:'MODEL-1',cents:40000}]);
+  assert.deepEqual(sellerCatalog.promoRules,[promo]);
+  assert.equal(sellerCatalog.schema,3);
+  assert.equal(sellerCatalog.prices,undefined);
+  assert.equal(sellerCatalog.managementRole,undefined);
+
+  for(const action of ['masterRead','masterProduct','masterCustomer']){
+    assert.equal((await handler(client('s'.repeat(32),{action}))).status,403);
+  }
+  const sellerPhoto=new Request('https://stock.example/',{method:'POST',
+    headers:{Origin:origin,Authorization:'Bearer '+'s'.repeat(32),'X-Lewar-Photo-Sku':'MODEL-1','X-Lewar-Device':'test-device'}});
+  assert.equal((await handler(sellerPhoto)).status,403);
   assert.ok(calls.every(url=>!url.includes('price_items')));
 });
 test('owner, portal administrators and catalog editors have distinct write permissions',async()=>{
