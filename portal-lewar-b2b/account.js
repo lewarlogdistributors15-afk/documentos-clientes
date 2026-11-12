@@ -1,5 +1,14 @@
 (function () {
   'use strict';
+  if (window.location.protocol === 'http:' &&
+      ['lewardistributors.com', 'www.lewardistributors.com'].includes(window.location.hostname)) {
+    const secureUrl = new window.URL(window.location.href);
+    secureUrl.protocol = 'https:';
+    secureUrl.hostname = 'www.lewardistributors.com';
+    secureUrl.port = '';
+    window.location.replace(secureUrl.href);
+    return;
+  }
   const URL = 'https://aznoakixjklsxuwuyshw.supabase.co';
   const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6bm9ha2l4amtsc3h1d3V5c2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3OTgxNjIsImV4cCI6MjEwNjM3NDE2Mn0.yFIUmArDTliai9JhLtVtxGdGU5Y6U6bVZGYzJEFHe14';
   const SESSION = 'lewar-client-session-v1', DEVICE = 'lewar-client-device-v1';
@@ -78,7 +87,23 @@
     try {
       const r=await fetch(URL+'/functions/v1/portal-account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionToken:token,deviceId:device(),customerId}),cache:'no-store',signal:AbortSignal.timeout(25000)});
       const value=await r.json();if(version!==generation||usedToken!==token)return;
-      if(!r.ok){if(r.status===401||r.status===403){clearToken();clearFigures();el('accountGate').hidden=false;el('accountLogout').hidden=true;el('accountCustomerSelect').hidden=true;status(value.error||'Sesión inválida o vencida.',true);}throw Error(value.error||'No se pudo actualizar.');}
+      if(!r.ok){
+        if(r.status===401){
+          clearToken();
+          clearFigures();
+          el('accountGate').hidden=false;
+          el('accountLogout').hidden=true;
+          el('accountCustomerSelect').hidden=true;
+          status(value.error||'Sesión inválida o vencida.',true);
+          return;
+        }
+        if(r.status===403){
+          el('accountGate').hidden=true;
+          el('accountLogout').hidden=false;
+          el('accountCustomerSelect').hidden=true;
+        }
+        throw Error(value.error||'No se pudo actualizar.');
+      }
       el('accountGate').hidden=true;el('accountLogout').hidden=false;
       if(value.selectCustomer){clearFigures();const select=el('accountCustomerSelect');select.innerHTML='<option value="">Selecciona un cliente</option>'+value.customers.map(c=>'<option value="'+escape(c.id)+'">'+escape(c.name)+'</option>').join('');select.hidden=false;status('Selecciona el cliente cuyo estado de cuenta deseas consultar.');return;}
       data=value;render();
